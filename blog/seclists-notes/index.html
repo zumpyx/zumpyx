@@ -1,0 +1,184 @@
+<!DOCTYPE html><html lang="zh-CN" data-astro-cid-sgg5joot><head><!-- Global Metadata --><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="icon" type="image/png" href="/favicon.png"><link rel="icon" href="/favicon.ico" sizes="any"><link rel="apple-touch-icon" href="/apple-touch-icon.png"><link rel="sitemap" href="/sitemap-index.xml"><link rel="alternate" type="application/rss+xml" title="Zumpyx's Blog" href="https://blog.zumpyx.com/rss.xml"><meta name="generator" content="Astro v7.1.0"><meta name="color-scheme" content="light dark"><meta name="theme-color" content="#0b0d11" media="(prefers-color-scheme: dark)"><meta name="theme-color" content="#f4f5f7" media="(prefers-color-scheme: light)"><script>
+	(() => {
+		try {
+			const t = localStorage.getItem('theme');
+			if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t);
+			else document.documentElement.removeAttribute('data-theme');
+		} catch {}
+	})();
+</script><style>@font-face{font-family:Atkinson-c7f4c4e8b285552f;src:url("/_astro/fonts/89758defcfa85239.woff") format("woff");font-display:swap;font-weight:400;font-style:normal;}@font-face{font-family:Atkinson-c7f4c4e8b285552f;src:url("/_astro/fonts/14aa8dd5744dd4bc.woff") format("woff");font-display:swap;font-weight:700;font-style:normal;}@font-face{font-family:"Atkinson-c7f4c4e8b285552f fallback: Arial";src:local("Arial");font-display:swap;font-weight:400;font-style:normal;size-adjust:99.3717%;ascent-override:80.1033%;descent-override:25.2587%;line-gap-override:0%;}@font-face{font-family:"Atkinson-c7f4c4e8b285552f fallback: Arial Bold";src:local("Arial Bold");font-display:swap;font-weight:700;font-style:normal;size-adjust:92.2954%;ascent-override:86.2448%;descent-override:27.1953%;line-gap-override:0%;}:root{--font-atkinson:Atkinson-c7f4c4e8b285552f,"Atkinson-c7f4c4e8b285552f fallback: Arial","Atkinson-c7f4c4e8b285552f fallback: Arial Bold",sans-serif;}</style><link rel="preload" href="/_astro/fonts/89758defcfa85239.woff" as="font" type="font/woff" crossorigin><link rel="preload" href="/_astro/fonts/14aa8dd5744dd4bc.woff" as="font" type="font/woff" crossorigin><!-- Canonical URL --><link rel="canonical" href="https://blog.zumpyx.com/blog/seclists-notes/"><!-- Primary Meta Tags --><title>SecLists 笔记 · Zumpyx&#39;s Blog</title><meta name="description" content="SecLists 笔记 笔记"><!-- Open Graph / Facebook --><meta property="og:type" content="website"><meta property="og:url" content="https://blog.zumpyx.com/blog/seclists-notes/"><meta property="og:title" content="SecLists 笔记 · Zumpyx's Blog"><meta property="og:description" content="SecLists 笔记 笔记"><meta property="og:image" content="https://blog.zumpyx.com/_astro/head.CE6FOIKY.png"><!-- Twitter --><meta name="twitter:card" content="summary_large_image"><meta name="twitter:url" content="https://blog.zumpyx.com/blog/seclists-notes/"><meta name="twitter:title" content="SecLists 笔记 · Zumpyx's Blog"><meta name="twitter:description" content="SecLists 笔记 笔记"><meta name="twitter:image" content="https://blog.zumpyx.com/_astro/head.CE6FOIKY.png"><link rel="stylesheet" href="/_astro/Header.CMmW25g2.css"><link rel="stylesheet" href="/_astro/ArticleLayout.DA3idRZl.css"><style>.nav-link[data-astro-cid-evkijfd6]{color:var(--text-muted);font-family:var(--font-mono);letter-spacing:.04em;text-transform:uppercase;white-space:nowrap;border:1px solid #0000;border-radius:999px;justify-content:center;align-items:center;padding:.5em .95em;font-size:.78rem;font-weight:500;text-decoration:none;transition:color .18s,background .18s,border-color .18s,box-shadow .18s;display:inline-flex}.nav-link[data-astro-cid-evkijfd6]:hover{color:var(--text-bright);background:var(--surface-hover);text-decoration:none}.nav-link[data-astro-cid-evkijfd6].active{color:var(--on-accent);background:linear-gradient(135deg, var(--accent-hover), var(--accent));box-shadow:0 0 0 1px var(--border-strong), 0 6px 16px var(--accent-glow-strong);text-shadow:none;border-color:#0000;font-weight:700;text-decoration:none}
+</style><script type="module" src="/_astro/page.CTxKKjGj.js"></script></head><body data-astro-cid-sgg5joot><div class="scanline" aria-hidden="true" data-astro-cid-sgg5joot></div><header data-astro-cid-nen7h5rs><div class="bar" data-astro-cid-nen7h5rs><a class="brand" href="/" data-astro-cid-nen7h5rs><span class="logo" aria-hidden="true" data-astro-cid-nen7h5rs><img src="/_astro/head.CE6FOIKY_1SW1hc.webp" srcset="/_astro/head.CE6FOIKY_1SW1hc.webp 1x, /_astro/head.CE6FOIKY_scYzG.webp 2x" alt data-astro-cid-nen7h5rs="true" loading="lazy" decoding="async" width="64" height="64" class="logo-img"></span><span class="brand-text" data-astro-cid-nen7h5rs><span class="brand-name" data-astro-cid-nen7h5rs>Zumpyx&#39;s Blog</span></span></a><nav class="nav-pill" aria-label="Primary" data-astro-cid-nen7h5rs><div class="nav-track" data-astro-cid-nen7h5rs><a href="/" class="nav-link" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>Home</a><a href="/blog" class="nav-link active" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>Blog</a><a href="/hackthebox" class="nav-link" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>HackTheBox</a><a href="/projects" class="nav-link" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>Projects</a><a href="/about" class="nav-link" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>About</a></div></nav><div class="actions" data-astro-cid-nen7h5rs><button type="button" class="icon-btn search-trigger" data-search-open aria-label="搜索" title="搜索 (Ctrl/⌘+K)" data-astro-cid-7yy3665x><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true" data-astro-cid-7yy3665x><circle cx="11" cy="11" r="6.5" data-astro-cid-7yy3665x></circle><path d="M16.5 16.5 21 21" stroke-linecap="round" data-astro-cid-7yy3665x></path></svg></button><div class="search-root" data-search-root hidden data-astro-cid-7yy3665x><div class="search-backdrop" data-search-close data-astro-cid-7yy3665x></div><div class="search-panel" role="dialog" aria-modal="true" aria-label="全站搜索" data-astro-cid-7yy3665x><div class="search-bar" data-astro-cid-7yy3665x><svg class="search-ico" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true" data-astro-cid-7yy3665x><circle cx="11" cy="11" r="6.5" data-astro-cid-7yy3665x></circle><path d="M16.5 16.5 21 21" stroke-linecap="round" data-astro-cid-7yy3665x></path></svg><input type="search" class="search-input" data-search-input placeholder="全文搜索：标题 / 正文 / 标签…" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="search" data-astro-cid-7yy3665x><kbd class="search-kbd" data-search-close-hint data-astro-cid-7yy3665x>Esc</kbd></div><div class="search-meta" data-search-meta data-astro-cid-7yy3665x>输入关键词开始搜索</div><ul class="search-results" data-search-results role="listbox" aria-label="搜索结果" data-astro-cid-7yy3665x></ul></div></div><script type="module" src="/_astro/SiteSearch.astro_astro_type_script_index_0_lang.CiT4pk6n.js"></script><button type="button" class="icon-btn theme-toggle" data-theme-toggle aria-label="主题：跟随系统" title="主题：跟随系统（点击切换）" data-astro-cid-l6lhmie6><span class="icon icon-system" aria-hidden="true" data-astro-cid-l6lhmie6><!-- auto / system --><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" data-astro-cid-l6lhmie6><rect x="3" y="4" width="18" height="12" rx="2" data-astro-cid-l6lhmie6></rect><path d="M8 20h8M12 16v4" data-astro-cid-l6lhmie6></path></svg></span><span class="icon icon-light" aria-hidden="true" hidden data-astro-cid-l6lhmie6><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" data-astro-cid-l6lhmie6><circle cx="12" cy="12" r="4" data-astro-cid-l6lhmie6></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" data-astro-cid-l6lhmie6></path></svg></span><span class="icon icon-dark" aria-hidden="true" hidden data-astro-cid-l6lhmie6><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" data-astro-cid-l6lhmie6><path d="M21 14.5A8.5 8.5 0 1 1 9.5 3a7 7 0 0 0 11.5 11.5z" stroke-linejoin="round" data-astro-cid-l6lhmie6></path></svg></span></button><script>
+	(() => {
+		const KEY = 'theme';
+		const ORDER = ['system', 'light', 'dark'];
+		const LABELS = {
+			system: '主题：跟随系统',
+			light: '主题：亮色',
+			dark: '主题：暗色',
+		};
+
+		const getStored = () => {
+			try {
+				const v = localStorage.getItem(KEY);
+				if (v === 'light' || v === 'dark' || v === 'system') return v;
+			} catch {}
+			return 'system';
+		};
+
+		const apply = (mode) => {
+			const root = document.documentElement;
+			if (mode === 'light' || mode === 'dark') root.setAttribute('data-theme', mode);
+			else root.removeAttribute('data-theme');
+			try {
+				if (mode === 'system') localStorage.removeItem(KEY);
+				else localStorage.setItem(KEY, mode);
+			} catch {}
+		};
+
+		const syncButton = (mode) => {
+			document.querySelectorAll('[data-theme-toggle]').forEach((btn) => {
+				btn.setAttribute('data-mode', mode);
+				btn.setAttribute('aria-label', LABELS[mode]);
+				btn.setAttribute('title', `${LABELS[mode]}（点击切换）`);
+				btn.querySelectorAll('.icon').forEach((el) => {
+					el.hidden = true;
+				});
+				const icon = btn.querySelector(`.icon-${mode}`);
+				if (icon) icon.hidden = false;
+			});
+		};
+
+		const mode = getStored();
+		apply(mode);
+		syncButton(mode);
+
+		document.querySelectorAll('[data-theme-toggle]').forEach((btn) => {
+			btn.addEventListener('click', () => {
+				const cur = getStored();
+				const next = ORDER[(ORDER.indexOf(cur) + 1) % ORDER.length];
+				apply(next);
+				syncButton(next);
+			});
+		});
+
+		// If following system, react to OS changes
+		try {
+			const mq = window.matchMedia('(prefers-color-scheme: dark)');
+			mq.addEventListener?.('change', () => {
+				if (getStored() === 'system') apply('system');
+			});
+		} catch {}
+	})();
+</script><a class="icon-btn" href="/rss.xml" target="_blank" rel="noopener noreferrer" title="RSS" aria-label="RSS 订阅" data-astro-cid-nen7h5rs><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true" data-astro-cid-nen7h5rs><path d="M5 19a1.5 1.5 0 1 0 0.01 0" fill="currentColor" stroke="none" data-astro-cid-nen7h5rs></path><path d="M4 11a9 9 0 0 1 9 9" stroke-linecap="round" data-astro-cid-nen7h5rs></path><path d="M4 5a15 15 0 0 1 15 15" stroke-linecap="round" data-astro-cid-nen7h5rs></path></svg></a></div></div></header><main data-astro-cid-sgg5joot><article data-astro-cid-sgg5joot><div class="article-shell" data-astro-cid-sgg5joot><div class="prose" data-article-body data-astro-cid-sgg5joot><div class="title" data-astro-cid-sgg5joot><div class="date" data-astro-cid-sgg5joot><time datetime="2024-06-01T00:00:00.000Z">2024-06-01</time></div><div class="title-row" data-astro-cid-sgg5joot><h1 data-astro-cid-sgg5joot>SecLists 笔记</h1></div><div class="meta" data-astro-cid-sgg5joot><span class="badge">tools</span><span class="badge">wordlist</span></div><hr data-astro-cid-sgg5joot></div><div class="content" data-article-content data-astro-cid-sgg5joot><blockquote>
+<p><a href="https://github.com/danielmiessler/SecLists/releases/tag/2023.2">Releases: 2023.2</a></p>
+</blockquote>
+<p>[TOC]</p>
+<h2 id="usernames用户名用户名相关的字典">Usernames（用户名）：用户名相关的字典</h2>
+<h2 id="passwords密码密码相关的字典">Passwords（密码）：密码相关的字典</h2>
+<h2 id="discovery信息发现各种用于信息收集和侦察的字典和工具">Discovery（信息发现）：各种用于信息收集和侦察的字典和工具。</h2>
+<h3 id="1-dns">1 DNS</h3>
+<h4 id="1">1)</h4>
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" disabled> asdad</li>
+</ul>
+<h2 id="fuzzing模糊测试用于模糊测试的字典和有效负载">Fuzzing（模糊测试）：用于模糊测试的字典和有效负载。</h2>
+<h2 id="payloads有效负载各种类型的有效负载">Payloads（有效负载）：各种类型的有效负载。</h2>
+<h2 id="web-shellsweb后门各种web后门的字典和有效负载">Web-Shells（Web后门）：各种Web后门的字典和有效负载。</h2>
+<h2 id="iocs威胁指示器各种威胁指示器例如恶意ip地址恶意域名恶意哈希等的字典和有效负载">IOCs（威胁指示器）：各种威胁指示器（例如恶意IP地址、恶意域名、恶意哈希等）的字典和有效负载。</h2>
+<h2 id="pattern-matching模式匹配包含用于模式匹配和规则匹配的字典和有效负载">Pattern-Matching（模式匹配）：包含用于模式匹配和规则匹配的字典和有效负载。</h2>
+<h2 id="miscellaneous其他杂项其他的字典和有效负载">Miscellaneous（其他杂项）：其他的字典和有效负载。</h2>
+<h2 id="discovery">Discovery</h2>
+<h3 id="dns">DNS</h3>
+<h4 id="alltxt包含常见的dns相关字典">all.txt：包含常见的DNS相关字典。</h4>
+<h4 id="dns-jhaddixtxt基于jhaddix的dns字典">dns-Jhaddix.txt：基于Jhaddix的DNS字典。</h4>
+<h4 id="dnsmaptxt用于dns映射的字典">dnsmap.txt：用于DNS映射的字典。</h4>
+<h4 id="等等">等等…</h4>
+<h3 id="http">/HTTP</h3>
+<h4 id="apachetxt包含apache服务器相关字典">apache.txt：包含Apache服务器相关字典。</h4>
+<h4 id="bigtxt大型字典文件包含广泛的http字典">big.txt：大型字典文件，包含广泛的HTTP字典。</h4>
+<h4 id="cgistxt包含常见cgi文件和路径的字典">cgis.txt：包含常见CGI文件和路径的字典。</h4>
+<h4 id="等等-1">等等…</h4>
+<h3 id="password">/Password</h3>
+<h4 id="leaked-databases">/Leaked-Databases</h4>
+<h5 id="10-million-password-list-top-100txt包含10000000个最常见密码的字典">10-million-password-list-top-100.txt：包含10,000,000个最常见密码的字典。</h5>
+<h5 id="10-million-password-list-top-500txt包含10000000个常见密码的字典前500个">10-million-password-list-top-500.txt：包含10,000,000个常见密码的字典（前500个）。</h5>
+<h5 id="10-million-password-list-top-1000txt包含10000000个常见密码的字典前1000个">10-million-password-list-top-1000.txt：包含10,000,000个常见密码的字典（前1000个）。</h5>
+<h5 id="等等-2">等等…</h5>
+<h4 id="passwords">/Passwords</h4>
+<h5 id="darkweb2017-top10000txt基于2017年从暗网泄露的密码数据整理的字典">darkweb2017-top10000.txt：基于2017年从暗网泄露的密码数据整理的字典。</h5>
+<h5 id="fasttracktxt用于快速渗透测试的密码字典">fasttrack.txt：用于快速渗透测试的密码字典。</h5>
+<h5 id="rockyoutxt基于rockyou数据泄露的密码字典">rockyou.txt：基于RockYou数据泄露的密码字典。</h5>
+<h5 id="等等-3">等等…</h5>
+<h3 id="reconnaissance">/Reconnaissance</h3>
+<h4 id="archive">/Archive</h4>
+<h5 id="commontxt包含常见的归档文件和目录字典">common.txt：包含常见的归档文件和目录字典。</h5>
+<h5 id="common-jstxt用于javascript源代码归档的常见字典">common-js.txt：用于JavaScript源代码归档的常见字典。</h5>
+<h5 id="等等-4">等等…</h5>
+<h4 id="osint">/OSINT</h4>
+<h5 id="01-human-namestxt包含常见的人名字典">01-human-names.txt：包含常见的人名字典。</h5>
+<h5 id="02-passwordstxt包含常见的密码字典">02-passwords.txt：包含常见的密码字典。</h5>
+<h5 id="03-keywordstxt包含常见的关键词字典">03-keywords.txt：包含常见的关键词字典。</h5>
+<h5 id="等等-5">等等…</h5>
+<h3 id="usernames">/Usernames</h3>
+<h4 id="names">/Names</h4>
+<h5 id="female-namestxt包含常见的女性名字字典">female-names.txt：包含常见的女性名字字典。</h5>
+<h5 id="male-namestxt包含常见的男性名字字典">male-names.txt：包含常见的男性名字字典。</h5>
+<h5 id="等等-6">等等…</h5>
+<h4 id="usernames-1">/Usernames</h4>
+<h5 id="generictxt包含常见的通用用户名字典">generic.txt：包含常见的通用用户名字典。</h5>
+<h5 id="hacker-namestxt包含黑客和安全相关的用户名字典">hacker-names.txt：包含黑客和安全相关的用户名字典。</h5>
+<h5 id="等等-7">等等…</h5>
+<h3 id="web-content">/Web-Content</h3>
+<h4 id="robotsdisallowed">/RobotsDisallowed</h4>
+<h5 id="bigtxt包含robotstxt文件中的disallow规则字典">big.txt：包含Robots.txt文件中的Disallow规则字典。</h5>
+<h5 id="disallowtxt包含robotstxt文件中的disallow规则字典">disallow.txt：包含Robots.txt文件中的Disallow规则字典。</h5>
+<h5 id="等等-8">等等…</h5>
+<h4 id="bigtxt大型字典文件包含广泛的web内容字典">big.txt：大型字典文件，包含广泛的Web内容字典。</h4>
+<h4 id="commontxt包含常见的web内容字典">common.txt：包含常见的Web内容字典。</h4>
+<h4 id="等等-9">等等…</h4>
+<h2 id="fuzzing">/Fuzzing</h2>
+<h3 id="discovery-1">/Discovery</h3>
+<h4 id="web-content-1">/Web-Content</h4>
+<h5 id="cms">/CMS</h5>
+<h5 id="joomlatxtjoomla内容管理系统相关的字典">joomla.txt：Joomla内容管理系统相关的字典。</h5>
+<h5 id="wordpresstxtwordpress内容管理系统相关的字典">wordpress.txt：WordPress内容管理系统相关的字典。</h5>
+<h5 id="等等-10">等等…</h5>
+<h5 id="directories">/Directories</h5>
+<h5 id="apachetxt包含apache服务器相关的目录字典">apache.txt：包含Apache服务器相关的目录字典。</h5>
+<h5 id="bigtxt大型字典文件包含广泛的目录字典">big.txt：大型字典文件，包含广泛的目录字典。</h5>
+<h5 id="等等-11">等等…</h5>
+<h5 id="files">/Files</h5>
+<h5 id="asptxt包含asp文件相关的字典">asp.txt：包含ASP文件相关的字典。</h5>
+<h5 id="aspxtxt包含aspnet文件相关的字典">aspx.txt：包含ASP.NET文件相关的字典。</h5>
+<h5 id="等等-12">等等…</h5>
+<h3 id="io">/IO</h3>
+<h4 id="iot">/IOT</h4>
+<h5 id="default-credentialstxt包含物联网设备默认凭证的字典">default-credentials.txt：包含物联网设备默认凭证的字典。</h5>
+<h5 id="dns-twist-mutationstxt用于dns变形的字典">dns-twist-mutations.txt：用于DNS变形的字典。</h5>
+<h5 id="等等-13">等等…</h5>
+<h4 id="network-services">/Network-Services</h4>
+<h5 id="default-credentialstxt包含网络服务默认凭证的字典">default-credentials.txt：包含网络服务默认凭证的字典。</h5>
+<h5 id="等等-14">等等…</h5>
+<h4 id="web-services">/Web-Services</h4>
+<h5 id="apitxt包含常见web服务api的字典">api.txt：包含常见Web服务API的字典。</h5>
+<h5 id="http-authentication-typestxt包含http身份验证类型的字典">http-authentication-types.txt：包含HTTP身份验证类型的字典。</h5>
+<h5 id="等等-15">等等…</h5>
+<h3 id="payloads">/Payloads</h3>
+<blockquote>
+<p>各种漏洞的利用载荷</p>
+</blockquote>
+<h3 id="anti-virus">Anti-Virus</h3>
+<h3 id="file-names">File-Names</h3>
+<h4 id="exec">exec</h4>
+<h4 id="null-byte">null-byte</h4>
+<h3 id="flash">Flash</h3>
+<h3 id="images">Images</h3>
+<h3 id="zip-bombs">Zip-Bombs</h3>
+<h3 id="zip-traversal">Zip-Traversal</h3>
+<h4 id="all">/All</h4>
+<h5 id="readmemd提供所有有效负载的说明文档">README.md：提供所有有效负载的说明文档。</h5>
+<h5 id="等等-16">等等…</h5>
+<h4 id="file-inclusion">/File-Inclusion</h4>
+<h5 id="fuzzdb">/FuzzDB</h5>
+<h5 id="traversaltxt用于文件包含漏洞的遍历字符串">traversal.txt：用于文件包含漏洞的遍历字符串</h5>
+</div></div><aside class="toc" data-toc hidden aria-label="目录" data-astro-cid-sgg5joot><p class="toc-label" data-astro-cid-sgg5joot>目录</p><nav class="toc-nav" data-toc-nav data-astro-cid-sgg5joot></nav></aside></div></article></main><footer data-astro-cid-jo6i4kqk><div class="inner" data-astro-cid-jo6i4kqk><p class="line" data-astro-cid-jo6i4kqk>© 2026 Zumpyx</p><p class="note" data-astro-cid-jo6i4kqk>notes · exploit · write · repeat</p></div></footer><script type="module">function e(e){return e.trim().toLowerCase().replace(/\s+/g,`-`).replace(/[^\w\u4e00-\u9fff-]+/g,``).replace(/-+/g,`-`).replace(/^-|-$/g,``)||`section`}var t=null;function n(){let n=document.querySelector(`[data-article-content]`),r=document.querySelector(`[data-toc]`),i=document.querySelector(`[data-toc-nav]`);if(!n||!r||!i)return;t?.disconnect(),t=null,i.replaceChildren();let a=Array.from(n.querySelectorAll(`h2, h3`)).filter(e=>(e.textContent??``).trim().length>0);if(a.length===0){r.hidden=!0;return}r.hidden=!1;let o=new Set,s=[];for(let t of a){let n=t.id;if(!n){let r=e(t.textContent??``);n=r;let i=2;for(;o.has(n)||document.getElementById(n);)n=`${r}-${i}`,i+=1;t.id=n}o.add(n);let r=document.createElement(`a`);r.href=`#${n}`,r.textContent=(t.textContent??``).trim(),r.className=t.tagName===`H3`?`toc-h3`:`toc-h2`,r.dataset.target=n,i.appendChild(r),s.push(r)}let c=e=>{for(let t of s)t.classList.toggle(`active`,t.dataset.target===e)};t=new IntersectionObserver(e=>{let t=e.filter(e=>e.isIntersecting).sort((e,t)=>e.target.offsetTop-t.target.offsetTop);t[0]&&c(t[0].target.id)},{rootMargin:`-15% 0px -70% 0px`,threshold:[0,1]});for(let e of a)t.observe(e);location.hash?c(decodeURIComponent(location.hash.slice(1))):a[0]&&c(a[0].id)}n(),document.addEventListener(`article-content-unlocked`,()=>{n()});</script></body></html>

@@ -1,0 +1,2093 @@
+<!DOCTYPE html><html lang="zh-CN" data-astro-cid-sgg5joot><head><!-- Global Metadata --><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="icon" type="image/png" href="/favicon.png"><link rel="icon" href="/favicon.ico" sizes="any"><link rel="apple-touch-icon" href="/apple-touch-icon.png"><link rel="sitemap" href="/sitemap-index.xml"><link rel="alternate" type="application/rss+xml" title="Zumpyx's Blog" href="https://blog.zumpyx.com/rss.xml"><meta name="generator" content="Astro v7.1.0"><meta name="color-scheme" content="light dark"><meta name="theme-color" content="#0b0d11" media="(prefers-color-scheme: dark)"><meta name="theme-color" content="#f4f5f7" media="(prefers-color-scheme: light)"><script>
+	(() => {
+		try {
+			const t = localStorage.getItem('theme');
+			if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t);
+			else document.documentElement.removeAttribute('data-theme');
+		} catch {}
+	})();
+</script><style>@font-face{font-family:Atkinson-c7f4c4e8b285552f;src:url("/_astro/fonts/89758defcfa85239.woff") format("woff");font-display:swap;font-weight:400;font-style:normal;}@font-face{font-family:Atkinson-c7f4c4e8b285552f;src:url("/_astro/fonts/14aa8dd5744dd4bc.woff") format("woff");font-display:swap;font-weight:700;font-style:normal;}@font-face{font-family:"Atkinson-c7f4c4e8b285552f fallback: Arial";src:local("Arial");font-display:swap;font-weight:400;font-style:normal;size-adjust:99.3717%;ascent-override:80.1033%;descent-override:25.2587%;line-gap-override:0%;}@font-face{font-family:"Atkinson-c7f4c4e8b285552f fallback: Arial Bold";src:local("Arial Bold");font-display:swap;font-weight:700;font-style:normal;size-adjust:92.2954%;ascent-override:86.2448%;descent-override:27.1953%;line-gap-override:0%;}:root{--font-atkinson:Atkinson-c7f4c4e8b285552f,"Atkinson-c7f4c4e8b285552f fallback: Arial","Atkinson-c7f4c4e8b285552f fallback: Arial Bold",sans-serif;}</style><link rel="preload" href="/_astro/fonts/89758defcfa85239.woff" as="font" type="font/woff" crossorigin><link rel="preload" href="/_astro/fonts/14aa8dd5744dd4bc.woff" as="font" type="font/woff" crossorigin><!-- Canonical URL --><link rel="canonical" href="https://blog.zumpyx.com/blog/windows-version-taxonomy/"><!-- Primary Meta Tags --><title>Windows 版本怎么分：通道、形态与内核 · Zumpyx&#39;s Blog</title><meta name="description" content="全面梳理 Windows 版本体系：SAC/LTSC 与服务通道、PC/Server/IoT/ARM 等形态、NT 3.1 至 Windows 11/Server 2025 内核与 Build，以及按代际对照 UAC/WDAC/ASR/Credential Guard 等安全特性。"><!-- Open Graph / Facebook --><meta property="og:type" content="website"><meta property="og:url" content="https://blog.zumpyx.com/blog/windows-version-taxonomy/"><meta property="og:title" content="Windows 版本怎么分：通道、形态与内核 · Zumpyx's Blog"><meta property="og:description" content="全面梳理 Windows 版本体系：SAC/LTSC 与服务通道、PC/Server/IoT/ARM 等形态、NT 3.1 至 Windows 11/Server 2025 内核与 Build，以及按代际对照 UAC/WDAC/ASR/Credential Guard 等安全特性。"><meta property="og:image" content="https://blog.zumpyx.com/_astro/head.CE6FOIKY.png"><!-- Twitter --><meta name="twitter:card" content="summary_large_image"><meta name="twitter:url" content="https://blog.zumpyx.com/blog/windows-version-taxonomy/"><meta name="twitter:title" content="Windows 版本怎么分：通道、形态与内核 · Zumpyx's Blog"><meta name="twitter:description" content="全面梳理 Windows 版本体系：SAC/LTSC 与服务通道、PC/Server/IoT/ARM 等形态、NT 3.1 至 Windows 11/Server 2025 内核与 Build，以及按代际对照 UAC/WDAC/ASR/Credential Guard 等安全特性。"><meta name="twitter:image" content="https://blog.zumpyx.com/_astro/head.CE6FOIKY.png"><link rel="stylesheet" href="/_astro/Header.CMmW25g2.css"><link rel="stylesheet" href="/_astro/ArticleLayout.DA3idRZl.css"><style>.nav-link[data-astro-cid-evkijfd6]{color:var(--text-muted);font-family:var(--font-mono);letter-spacing:.04em;text-transform:uppercase;white-space:nowrap;border:1px solid #0000;border-radius:999px;justify-content:center;align-items:center;padding:.5em .95em;font-size:.78rem;font-weight:500;text-decoration:none;transition:color .18s,background .18s,border-color .18s,box-shadow .18s;display:inline-flex}.nav-link[data-astro-cid-evkijfd6]:hover{color:var(--text-bright);background:var(--surface-hover);text-decoration:none}.nav-link[data-astro-cid-evkijfd6].active{color:var(--on-accent);background:linear-gradient(135deg, var(--accent-hover), var(--accent));box-shadow:0 0 0 1px var(--border-strong), 0 6px 16px var(--accent-glow-strong);text-shadow:none;border-color:#0000;font-weight:700;text-decoration:none}
+</style><script type="module" src="/_astro/page.CTxKKjGj.js"></script></head><body data-astro-cid-sgg5joot><div class="scanline" aria-hidden="true" data-astro-cid-sgg5joot></div><header data-astro-cid-nen7h5rs><div class="bar" data-astro-cid-nen7h5rs><a class="brand" href="/" data-astro-cid-nen7h5rs><span class="logo" aria-hidden="true" data-astro-cid-nen7h5rs><img src="/_astro/head.CE6FOIKY_1SW1hc.webp" srcset="/_astro/head.CE6FOIKY_1SW1hc.webp 1x, /_astro/head.CE6FOIKY_scYzG.webp 2x" alt data-astro-cid-nen7h5rs="true" loading="lazy" decoding="async" width="64" height="64" class="logo-img"></span><span class="brand-text" data-astro-cid-nen7h5rs><span class="brand-name" data-astro-cid-nen7h5rs>Zumpyx&#39;s Blog</span></span></a><nav class="nav-pill" aria-label="Primary" data-astro-cid-nen7h5rs><div class="nav-track" data-astro-cid-nen7h5rs><a href="/" class="nav-link" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>Home</a><a href="/blog" class="nav-link active" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>Blog</a><a href="/hackthebox" class="nav-link" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>HackTheBox</a><a href="/projects" class="nav-link" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>Projects</a><a href="/about" class="nav-link" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>About</a></div></nav><div class="actions" data-astro-cid-nen7h5rs><button type="button" class="icon-btn search-trigger" data-search-open aria-label="搜索" title="搜索 (Ctrl/⌘+K)" data-astro-cid-7yy3665x><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true" data-astro-cid-7yy3665x><circle cx="11" cy="11" r="6.5" data-astro-cid-7yy3665x></circle><path d="M16.5 16.5 21 21" stroke-linecap="round" data-astro-cid-7yy3665x></path></svg></button><div class="search-root" data-search-root hidden data-astro-cid-7yy3665x><div class="search-backdrop" data-search-close data-astro-cid-7yy3665x></div><div class="search-panel" role="dialog" aria-modal="true" aria-label="全站搜索" data-astro-cid-7yy3665x><div class="search-bar" data-astro-cid-7yy3665x><svg class="search-ico" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true" data-astro-cid-7yy3665x><circle cx="11" cy="11" r="6.5" data-astro-cid-7yy3665x></circle><path d="M16.5 16.5 21 21" stroke-linecap="round" data-astro-cid-7yy3665x></path></svg><input type="search" class="search-input" data-search-input placeholder="全文搜索：标题 / 正文 / 标签…" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="search" data-astro-cid-7yy3665x><kbd class="search-kbd" data-search-close-hint data-astro-cid-7yy3665x>Esc</kbd></div><div class="search-meta" data-search-meta data-astro-cid-7yy3665x>输入关键词开始搜索</div><ul class="search-results" data-search-results role="listbox" aria-label="搜索结果" data-astro-cid-7yy3665x></ul></div></div><script type="module" src="/_astro/SiteSearch.astro_astro_type_script_index_0_lang.CiT4pk6n.js"></script><button type="button" class="icon-btn theme-toggle" data-theme-toggle aria-label="主题：跟随系统" title="主题：跟随系统（点击切换）" data-astro-cid-l6lhmie6><span class="icon icon-system" aria-hidden="true" data-astro-cid-l6lhmie6><!-- auto / system --><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" data-astro-cid-l6lhmie6><rect x="3" y="4" width="18" height="12" rx="2" data-astro-cid-l6lhmie6></rect><path d="M8 20h8M12 16v4" data-astro-cid-l6lhmie6></path></svg></span><span class="icon icon-light" aria-hidden="true" hidden data-astro-cid-l6lhmie6><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" data-astro-cid-l6lhmie6><circle cx="12" cy="12" r="4" data-astro-cid-l6lhmie6></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" data-astro-cid-l6lhmie6></path></svg></span><span class="icon icon-dark" aria-hidden="true" hidden data-astro-cid-l6lhmie6><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" data-astro-cid-l6lhmie6><path d="M21 14.5A8.5 8.5 0 1 1 9.5 3a7 7 0 0 0 11.5 11.5z" stroke-linejoin="round" data-astro-cid-l6lhmie6></path></svg></span></button><script>
+	(() => {
+		const KEY = 'theme';
+		const ORDER = ['system', 'light', 'dark'];
+		const LABELS = {
+			system: '主题：跟随系统',
+			light: '主题：亮色',
+			dark: '主题：暗色',
+		};
+
+		const getStored = () => {
+			try {
+				const v = localStorage.getItem(KEY);
+				if (v === 'light' || v === 'dark' || v === 'system') return v;
+			} catch {}
+			return 'system';
+		};
+
+		const apply = (mode) => {
+			const root = document.documentElement;
+			if (mode === 'light' || mode === 'dark') root.setAttribute('data-theme', mode);
+			else root.removeAttribute('data-theme');
+			try {
+				if (mode === 'system') localStorage.removeItem(KEY);
+				else localStorage.setItem(KEY, mode);
+			} catch {}
+		};
+
+		const syncButton = (mode) => {
+			document.querySelectorAll('[data-theme-toggle]').forEach((btn) => {
+				btn.setAttribute('data-mode', mode);
+				btn.setAttribute('aria-label', LABELS[mode]);
+				btn.setAttribute('title', `${LABELS[mode]}（点击切换）`);
+				btn.querySelectorAll('.icon').forEach((el) => {
+					el.hidden = true;
+				});
+				const icon = btn.querySelector(`.icon-${mode}`);
+				if (icon) icon.hidden = false;
+			});
+		};
+
+		const mode = getStored();
+		apply(mode);
+		syncButton(mode);
+
+		document.querySelectorAll('[data-theme-toggle]').forEach((btn) => {
+			btn.addEventListener('click', () => {
+				const cur = getStored();
+				const next = ORDER[(ORDER.indexOf(cur) + 1) % ORDER.length];
+				apply(next);
+				syncButton(next);
+			});
+		});
+
+		// If following system, react to OS changes
+		try {
+			const mq = window.matchMedia('(prefers-color-scheme: dark)');
+			mq.addEventListener?.('change', () => {
+				if (getStored() === 'system') apply('system');
+			});
+		} catch {}
+	})();
+</script><a class="icon-btn" href="/rss.xml" target="_blank" rel="noopener noreferrer" title="RSS" aria-label="RSS 订阅" data-astro-cid-nen7h5rs><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true" data-astro-cid-nen7h5rs><path d="M5 19a1.5 1.5 0 1 0 0.01 0" fill="currentColor" stroke="none" data-astro-cid-nen7h5rs></path><path d="M4 11a9 9 0 0 1 9 9" stroke-linecap="round" data-astro-cid-nen7h5rs></path><path d="M4 5a15 15 0 0 1 15 15" stroke-linecap="round" data-astro-cid-nen7h5rs></path></svg></a></div></div></header><main data-astro-cid-sgg5joot><article data-astro-cid-sgg5joot><div class="article-shell" data-astro-cid-sgg5joot><div class="prose" data-article-body data-astro-cid-sgg5joot><div class="title" data-astro-cid-sgg5joot><div class="date" data-astro-cid-sgg5joot><time datetime="2026-07-20T00:00:00.000Z">2026-07-20</time><div class="last-updated-on" data-astro-cid-sgg5joot>Updated <time datetime="2026-07-20T00:00:00.000Z">2026-07-20</time></div></div><div class="title-row" data-astro-cid-sgg5joot><h1 data-astro-cid-sgg5joot>Windows 版本怎么分：通道、形态与内核</h1></div><div class="meta" data-astro-cid-sgg5joot><span class="badge">Windows</span><span class="badge">NT内核</span><span class="badge">LTSC</span><span class="badge">SAC</span><span class="badge">Server</span><span class="badge">版本管理</span><span class="badge">IoT</span></div><hr data-astro-cid-sgg5joot></div><div class="content" data-article-content data-astro-cid-sgg5joot><p>日常说「这台是 Win10」往往不够用。同一句 Windows 10 背后，可能是半年一更功能的商用通道，也可能是数年才大改的 LTSC；可能是桌面 Pro，也可能是精简 IoT；内核都叫 10.0，Build 却差一整代安全缓解。</p>
+<p>做<strong>兼容性、驱动、补丁基线、镜像选型、红队载荷与资产盘点</strong>时，建议至少钉死三个轴，并在需要时加上第四、第五轴：</p>
+<table>
+<thead>
+<tr>
+<th>轴</th>
+<th>问题</th>
+<th>例子</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>1. 服务通道 / 更新频率</strong></td>
+<td>功能火车有多勤？</td>
+<td>SAC、LTSC、Insider</td>
+</tr>
+<tr>
+<td><strong>2. 系统形态</strong></td>
+<td>给谁用、装什么组件？</td>
+<td>PC / Server / IoT / 云 PC</td>
+</tr>
+<tr>
+<td><strong>3. 内核世代</strong></td>
+<td>NT 主版本是哪条线？</td>
+<td>6.1、6.3、10.0</td>
+</tr>
+<tr>
+<td><strong>4. 构建与功能版</strong></td>
+<td>具体哪一列车？</td>
+<td>Build 19045、22H2、24H2</td>
+</tr>
+<tr>
+<td><strong>5. 版本 SKU</strong></td>
+<td>授权与策略能力？</td>
+<td>Pro / Enterprise / Datacenter</td>
+</tr>
+<tr>
+<td><strong>6. 安全能力代际</strong></td>
+<td>这代有哪些防护、是否常默认开？</td>
+<td>UAC、CG、WDAC、ASR、HVCI…</td>
+</tr>
+</tbody>
+</table>
+<p>下文按你习惯的三维展开，补全 9x/ARM/PE/Mobile 等分支，并单列 <strong>按 NT 代际的安全特性对照表</strong>，方便当索引用。</p>
+<blockquote>
+<p><strong>事实性说明</strong>：版本号、Build、通道名称以 <a href="https://learn.microsoft.com/">Microsoft 发布/生命周期文档</a> 为准。本文做结构归纳；<strong>安全特性表表示「该代是否具备可配置能力」</strong>，不表示某镜像默认已开启。SKU、GPO、云基线、OEM 都会改变默认。EOL 与许可证条款会变更，<strong>不在文中写死截止日期</strong>。</p>
+</blockquote>
+<hr>
+<h2 id="〇先分清营销名--内核号--build--通道">〇、先分清：营销名 ≠ 内核号 ≠ Build ≠ 通道</h2>
+<table>
+<thead>
+<tr>
+<th>名称</th>
+<th>是什么</th>
+<th>例子</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>商品/营销名</strong></td>
+<td>盒子上/设置里写的名字</td>
+<td>Windows 11 专业版</td>
+</tr>
+<tr>
+<td><strong>NT 版本</strong></td>
+<td>内核主.次版本</td>
+<td>10.0</td>
+</tr>
+<tr>
+<td><strong>Build</strong></td>
+<td>编译构建号，兼容性最有用</td>
+<td>22631、26100</td>
+</tr>
+<tr>
+<td><strong>DisplayVersion / 功能版本</strong></td>
+<td>面向用户的火车标签</td>
+<td>22H2、24H2</td>
+</tr>
+<tr>
+<td><strong>UBR</strong></td>
+<td>Update Build Revision，随累积更新变</td>
+<td>完整版本常写作 <code>10.0.{Build}.{UBR}</code></td>
+</tr>
+<tr>
+<td><strong>版本 + 通道</strong></td>
+<td>授权版本与服务通道的组合</td>
+<td>Enterprise + LTSC 2021</td>
+</tr>
+<tr>
+<td><strong>InstallationType</strong></td>
+<td>客户端还是服务器等</td>
+<td>Client / Server</td>
+</tr>
+</tbody>
+</table>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="text"><code><span class="line"><span>推荐资产标签模板：</span></span>
+<span class="line"><span>{形态}/{SKU}/{通道或发行}/{NT}/{DisplayVersion|LTSC年}/{Build}.{UBR}</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>例：</span></span>
+<span class="line"><span>PC/Enterprise/LTSC2021/NT10.0/19044.&lt;UBR&gt;</span></span>
+<span class="line"><span>PC/Pro/GAC/NT10.0/24H2/26100.xxxx</span></span>
+<span class="line"><span>Server/Datacenter/2022/NT10.0/20348.xxxx/Core</span></span></code></pre>
+<hr>
+<h2 id="一按更新频率sacltsc-与通道全家福">一、按更新频率：SAC、LTSC 与通道全家福</h2>
+<blockquote>
+<p><em>Senu-Annual</em> 一般为 <strong>Semi-Annual Channel</strong> 笔误，下称 <strong>SAC（半年通道）</strong>。<br>
+下文凡写「约略 Build」「常见」处，均以 Microsoft 发布信息为权威；补丁级 UBR 会随累积更新变化，示例仅作格式参考。</p>
+</blockquote>
+<h3 id="11-为什么要有通道">1.1 为什么要有「通道」</h3>
+<p>Windows 10 起，微软把「<strong>功能更新</strong>（新能力、新壳、新 API 面）」和「<strong>质量/安全更新</strong>（补丁）」拆开运营：</p>
+<ul>
+<li><strong>功能更新</strong>：改变兼容面，需要测试窗口；</li>
+<li><strong>质量更新</strong>：尽量不改功能，修漏洞与稳定性。</li>
+</ul>
+<p>通道决定的是：<strong>你多久会接到功能更新</strong>，以及<strong>某一功能版本还能领多久安全/质量更新</strong>。</p>
+<h3 id="12-sacsemi-annual-channel半年服务通道">1.2 SAC（Semi-Annual Channel，半年服务通道）</h3>
+<table>
+<thead>
+<tr>
+<th>项</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>定位</strong></td>
+<td>需要持续获得新功能的商业/消费桌面（历史上 Server 也曾有 SAC 镜像）</td>
+</tr>
+<tr>
+<td><strong>经典节奏</strong></td>
+<td>Win10 前中期常见一年两波功能更新（后多称 H1/H2）；<strong>后期节奏有调整</strong>（部分年份以一波主功能更新为主），以当时发布说明为准</td>
+</tr>
+<tr>
+<td><strong>支持模型</strong></td>
+<td>每个功能版本有固定服务期限（消费/教育/企业时长不同）；到期后需升到仍在服务的功能版本才继续收该通道的更新</td>
+</tr>
+<tr>
+<td><strong>适合</strong></td>
+<td>知识办公、开发机、要新浏览器/新防护能力的标准桌面</td>
+</tr>
+<tr>
+<td><strong>代价</strong></td>
+<td>驱动、安全软件、行业软件宜按「功能版本 + Build」做回归</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Win10 功能版本火车（客户端，常用）</strong></p>
+<table>
+<thead>
+<tr>
+<th>营销/显示</th>
+<th>约略 Build</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1507 (RTM)</td>
+<td>10240</td>
+<td>初代</td>
+</tr>
+<tr>
+<td>1511</td>
+<td>10586</td>
+<td></td>
+</tr>
+<tr>
+<td>1607</td>
+<td>14393</td>
+<td>与 Server 2016 同系</td>
+</tr>
+<tr>
+<td>1703</td>
+<td>15063</td>
+<td></td>
+</tr>
+<tr>
+<td>1709</td>
+<td>16299</td>
+<td></td>
+</tr>
+<tr>
+<td>1803</td>
+<td>17134</td>
+<td></td>
+</tr>
+<tr>
+<td>1809</td>
+<td>17763</td>
+<td>与 Server 2019 同系</td>
+</tr>
+<tr>
+<td>1903</td>
+<td>18362</td>
+<td></td>
+</tr>
+<tr>
+<td>1909</td>
+<td>18363</td>
+<td>启用包类升级常见</td>
+</tr>
+<tr>
+<td>2004</td>
+<td>19041</td>
+<td></td>
+</tr>
+<tr>
+<td>20H2</td>
+<td>19042</td>
+<td></td>
+</tr>
+<tr>
+<td>21H1</td>
+<td>19043</td>
+<td></td>
+</tr>
+<tr>
+<td>21H2</td>
+<td>19044</td>
+<td>LTSC 2021 同建系</td>
+</tr>
+<tr>
+<td>22H2</td>
+<td>19045</td>
+<td>Win10 后期主线</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Win11 功能版本（仍是 NT 10.0）</strong></p>
+<table>
+<thead>
+<tr>
+<th>显示版本</th>
+<th>约略 Build</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>21H2</td>
+<td>22000</td>
+<td>第一代 11</td>
+</tr>
+<tr>
+<td>22H2</td>
+<td>22621</td>
+<td></td>
+</tr>
+<tr>
+<td>23H2</td>
+<td>22631</td>
+<td>多启用包</td>
+</tr>
+<tr>
+<td>24H2</td>
+<td>26100</td>
+<td>较新平台线；Win11 Enterprise LTSC 2024 亦基于 24H2/26100 系</td>
+</tr>
+<tr>
+<td>后续版本</td>
+<td>以官方为准</td>
+<td>以 <code>DisplayVersion</code> + <code>CurrentBuild</code> 为准</td>
+</tr>
+</tbody>
+</table>
+<p>启用包说明：例如 1909 相对 1903、<strong>23H2 相对 22H2</strong>，常通过<strong>启用包</strong>切换 <code>DisplayVersion</code> 与小幅 Build（如 22621→22631），与「重装换一代平台」不同；探测以本机注册表为准。</p>
+<h3 id="13-ltsclong-term-servicing-channel长期服务通道">1.3 LTSC（Long-Term Servicing Channel，长期服务通道）</h3>
+<table>
+<thead>
+<tr>
+<th>项</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>定位</strong></td>
+<td>专用系统：工控、医疗器械上位机、ATM/柜面、加固终端、通过认证的产线机</td>
+</tr>
+<tr>
+<td><strong>节奏</strong></td>
+<td>约每 2–3 年一代（以微软实际发布为准）；周期内以安全/质量更新为主，不跟消费版功能火车</td>
+</tr>
+<tr>
+<td><strong>特征</strong></td>
+<td>组件集与同期 SAC/GAC 不完全相同（例如传统上弱化部分消费向应用）；功能面相对稳定</td>
+</tr>
+<tr>
+<td><strong>不是</strong></td>
+<td>「永不打补丁」——服务期结束后停止更新</td>
+</tr>
+<tr>
+<td><strong>年限</strong></td>
+<td><strong>因产品而异</strong>（例如部分旧桌面 LTSC 曾提供约 10 年，近年 <strong>Windows 11 Enterprise LTSC</strong> 与 <strong>IoT Enterprise LTSC</strong> 的 mainstream/extended 年限并不相同）——<strong>一律以 Microsoft 生命周期页为准</strong>，本文不写死 EOL 日期</td>
+</tr>
+</tbody>
+</table>
+<p><strong>桌面 Enterprise / 相关 LTSC 谱系（常见）</strong></p>
+<table>
+<thead>
+<tr>
+<th>LTSC</th>
+<th>内核</th>
+<th>基础 Build（量产线）</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Windows 10 Enterprise 2015 LTSB</td>
+<td>10.0</td>
+<td>10240</td>
+<td>旧称 <strong>LTSB</strong></td>
+</tr>
+<tr>
+<td>Windows 10 Enterprise 2016 LTSB</td>
+<td>10.0</td>
+<td>14393</td>
+<td>与 1607 / Server 2016 同建系</td>
+</tr>
+<tr>
+<td>Windows 10 Enterprise LTSC 2019</td>
+<td>10.0</td>
+<td>17763</td>
+<td>与 1809 / Server 2019 同建系</td>
+</tr>
+<tr>
+<td>Windows 10 Enterprise LTSC 2021</td>
+<td>10.0</td>
+<td>19044</td>
+<td>与 21H2 同建系</td>
+</tr>
+<tr>
+<td>Windows 11 Enterprise LTSC 2024</td>
+<td>10.0</td>
+<td>26100 系</td>
+<td>基于 24H2 平台线</td>
+</tr>
+<tr>
+<td>Windows 11 IoT Enterprise LTSC 2024</td>
+<td>10.0</td>
+<td>26100 系</td>
+<td>行业/设备向；生命周期条款与 Enterprise LTSC 可能不同</td>
+</tr>
+</tbody>
+</table>
+<p>名称：<strong>LTSB → LTSC</strong> 为同一思路的改名（Long-Term Servicing <strong>Branch</strong> → <strong>Channel</strong>）。</p>
+<h3 id="14-通道命名演变避免读到旧文档迷路">1.4 通道命名演变（避免读到旧文档迷路）</h3>
+<table>
+<thead>
+<tr>
+<th>阶段</th>
+<th>常见名称</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Win10 早期</td>
+<td>CB / CBB 等</td>
+<td>Current Branch / Current Branch for Business 等，已淘汰</td>
+</tr>
+<tr>
+<td>Win10 1709 前后</td>
+<td>SAC Targeted 等过渡名</td>
+<td>文档一度区分 Targeted 与宽 SAC，后简化</td>
+</tr>
+<tr>
+<td>Win10 成熟期</td>
+<td><strong>SAC</strong> vs <strong>LTSC</strong></td>
+<td>对比最经典，运维口语仍常用</td>
+</tr>
+<tr>
+<td>较新商业桌面表述</td>
+<td><strong>General Availability Channel (GAC)</strong></td>
+<td>功能更新通道的现行常见官方表述之一；<strong>承接原 SAC 角色</strong>，不是另一套互不兼容的内核</td>
+</tr>
+<tr>
+<td>Win11</td>
+<td>功能更新节奏调整为更偏「年更」叙事</td>
+<td>不再强调「严格一年两版 SAC」，但 <strong>LTSC 仍独立存在</strong></td>
+</tr>
+<tr>
+<td>Server</td>
+<td><strong>LTSC（按发布年的 Server 版本）</strong> 为主</td>
+<td>见下一节</td>
+</tr>
+</tbody>
+</table>
+<h3 id="15-server-的通道怎么理解">1.5 Server 的「通道」怎么理解</h3>
+<ul>
+<li>生产环境主流是 <strong>Windows Server 2016 / 2019 / 2022 / 2025</strong> 等<strong>按年发布的版本</strong>；微软文档中常把这类定位为 <strong>LTSC</strong> 服务模式（长期服务，而非桌面那种半年功能火车）。</li>
+<li><strong>Windows Server Semi-Annual Channel（SAC）</strong> 曾提供（多为 Server Core），用于更快获取功能，后已收缩/退役相关选项；<strong>新部署不要默认还能选 Server SAC</strong>，以当前 Microsoft 文档与 VL 介质为准。</li>
+<li><strong>Azure 专用镜像、多会话主机</strong> 等云 SKU 的更新与支持条款可能不同，以订阅与镜像说明为准。</li>
+</ul>
+<h3 id="16-insider-与其它预览通道">1.6 Insider 与其它预览通道</h3>
+<table>
+<thead>
+<tr>
+<th>通道</th>
+<th>用途</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Canary / Dev / Beta / Release Preview</td>
+<td>Windows Insider 预览环（环名称会随微软调整）；<strong>非生产</strong></td>
+</tr>
+<tr>
+<td>预览累积更新</td>
+<td>可能早于正式通道，稳定性与支持范围不同</td>
+</tr>
+</tbody>
+</table>
+<p>资产表里应单独标记 <code>Insider=yes</code>，避免和 SAC/LTSC 生产机混淆。</p>
+<h3 id="17-更新类型速查和通道正交">1.7 更新类型速查（和通道正交）</h3>
+<table>
+<thead>
+<tr>
+<th>类型</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>功能更新 Feature Update</td>
+<td>大版本火车（21H2→22H2）</td>
+</tr>
+<tr>
+<td>启用包 Enablement Package</td>
+<td>小包「打开」已预先放进系统的功能，Build 主号可能微变</td>
+</tr>
+<tr>
+<td>累积更新 LCU</td>
+<td>每月安全/质量合集</td>
+</tr>
+<tr>
+<td>SSU</td>
+<td>服务栈更新，打补丁的前置</td>
+</tr>
+<tr>
+<td>.NET / 定义库等</td>
+<td>组件通道，需单独管理</td>
+</tr>
+</tbody>
+</table>
+<h3 id="18-通道选型">1.8 通道选型</h3>
+<table>
+<thead>
+<tr>
+<th>场景</th>
+<th>建议</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>办公/开发标准桌面</td>
+<td>现行通用功能通道（Win10 仍在服功能版或 Win11 当前支持版）</td>
+</tr>
+<tr>
+<td>工控、认证软件锁版本</td>
+<td><strong>LTSC</strong> + 冻结驱动清单</td>
+</tr>
+<tr>
+<td>域控/SQL/文件服务器</td>
+<td>Server 年版本（LTSC 语义）+ 变更窗口</td>
+</tr>
+<tr>
+<td>安全研究多版本矩阵</td>
+<td>按 <strong>Build</strong> 建虚拟机目录，不要只按商品名</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="二按系统形态pcserver-与更多分支">二、按系统形态：PC、Server 与更多分支</h2>
+<h3 id="21-pc--客户端client">2.1 PC / 客户端（Client）</h3>
+<p><strong>角色</strong>：人机交互、办公、开发、娱乐。<br>
+<strong>常见 SKU</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>SKU</th>
+<th>典型用途</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Home</td>
+<td>消费</td>
+</tr>
+<tr>
+<td>Pro</td>
+<td>中小商务、可加入域等（具体功能随版本变化）</td>
+</tr>
+<tr>
+<td>Pro for Workstations</td>
+<td>面向工作站硬件与部分企业向能力差异</td>
+</tr>
+<tr>
+<td>Enterprise</td>
+<td>大企业功能与管理；<strong>桌面 LTSC 落在 Enterprise（及 IoT Enterprise）</strong></td>
+</tr>
+<tr>
+<td>Education</td>
+<td>教育授权，功能集接近企业向，<strong>一般不提供桌面 LTSC SKU</strong></td>
+</tr>
+<tr>
+<td>SE / 其它区域 SKU</td>
+<td>如教育精简等，随市场与政策变化</td>
+</tr>
+</tbody>
+</table>
+<p><strong>授权/能力差异</strong>：BitLocker、AppLocker、WDAC、Credential Guard、LTSC 等是否可用/是否可用 GPO 管理，<strong>随 Windows 版本、SKU、管理方式（GPO/MDM）与硬件变化</strong>。微软对 AppLocker 的 SKU 限制在较新版本上做过调整（例如移除部分版本检查），<strong>不能套用十年前的「只有企业版」一刀切</strong>。以当前官方 <em>Requirements</em> 与本机实测为准。</p>
+<h3 id="22-server">2.2 Server</h3>
+<p><strong>角色</strong>：身份、文件、虚拟化、应用托管、远程桌面等。<br>
+<strong>安装形态</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>形态</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Desktop Experience</strong></td>
+<td>带完整桌面体验</td>
+</tr>
+<tr>
+<td><strong>Server Core</strong></td>
+<td>无传统完整 Shell，面更小，运维靠 CLI/WinRM</td>
+</tr>
+<tr>
+<td><strong>Nano Server（历史）</strong></td>
+<td>更激进精简，容器/特定场景，生命周期与定位多次调整</td>
+</tr>
+<tr>
+<td><strong>容器基础镜像</strong></td>
+<td>Server Core / Nano 等容器镜像，与宿主版本强相关</td>
+</tr>
+</tbody>
+</table>
+<p><strong>常见 Server SKU</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>SKU</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Essentials</td>
+<td>小企业一体化，限制多</td>
+</tr>
+<tr>
+<td>Standard</td>
+<td>常规虚拟化权益有限</td>
+</tr>
+<tr>
+<td>Datacenter</td>
+<td>虚拟化权益高，数据中心常见</td>
+</tr>
+<tr>
+<td>历史/特殊 SKU</td>
+<td>如已退役的 MultiPoint Server 等，仅遗留环境</td>
+</tr>
+</tbody>
+</table>
+<p><strong>版本与内核（见第三节）</strong>：2008→6.0，2008 R2→6.1，2012→6.2，2012 R2→6.3，2016+→10.0。</p>
+<h3 id="23-同一内核上的-pc-vs-server">2.3 同一内核上的 PC vs Server</h3>
+<table>
+<thead>
+<tr>
+<th>相同</th>
+<th>不同</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>大量内核组件、很多安全补丁同源</td>
+<td>默认角色、防火墙、IE/Edge 策略、驱动认证、授权</td>
+</tr>
+<tr>
+<td>可用类似工具链做管理</td>
+<td>GUI 工具默认是否存在（Core）</td>
+</tr>
+<tr>
+<td></td>
+<td>支持周期、升级路径、云镜像</td>
+</tr>
+</tbody>
+</table>
+<p>探测时务必区分 <code>ProductName</code> 与 <code>InstallationType</code>，不要只看 NT 版本号。</p>
+<h3 id="24-iot--embedded--行业版">2.4 IoT / Embedded / 行业版</h3>
+<table>
+<thead>
+<tr>
+<th>分支</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Windows 10/11 IoT Enterprise</strong></td>
+<td>键亭、行业设备、锁定场景；另有 <strong>IoT Enterprise LTSC</strong></td>
+</tr>
+<tr>
+<td><strong>Windows 10 IoT Core（历史）</strong></td>
+<td>面向小型设备，已非主流选型；生命周期以官方为准</td>
+</tr>
+<tr>
+<td><strong>Embedded / POSReady 等（历史）</strong></td>
+<td>XP/7 时代行业变种，超旧环境仍可能见到</td>
+</tr>
+<tr>
+<td><strong>Windows Embedded Compact / CE</strong></td>
+<td><strong>与 NT 桌面客户端不是同一产品线</strong>，API/工具链不同</td>
+</tr>
+</tbody>
+</table>
+<p>工控现场点名时，写清 <strong>IoT Enterprise LTSC 年份</strong> 比写「Win10 物联网」有用得多。</p>
+<h3 id="25-arm-与非-x86桌面">2.5 ARM 与「非 x86」桌面</h3>
+<table>
+<thead>
+<tr>
+<th>产品</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Windows RT</strong></td>
+<td>NT 6.2/6.3 时代 ARM 平板，桌面应用模型受限</td>
+</tr>
+<tr>
+<td><strong>Windows 10/11 on ARM</strong></td>
+<td>较新 ARM64 客户端；x86/x64 模拟层随 Build 增强</td>
+</tr>
+<tr>
+<td><strong>Windows Server on ARM</strong></td>
+<td>云与特定硬件场景，生态与 x64 不完全对等</td>
+</tr>
+</tbody>
+</table>
+<p>载荷、驱动、EDR 在 ARM64 上要单独验证，不能假设与 x64 二进制通用。</p>
+<h3 id="26-云-pc-与多会话桌面">2.6 云 PC 与「多会话」桌面</h3>
+<table>
+<thead>
+<tr>
+<th>形态</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Windows 365</strong></td>
+<td>云托管 PC，底层仍是 Windows 客户端镜像 + 策略</td>
+</tr>
+<tr>
+<td><strong>Azure Virtual Desktop 多会话</strong></td>
+<td>企业多用户桌面，SKU/许可特殊</td>
+</tr>
+<tr>
+<td><strong>Marketplace 镜像</strong></td>
+<td>常预装代理，Build 与通道看镜像发布说明</td>
+</tr>
+</tbody>
+</table>
+<h3 id="27-预安装环境与恢复">2.7 预安装环境与恢复</h3>
+<table>
+<thead>
+<tr>
+<th>环境</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Windows PE</strong></td>
+<td>预安装/救援环境，版本随 ADK；功能子集</td>
+</tr>
+<tr>
+<td><strong>WinRE</strong></td>
+<td>恢复环境，与主系统镜像相关</td>
+</tr>
+<tr>
+<td><strong>Setup 启动环境</strong></td>
+<td>安装介质中的临时系统</td>
+</tr>
+</tbody>
+</table>
+<p>写「PE 下能否跑某工具」取决于 <strong>PE 的架构与组件包</strong>，不是宿主机的营销名。</p>
+<h3 id="28-移动与其它完整性">2.8 移动与其它（完整性）</h3>
+<table>
+<thead>
+<tr>
+<th>产品线</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Windows Phone 7.x</td>
+<td>主要基于 Windows CE 一系，<strong>不是桌面 NT 那条线</strong></td>
+</tr>
+<tr>
+<td>Windows Phone 8 / 8.1</td>
+<td>转为 NT 内核家族，但与桌面分支/应用模型仍不同</td>
+</tr>
+<tr>
+<td>Windows 10 Mobile</td>
+<td>已停服，仅考古</td>
+</tr>
+<tr>
+<td>Xbox 系统 OS</td>
+<td>专用，与桌面运维无关</td>
+</tr>
+<tr>
+<td>HoloLens</td>
+<td>专用分支</td>
+</tr>
+<tr>
+<td>Team / 协作设备 SKU</td>
+<td>会议设备</td>
+</tr>
+</tbody>
+</table>
+<p>资产盘点一般单列，勿与 PC SAC/LTSC 混在一张「Win10」报表里。</p>
+<h3 id="29-非-nt9x-系对比用">2.9 非 NT：9x 系（对比用）</h3>
+<table>
+<thead>
+<tr>
+<th>产品</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Windows 95 / 98 / Me</td>
+<td><strong>Win9x 内核</strong>，不是 NT</td>
+</tr>
+<tr>
+<td>Windows 3.1 + Win32s 等</td>
+<td>更早</td>
+</tr>
+</tbody>
+</table>
+<p>与 NT 5.x 同时代的消费市场有重叠，但<strong>驱动模型、安全模型完全不同</strong>。</p>
+<hr>
+<h2 id="三按内核版本从-nt-31-到-nt-100">三、按内核版本：从 NT 3.1 到 NT 10.0</h2>
+<h3 id="31-如何自己读出内核与构建">3.1 如何自己读出内核与构建</h3>
+<p><strong>GUI</strong>：<code>winver</code></p>
+<p><strong>命令行</strong>：</p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="bat"><code><span class="line"><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">systeminfo</span></span>
+<span class="line"><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">ver</span></span>
+<span class="line"><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">reg</span><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF"> query</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion"</span></span></code></pre>
+<p><strong>PowerShell（示例字段）</strong>：</p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="powershell"><code><span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#EEF0F9">Get-ItemProperty</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion'</span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9"> |</span></span>
+<span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#EEF0F9">  Select-Object</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9"> ProductName</span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9">,</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9"> DisplayVersion</span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9">,</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9"> CurrentBuild</span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9">,</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9"> UBR</span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9">,</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9"> InstallationType</span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9">,</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">                CurrentMajorVersionNumber</span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9">,</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9"> CurrentMinorVersionNumber</span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9">,</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9"> EditionID</span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9">,</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9"> ReleaseId</span></span></code></pre>
+<p><strong>注意（版本谎言）</strong>：对未在清单中声明兼容性的应用，Windows 8.1/10/11 上过时的 <code>GetVersion(Ex)</code> 等可能返回 <strong>6.2</strong>（表现为「永远是 Windows 8」），<strong>不是</strong>注册表里的真实内核/Build。自动化探测应优先：</p>
+<ul>
+<li><code>HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion</code> 的 <code>CurrentBuild</code> / <code>UBR</code> / <code>DisplayVersion</code></li>
+<li>或已清单感知的版本 API / WMI <code>Win32_OperatingSystem</code></li>
+</ul>
+<hr>
+<h3 id="32-超旧nt-31--nt-52">3.2 超旧：NT 3.1 – NT 5.2</h3>
+<table>
+<thead>
+<tr>
+<th>NT</th>
+<th>年份量级</th>
+<th>客户端 / 工作站</th>
+<th>服务器</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>3.1</strong></td>
+<td>1993</td>
+<td>Windows NT 3.1</td>
+<td>NT 3.1 Advanced Server</td>
+<td>NT 桌面/服务器分叉起点</td>
+</tr>
+<tr>
+<td><strong>3.5</strong></td>
+<td>1994</td>
+<td>NT 3.5</td>
+<td>NT 3.5 Server</td>
+<td></td>
+</tr>
+<tr>
+<td><strong>3.51</strong></td>
+<td>1995</td>
+<td>NT 3.51</td>
+<td>NT 3.51 Server</td>
+<td></td>
+</tr>
+<tr>
+<td><strong>4.0</strong></td>
+<td>1996</td>
+<td>NT 4.0 Workstation</td>
+<td>NT 4.0 Server 族</td>
+<td>界面接近 9x，内核仍是 NT</td>
+</tr>
+<tr>
+<td><strong>5.0</strong></td>
+<td>2000</td>
+<td><strong>Windows 2000 Professional</strong></td>
+<td>Windows 2000 Server / Adv / DC</td>
+<td>AD 大规模落地</td>
+</tr>
+<tr>
+<td><strong>5.1</strong></td>
+<td>2001</td>
+<td><strong>Windows XP</strong>（含 SP 世代）</td>
+<td>—（无独立「XP Server」商品）</td>
+<td>桌面超长尾；嵌入式/POS 变种多</td>
+</tr>
+<tr>
+<td><strong>5.2</strong></td>
+<td>2003</td>
+<td><strong>Windows XP Professional x64 Edition</strong> 等</td>
+<td><strong>Windows Server 2003 / 2003 R2</strong></td>
+<td>服务器超旧基线；注意 x64 XP 是 5.2 而非 5.1</td>
+</tr>
+</tbody>
+</table>
+<p><strong>XP 相关变种（常踩坑）</strong>：Embedded、POSReady、Tablet PC 版、Media Center、各语言与 OEM 定制——<strong>多数仍属 NT 5.1 客户端谱系</strong>，组件集与支持周期不同。</p>
+<p><strong>Server 2003 角色</strong>：域控、IIS6、旧线业务；现代浏览器与 TLS 基线基本不可用。</p>
+<hr>
+<h3 id="33-nt-60--vista--server-2008">3.3 NT 6.0 — Vista / Server 2008</h3>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>PC</strong></td>
+<td>Windows Vista（含 SP）</td>
+</tr>
+<tr>
+<td><strong>Server</strong></td>
+<td>Windows Server 2008（非 R2）</td>
+</tr>
+<tr>
+<td><strong>特征</strong></td>
+<td>UAC、完整性级别强化、WDDM 方向、后续安全架构的重要分水岭</td>
+</tr>
+<tr>
+<td><strong>现状</strong></td>
+<td>主流支持结束；虚拟机考古或遗留产线</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h3 id="34-nt-61--windows-7--server-2008-r2">3.4 NT 6.1 — Windows 7 / Server 2008 R2</h3>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>PC</strong></td>
+<td>Windows 7</td>
+</tr>
+<tr>
+<td><strong>Server</strong></td>
+<td>Windows Server 2008 R2</td>
+</tr>
+<tr>
+<td><strong>特征</strong></td>
+<td>企业桌面长期事实标准；海量行业软件认证停在此代</td>
+</tr>
+<tr>
+<td><strong>现状</strong></td>
+<td>停服后仍大量「专用机」；漏洞面公开资料极多</td>
+</tr>
+</tbody>
+</table>
+<p><strong>兼容口诀</strong>：只声明支持到 7/2008 R2 的软件，在 8+ 上靠兼容模式<strong>不保证</strong>可运行。</p>
+<hr>
+<h3 id="35-nt-62--windows-8--server-2012">3.5 NT 6.2 — Windows 8 / Server 2012</h3>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>PC</strong></td>
+<td>Windows 8；（并行）Windows RT（ARM）</td>
+</tr>
+<tr>
+<td><strong>Server</strong></td>
+<td>Windows Server 2012</td>
+</tr>
+<tr>
+<td><strong>特征</strong></td>
+<td>新壳层、应用模型变化；Server 强化云/多租户角色</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h3 id="36-nt-63--windows-81--server-2012-r2">3.6 NT 6.3 — Windows 8.1 / Server 2012 R2</h3>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>PC</strong></td>
+<td>Windows 8.1</td>
+</tr>
+<tr>
+<td><strong>Server</strong></td>
+<td>Windows Server 2012 R2</td>
+</tr>
+<tr>
+<td><strong>特征</strong></td>
+<td>8 的修正世代；虚拟化、RDS、文件服务在 2012 R2 上非常常见</td>
+</tr>
+<tr>
+<td><strong>探测</strong></td>
+<td>版本谎言问题在本代开始被广泛讨论</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h3 id="37-nt-100--windows-1011-与-server-2016">3.7 NT 10.0 — Windows 10/11 与 Server 2016+</h3>
+<p>从 Windows 10 起：</p>
+<ul>
+<li><strong>营销大版本</strong>可以叫 10、11；</li>
+<li><strong>NT 主版本钉在 10.0</strong>；</li>
+<li>真正区分世代的是 <strong>Build + DisplayVersion + 通道 SKU</strong>。</li>
+</ul>
+<h4 id="客户端">客户端</h4>
+<table>
+<thead>
+<tr>
+<th>产品</th>
+<th>NT</th>
+<th>通道常见形态</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Windows 10</td>
+<td>10.0</td>
+<td>SAC/通用功能通道；Enterprise LTSC 多代</td>
+</tr>
+<tr>
+<td>Windows 11</td>
+<td>10.0</td>
+<td>功能通道 + <strong>LTSC 2024</strong>；硬件门槛（TPM/CPU 等）</td>
+</tr>
+</tbody>
+</table>
+<h4 id="服务器">服务器</h4>
+<table>
+<thead>
+<tr>
+<th>产品</th>
+<th>NT</th>
+<th>基础 Build（常见）</th>
+<th>与桌面关系（粗，勿等同商品）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Server 2016</td>
+<td>10.0</td>
+<td><strong>14393</strong></td>
+<td>与 Win10 <strong>1607</strong> / LTSB 2016 同建系</td>
+</tr>
+<tr>
+<td>Server 2019</td>
+<td>10.0</td>
+<td><strong>17763</strong></td>
+<td>与 Win10 <strong>1809</strong> / LTSC 2019 同建系</td>
+</tr>
+<tr>
+<td>Server 2022</td>
+<td>10.0</td>
+<td><strong>20348</strong></td>
+<td>同期客户端主线是 1904x（21H2/22H2），<strong>Build 号并不相同</strong>，不能写成「等于 21H2」</td>
+</tr>
+<tr>
+<td>Server 2025</td>
+<td>10.0</td>
+<td><strong>26100 系</strong></td>
+<td>与 Win11 <strong>24H2</strong> 平台线更接近；细节以发布说明为准</td>
+</tr>
+</tbody>
+</table>
+<h4 id="同建系记忆法仅内核构建族功能集相同">「同建系」记忆法（仅内核/构建族，≠功能集相同）</h4>
+<table>
+<thead>
+<tr>
+<th>桌面侧</th>
+<th>Server 侧</th>
+<th>同建系 Build</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Win10 1607 / LTSB 2016</td>
+<td>Server 2016</td>
+<td>14393</td>
+</tr>
+<tr>
+<td>Win10 1809 / LTSC 2019</td>
+<td>Server 2019</td>
+<td>17763</td>
+</tr>
+<tr>
+<td>Win10 21H2–22H2 / LTSC 2021</td>
+<td>（无「Server 等于 19045」）</td>
+<td>19044 / 19045（<strong>客户端</strong>）</td>
+</tr>
+<tr>
+<td>Win11 24H2 / LTSC 2024</td>
+<td>Server 2025（近）</td>
+<td>26100 系</td>
+</tr>
+</tbody>
+</table>
+<p>Server 2022 请单独记 <strong>20348</strong>，不要和 19045 混用。资产表保留 <strong>Build.UBR</strong> 以对齐 KB。</p>
+<hr>
+<h3 id="38-内核世代总表收藏">3.8 内核世代总表（收藏）</h3>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="text"><code><span class="line"><span>NT 3.1 – 4.0     古典 NT</span></span>
+<span class="line"><span>NT 5.0 – 5.2     2000 / XP / 2003</span></span>
+<span class="line"><span>NT 6.0           Vista / 2008</span></span>
+<span class="line"><span>NT 6.1           Win7 / 2008 R2</span></span>
+<span class="line"><span>NT 6.2           Win8 / 2012</span></span>
+<span class="line"><span>NT 6.3           Win8.1 / 2012 R2</span></span>
+<span class="line"><span>NT 10.0          Win10 / Win11 / Server 2016+</span></span></code></pre>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="text"><code><span class="line"><span>              PC / Client              Server                通道关键词</span></span>
+<span class="line"><span>NT 5.1        XP                       —                    遗留</span></span>
+<span class="line"><span>NT 5.2        XP x64                   2003/R2              遗留</span></span>
+<span class="line"><span>NT 6.0        Vista                    2008                 遗留</span></span>
+<span class="line"><span>NT 6.1        Win7                     2008 R2              遗留专用机</span></span>
+<span class="line"><span>NT 6.2        Win8 / RT                2012                 遗留</span></span>
+<span class="line"><span>NT 6.3        Win8.1                   2012 R2              遗留</span></span>
+<span class="line"><span>NT 10.0       Win10/11 (±LTSC)         2016–2025            SAC/GAC 或 LTSC</span></span></code></pre>
+<hr>
+<h2 id="四三维五维交叉如何正确描述一台机器">四、三维（五维）交叉：如何正确描述一台机器</h2>
+<h3 id="41-推荐描述模板">4.1 推荐描述模板</h3>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="text"><code><span class="line"><span>形态 · SKU · 通道/发行 · NT · 功能版或LTSC年 · Build.UBR · 架构 · 安装形态</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>完整例：</span></span>
+<span class="line"><span>PC · Enterprise · LTSC 2021 · NT 10.0 · Build 19044.&lt;UBR&gt; · x64 · Client</span></span>
+<span class="line"><span>Server · Datacenter · 2022 · NT 10.0 · Build 20348.xxxx · x64 · Core</span></span>
+<span class="line"><span>PC · Pro · 功能通道 24H2 · NT 10.0 · Build 26100.xxxx · ARM64 · Client</span></span></code></pre>
+<h3 id="42-反例">4.2 反例</h3>
+<table>
+<thead>
+<tr>
+<th>含糊说法</th>
+<th>问题</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>「都是 Win10」</td>
+<td>LTSC 2019 与 22H2 差异巨大</td>
+</tr>
+<tr>
+<td>「NT 10 就能跑」</td>
+<td>忽略 Build 与缓解措施</td>
+</tr>
+<tr>
+<td>「Server 2022 等于 Win11」</td>
+<td>商品线不同，组件默认集不同</td>
+</tr>
+<tr>
+<td>「LTSC 不用更新」</td>
+<td>错误且危险</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="五实践专题">五、实践专题</h2>
+<h3 id="51-版本探测谎言">5.1 版本探测谎言</h3>
+<ul>
+<li>旧 <code>GetVersionEx</code> 等在缺少兼容性清单时，Win8.1+ 可能回报 <strong>6.2</strong>。</li>
+<li>安装包/授权/脚本请用：
+<ul>
+<li>清单声明 + 推荐版本 API</li>
+<li>或直接读 <code>CurrentBuild</code> / WMI <code>Win32_OperatingSystem</code></li>
+</ul>
+</li>
+</ul>
+<h3 id="52-补丁与-cve-对齐">5.2 补丁与 CVE 对齐</h3>
+<ul>
+<li>安全公告常写「Windows 10 Version 22H2」或具体 Build。</li>
+<li>库存应用 <strong>DisplayVersion + Build.UBR</strong> 对齐 KBs。</li>
+<li>LTSC 的 KB 适用性与 SAC 同 Build 系时常相近，但<strong>以目录为准</strong>。</li>
+</ul>
+<h3 id="53-驱动与签名">5.3 驱动与签名</h3>
+<ul>
+<li>驱动目标系统类（Client/Server）、架构（x64/ARM64）、是否强制签名/HVCI/Vulnerable Driver Blocklist，随 Build 变严。</li>
+<li>「能在 Win7 装」≠「能在 Win11 24H2 + Memory Integrity 下装」。</li>
+</ul>
+<h3 id="54-红队--蓝队--运维各自多看一眼">5.4 红队 / 蓝队 / 运维各自多看一眼</h3>
+<table>
+<thead>
+<tr>
+<th>角色</th>
+<th>额外关注</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>红队</td>
+<td>Build、Defender 平台版本、是否 Server Core、凭据防护与 ASR</td>
+</tr>
+<tr>
+<td>蓝队</td>
+<td>通道是否掉队、LTSC 是否 EOL、影子 IT 的 LTSC/IoT</td>
+</tr>
+<tr>
+<td>运维</td>
+<td>WSUS/Update 环形、功能更新冻结窗口、启用包策略</td>
+</tr>
+<tr>
+<td>开发</td>
+<td>支持矩阵写成 Build 范围；CI 矩阵不要只装「一个 Win10」</td>
+</tr>
+</tbody>
+</table>
+<h3 id="55-升级路径概念">5.5 升级路径（概念）</h3>
+<ul>
+<li>客户端：Win10 功能版之间、Win10→11（硬件与策略门槛）。</li>
+<li>LTSC：通常 <strong>不能</strong> 当「SAC 功能版」一样随便跨通道升级；换代往往是<strong>重新部署</strong>思维。</li>
+<li>Server：大版本升级路径与许可、应用认证绑定，生产环境以迁移项目论。</li>
+</ul>
+<h3 id="56-语言架构与介质">5.6 语言、架构与介质</h3>
+<ul>
+<li><strong>架构</strong>：x86（遗留）、x64、ARM64。</li>
+<li><strong>语言</strong>：语言包 vs 完整语言镜像。</li>
+<li><strong>介质</strong>：VL / OEM / Retail / 评估版 / Insider ISO——通道与激活不同。</li>
+</ul>
+<hr>
+<h2 id="六速查表打印向">六、速查表（打印向）</h2>
+<h3 id="61-通道">6.1 通道</h3>
+<table>
+<thead>
+<tr>
+<th>关键词</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>SAC</td>
+<td>半年功能通道（Win10 经典名）</td>
+</tr>
+<tr>
+<td>LTSC / LTSB</td>
+<td>长期服务，功能面稳</td>
+</tr>
+<tr>
+<td>GAC 等新名</td>
+<td>现行「通用功能更新」商业通道表述</td>
+</tr>
+<tr>
+<td>Insider</td>
+<td>预览，非生产</td>
+</tr>
+</tbody>
+</table>
+<h3 id="62-形态">6.2 形态</h3>
+<table>
+<thead>
+<tr>
+<th>关键词</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>PC / Client</td>
+<td>桌面</td>
+</tr>
+<tr>
+<td>Server</td>
+<td>服务器角色系统</td>
+</tr>
+<tr>
+<td>Core</td>
+<td>无完整桌面的 Server</td>
+</tr>
+<tr>
+<td>IoT Enterprise</td>
+<td>设备/行业</td>
+</tr>
+<tr>
+<td>PE / WinRE</td>
+<td>预安装与恢复环境</td>
+</tr>
+</tbody>
+</table>
+<h3 id="63-内核--商品">6.3 内核 → 商品</h3>
+<table>
+<thead>
+<tr>
+<th>NT</th>
+<th>立刻想起</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>5.1</td>
+<td>XP</td>
+</tr>
+<tr>
+<td>5.2</td>
+<td>Server 2003</td>
+</tr>
+<tr>
+<td>6.0</td>
+<td>Vista / 2008</td>
+</tr>
+<tr>
+<td>6.1</td>
+<td>Win7 / 2008 R2</td>
+</tr>
+<tr>
+<td>6.2</td>
+<td>Win8 / 2012</td>
+</tr>
+<tr>
+<td>6.3</td>
+<td>Win8.1 / 2012 R2</td>
+</tr>
+<tr>
+<td>10.0</td>
+<td>Win10/11 / Server 2016+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="64-你想说--更准确">6.4 你想说… → 更准确</h3>
+<table>
+<thead>
+<tr>
+<th>脱口而出</th>
+<th>建议写成</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>半年版</td>
+<td>SAC / 功能通道 + DisplayVersion</td>
+</tr>
+<tr>
+<td>工控版</td>
+<td>Enterprise LTSC + 年份 + Build</td>
+</tr>
+<tr>
+<td>服务器 2019</td>
+<td>Server 2019 + SKU + Core 与否 + Build</td>
+</tr>
+<tr>
+<td>新 Win11</td>
+<td>NT 10.0 + 24H2（等）+ Build</td>
+</tr>
+<tr>
+<td>老系统</td>
+<td>NT 主版本 + 商品名 + SP</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="七按-nt-代际安全特性对照默认--典型能力">七、按 NT 代际：安全特性对照（默认 / 典型能力）</h2>
+<blockquote>
+<p><strong>读表约定</strong></p>
+<ul>
+<li><strong>○</strong> 该代已具备能力或可规模部署（不一定出厂全开）</li>
+<li><strong>△</strong> 有限/需特定 SKU、硬件或后期补丁；或默认关、企业才开</li>
+<li><strong>—</strong> 基本不存在或可忽略</li>
+<li>「默认」随 <strong>SKU、组策略、云基线、OEM</strong> 变化极大；下表是<strong>代际能力地图</strong>，不是某一台机器的审计结果。</li>
+<li><strong>NT 10.0 必须再拆 Build</strong>：同为 10.0，1507 与 24H2 的缓解与 Defender 平台差一个时代。</li>
+</ul>
+</blockquote>
+<h3 id="71-身份会话与提权相关">7.1 身份、会话与提权相关</h3>
+<table>
+<thead>
+<tr>
+<th>能力</th>
+<th>≤5.2</th>
+<th>6.0</th>
+<th>6.1</th>
+<th>6.2</th>
+<th>6.3</th>
+<th>10.0</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>UAC</strong></td>
+<td>—</td>
+<td>○ 引入</td>
+<td>○</td>
+<td>○</td>
+<td>○</td>
+<td>○</td>
+</tr>
+<tr>
+<td><strong>MIC（完整性级别）</strong></td>
+<td>—</td>
+<td>○</td>
+<td>○</td>
+<td>○</td>
+<td>○</td>
+<td>○</td>
+</tr>
+<tr>
+<td><strong>拆分令牌 / 受保护的管理员</strong></td>
+<td>—</td>
+<td>○</td>
+<td>○</td>
+<td>○</td>
+<td>○</td>
+<td>○</td>
+</tr>
+<tr>
+<td><strong>Credential Guard</strong></td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>△ <strong>Windows 10 1607 / Server 2016 起</strong>可配；需虚拟化基安全相关硬件；<strong>受支持 SKU</strong>；默认不保证开启</td>
+</tr>
+<tr>
+<td><strong>Remote Credential Guard</strong></td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>△ 在文档列出的 OS 组合上可配；默认不保证开启</td>
+</tr>
+<tr>
+<td><strong>LSASS 以 PPL 运行等</strong></td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>△ <strong>Windows 8.1</strong> 起相关加固选项出现</td>
+<td>○ 可配（注册表/策略）；是否开启看环境</td>
+</tr>
+<tr>
+<td><strong>Windows Hello（品牌）</strong></td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>○ <strong>Windows 10 起</strong>的品牌与平台</td>
+</tr>
+<tr>
+<td><strong>PIN / 生物识别前身</strong></td>
+<td>—</td>
+<td>—</td>
+<td>△ 有限</td>
+<td>△</td>
+<td>△ 8.1 等增强</td>
+<td>并入 Hello 体系</td>
+</tr>
+<tr>
+<td><strong>Hello for Business</strong></td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>△ <strong>企业部署</strong>（云信任/密钥信任等），不是消费版「开箱即用」同义词</td>
+</tr>
+<tr>
+<td><strong>VBS</strong></td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>△ <strong>Windows 10 起</strong>可提供；依赖硬件/固件/SKU/策略</td>
+</tr>
+</tbody>
+</table>
+<h3 id="72-代码完整性应用控制与宏">7.2 代码完整性、应用控制与宏</h3>
+<table>
+<thead>
+<tr>
+<th>能力</th>
+<th>≤5.2</th>
+<th>6.0</th>
+<th>6.1</th>
+<th>6.2</th>
+<th>6.3</th>
+<th>10.0</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>x64 KMCS（内核驱动签名）</strong></td>
+<td>—</td>
+<td>○ <strong>Vista x64 起要求</strong></td>
+<td>○</td>
+<td>○</td>
+<td>○</td>
+<td>○（要求随时代变严）</td>
+</tr>
+<tr>
+<td><strong>AppLocker</strong></td>
+<td>—</td>
+<td>—</td>
+<td>○ <strong>Win7 Enterprise/Ultimate、Server 2008 R2</strong> 等引入</td>
+<td>○ 受支持 SKU</td>
+<td>○ 受支持 SKU</td>
+<td>○ 历史以 Enterprise/Education + GPO 为主；<strong>MDM/CSP 与后续版本对 SKU 限制有调整</strong>（见微软 AppLocker 要求文档）</td>
+</tr>
+<tr>
+<td><strong>WDAC（应用控制策略）</strong></td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>△ <strong>Windows 10 起</strong>（早期常与 Device Guard 等名称一并出现）；企业向</td>
+</tr>
+<tr>
+<td><strong>Smart App Control</strong></td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>○ <strong>仅 Windows 11</strong>，且通常要求满足干净安装等条件；<strong>多数升级路径/不满足条件时不可用或保持关闭</strong></td>
+</tr>
+<tr>
+<td><strong>MOTW</strong></td>
+<td>△ <strong>XP SP2</strong> 起附件区域等机制</td>
+<td>○</td>
+<td>○</td>
+<td>○</td>
+<td>○</td>
+<td>○</td>
+</tr>
+<tr>
+<td><strong>Office「来自 Internet 的宏」</strong></td>
+<td>松</td>
+<td>松</td>
+<td>松</td>
+<td>松</td>
+<td>松</td>
+<td>△→○ 主要由 <strong>Microsoft 365 Apps / Office 策略</strong> 与 MOTW 决定，<strong>不是单一 Windows SKU 开关</strong>；近年企业默认趋严</td>
+</tr>
+<tr>
+<td><strong>ASR</strong></td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>△ <strong>Windows 10 1709 起</strong>；规则列表随 Defender 平台更新；<strong>默认规则集不等于全部 Audit/Block</strong></td>
+</tr>
+<tr>
+<td><strong>XLL 等加载项</strong></td>
+<td>松</td>
+<td>松</td>
+<td>松</td>
+<td>松</td>
+<td>松</td>
+<td>△ 随 Office 与安全策略收紧</td>
+</tr>
+</tbody>
+</table>
+<h3 id="73-内存与平台缓解">7.3 内存与平台缓解</h3>
+<table>
+<thead>
+<tr>
+<th>能力</th>
+<th>≤5.2</th>
+<th>6.0</th>
+<th>6.1</th>
+<th>6.2</th>
+<th>6.3</th>
+<th>10.0</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>DEP/NX</strong></td>
+<td>△ <strong>XP SP2</strong> 等起更可用</td>
+<td>○</td>
+<td>○</td>
+<td>○</td>
+<td>○</td>
+<td>○</td>
+</tr>
+<tr>
+<td><strong>ASLR</strong></td>
+<td>△ 很有限</td>
+<td>○ <strong>Vista 起系统级增强</strong></td>
+<td>○</td>
+<td>○</td>
+<td>○</td>
+<td>○ 持续加强</td>
+</tr>
+<tr>
+<td><strong>CFG</strong></td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>△ <strong>Windows 8.1 Update 3</strong> 起平台支持扩大；完整体验在 Win10+ 更常见</td>
+<td>○（需程序按 CFG 编译）</td>
+</tr>
+<tr>
+<td><strong>CET 等硬件相关缓解</strong></td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>△ <strong>较新 OS + 支持该指令集的 CPU</strong>；非全机标配</td>
+</tr>
+<tr>
+<td><strong>HVCI / 内存完整性</strong></td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>△ Win10 可启用；Win11 在合格硬件上更常作为推荐项</td>
+</tr>
+<tr>
+<td><strong>内核 DMA 保护</strong></td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>△ 需硬件/固件支持</td>
+</tr>
+<tr>
+<td><strong>易受攻击驱动封锁</strong></td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>△ 随安全更新维护列表；生效条件随版本变</td>
+</tr>
+<tr>
+<td><strong>SMBv1</strong></td>
+<td>常装有</td>
+<td>常装有</td>
+<td>常装有</td>
+<td>可禁用</td>
+<td>可禁用</td>
+<td>较新版本默认不启用或可移除</td>
+</tr>
+</tbody>
+</table>
+<h3 id="74-反恶意软件接口与审计">7.4 反恶意软件、接口与审计</h3>
+<table>
+<thead>
+<tr>
+<th>能力</th>
+<th>≤5.2</th>
+<th>6.0</th>
+<th>6.1</th>
+<th>6.2–6.3</th>
+<th>10.0</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>收件箱反恶意软件</strong></td>
+<td>无现代 Defender；可另装 MSE 等</td>
+<td>多为可选组件/另装</td>
+<td><strong>Security Essentials</strong> 等可选</td>
+<td><strong>Windows Defender</strong> 收件箱化加强</td>
+<td><strong>Microsoft Defender 杀毒</strong> inbox</td>
+</tr>
+<tr>
+<td><strong>云 EDR（如 Defender for Endpoint）</strong></td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>△ <strong>独立授权与接入</strong>；≠ 每个 Windows 许可证自带完整 EDR</td>
+</tr>
+<tr>
+<td><strong>AMSI</strong></td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>○ <strong>Windows 10 起</strong> API；宿主覆盖随版本增加</td>
+</tr>
+<tr>
+<td><strong>ETW</strong></td>
+<td>有</td>
+<td>增</td>
+<td>增</td>
+<td>增</td>
+<td>安全相关 Provider 显著增多</td>
+</tr>
+<tr>
+<td><strong>PowerShell 脚本块/模块日志</strong></td>
+<td>—</td>
+<td>—</td>
+<td>△ 旧 PS</td>
+<td>△</td>
+<td>○ <strong>Windows 10 + Windows PowerShell 5.x</strong> 可全面配置；默认不总是全开</td>
+</tr>
+<tr>
+<td><strong>受控文件夹访问</strong></td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>△ Win10 起可配</td>
+</tr>
+<tr>
+<td><strong>SmartScreen</strong></td>
+<td>早期附件/URL 信誉</td>
+<td>增</td>
+<td>增</td>
+<td>○</td>
+<td>○</td>
+</tr>
+</tbody>
+</table>
+<h3 id="75-磁盘启动与远程">7.5 磁盘、启动与远程</h3>
+<table>
+<thead>
+<tr>
+<th>能力</th>
+<th>≤5.2</th>
+<th>6.0</th>
+<th>6.1</th>
+<th>6.2–6.3</th>
+<th>10.0</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>BitLocker</strong></td>
+<td>—</td>
+<td>○ <strong>Vista Enterprise/Ultimate</strong> 引入</td>
+<td>○ <strong>Enterprise/Ultimate</strong>（经典划分下 <strong>Pro 不含</strong>完整 BitLocker）</td>
+<td>○ <strong>Win8+ 起 Pro 等更广泛提供</strong>（以当时功能表为准）</td>
+<td>○ 常见；与 TPM 策略相关</td>
+</tr>
+<tr>
+<td><strong>TPM</strong></td>
+<td>少</td>
+<td>少</td>
+<td>可选</td>
+<td>可选</td>
+<td>企业功能常用；<strong>Windows 11 产品要求包含 TPM 2.0 等硬件条件</strong>（有官方例外流程，不在此展开）</td>
+</tr>
+<tr>
+<td><strong>Secure Boot</strong></td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>○ <strong>Windows 8 起</strong>与 UEFI 安全启动模型绑定普及</td>
+<td>○</td>
+</tr>
+<tr>
+<td><strong>WinRM</strong></td>
+<td>旧远程</td>
+<td>增</td>
+<td>可配</td>
+<td>可配</td>
+<td>可配；<strong>WinRM over HTTPS 的 Channel Binding 等需单独硬化</strong></td>
+</tr>
+<tr>
+<td><strong>RDP + NLA</strong></td>
+<td>弱/无</td>
+<td>增</td>
+<td>○ 可要求 NLA</td>
+<td>○</td>
+<td>○</td>
+</tr>
+<tr>
+<td><strong>SMB 签名/加密</strong></td>
+<td>松</td>
+<td>增</td>
+<td>可配</td>
+<td>可配</td>
+<td>选项更多；默认随角色/策略变</td>
+</tr>
+</tbody>
+</table>
+<h3 id="76-网络与协议栈和能不能打补丁相关">7.6 网络与协议栈（和「能不能打补丁」相关）</h3>
+<table>
+<thead>
+<tr>
+<th>点</th>
+<th>长期未打补丁的旧系统 (如 XP/7 遗留)</th>
+<th>仍在服务的较新 10.0</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>TLS</td>
+<td>出厂密码套件陈旧；即使打过部分补丁也常难对齐现代网站</td>
+<td>默认偏向 TLS 1.2+；TLS 1.3 等随版本提供；旧协议可被策略关闭</td>
+</tr>
+<tr>
+<td>SMB1</td>
+<td>常见仍装有</td>
+<td>较新客户端/服务器多<strong>默认不启用</strong>或可卸载</td>
+</tr>
+<tr>
+<td>根证书</td>
+<td>停服后难持续更新</td>
+<td>随 Windows Update / 管理工具维护</td>
+</tr>
+<tr>
+<td>浏览器</td>
+<td>IE 或极旧引擎</td>
+<td>收件箱为 <strong>Chromium 版 Edge</strong>；IE 模式属企业兼容，不是默认冲浪引擎</td>
+</tr>
+</tbody>
+</table>
+<h3 id="77-nt-100-内部再拆一刀同一内核主版本">7.7 NT 10.0 内部再拆一刀（同一内核主版本）</h3>
+<p>同是 <strong>NT 10.0</strong>，安全能力仍可差很多。粗分（便于记忆，非官方分段名）：</p>
+<table>
+<thead>
+<tr>
+<th>阶段</th>
+<th>代表 Build/版本</th>
+<th>更准确的说法</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>10 初代</strong></td>
+<td>1507–1607（含 LTSB 2015/2016）</td>
+<td>VBS/Credential Guard 等在 1607 一带成型；<strong>尚无 ASR（1709 才有）</strong></td>
+</tr>
+<tr>
+<td><strong>10 中期</strong></td>
+<td>1709–1809（含 LTSC 2019 / Server 2019）</td>
+<td>ASR、WDAC/Device Guard 能力扩大</td>
+</tr>
+<tr>
+<td><strong>10 后期</strong></td>
+<td>20H2–22H2、LTSC 2021（19044/19045）</td>
+<td>Defender 平台成熟；Office 宏默认策略在企业环境很严；驱动治理加强</td>
+</tr>
+<tr>
+<td><strong>11 平台</strong></td>
+<td>22000+、24H2/26100、LTSC 2024</td>
+<td>产品硬件要求（如 TPM 2.0 等，见官方）；HVCI/Smart App Control 等<strong>有条件</strong>可用</td>
+</tr>
+<tr>
+<td><strong>Server</strong></td>
+<td>2016=14393 … 2022=20348 … 2025≈26100 系</td>
+<td><strong>角色默认攻击面 ≠ 同 Build 桌面</strong>；缓解能力跟平台，默认组件跟 SKU/安装选项</td>
+</tr>
+</tbody>
+</table>
+<h3 id="78-默认不等于合规谁在改默认">7.8 默认不等于合规：谁在改默认？</h3>
+<table>
+<thead>
+<tr>
+<th>来源</th>
+<th>影响</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>微软云安全基线 / 安全基线 GPO</strong></td>
+<td>企业域内远比家用「紧」</td>
+</tr>
+<tr>
+<td><strong>CIS / 等保式加固包</strong></td>
+<td>可开大量审计与限制</td>
+</tr>
+<tr>
+<td><strong>OEM / 厂商镜像</strong></td>
+<td>预装杀软、改 Defender、甚至关安全功能</td>
+</tr>
+<tr>
+<td><strong>LTSC 组件集</strong></td>
+<td>某些消费向防护 UI/商店依赖组件可能缺失，但内核缓解仍在</td>
+</tr>
+<tr>
+<td><strong>Server Core</strong></td>
+<td>攻击面小，但也不要假设「没有 GUI = 已开 CG/HVCI」</td>
+</tr>
+</tbody>
+</table>
+<p><strong>审计口令</strong>：代际表只解决「这代有没有这能力」；<strong>是否启用</strong>必须查本机策略 / <code>Get-MpComputerStatus</code> / <code>msinfo32</code> / 安全中心 / 对应 GPO。</p>
+<h3 id="79-和红队--蓝队的直接关系">7.9 和红队 / 蓝队的直接关系</h3>
+<table>
+<thead>
+<tr>
+<th>你在做…</th>
+<th>至少先问</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>宏钓鱼样本</td>
+<td>目标是哪代？MOTW + 默认拦宏是否生效？ASR 开了哪些？</td>
+</tr>
+<tr>
+<td>驱动/BYOVD</td>
+<td>目标 Build 是否已有 Vulnerable Driver Blocklist / HVCI？</td>
+</tr>
+<tr>
+<td>凭据窃取</td>
+<td>CG/PPL/WDigest 等在该代如何？</td>
+</tr>
+<tr>
+<td>应用白名单绕过</td>
+<td>AppLocker 还是 WDAC？Smart App Control 是否存在？</td>
+</tr>
+<tr>
+<td>补丁经营</td>
+<td>通道是否 LTSC？是否已 EOL？同 Build 的 UBR 是否落后？</td>
+</tr>
+</tbody>
+</table>
+<h3 id="710-一页脑图安全能力爬升">7.10 一页脑图（安全能力爬升）</h3>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="text"><code><span class="line"><span>XP/2003     无 UAC；依赖补丁纪律与第三方防护</span></span>
+<span class="line"><span>Vista/7     UAC + MIC；DEP/ASLR 成为常态；BitLocker 在特定 SKU</span></span>
+<span class="line"><span>8 / 8.1     Secure Boot 成为 UEFI 认证常见要求；CFG 在 **8.1 Update 3** 起更可用</span></span>
+<span class="line"><span>Win10       Defender inbox；VBS/CG（约 1607+）；ASR（约 1709+）；AMSI</span></span>
+<span class="line"><span>Win10 后期  企业宏/基线更严；驱动治理加强</span></span>
+<span class="line"><span>Win11       硬件门槛；HVCI / Smart App Control 等有条件可用</span></span></code></pre>
+<blockquote>
+<p>再次强调：表中 <strong>○/△ 表示「这代能不能配出这种能力」</strong>，不表示「零售镜像开机即全部开启」。</p>
+</blockquote>
+<blockquote>
+<p><strong>安全表维护原则</strong>：引入版本（CG≈1607、ASR≈1709、CFG≈8.1 Update 3）以微软文档为准；AppLocker 等 <strong>SKU 限制曾变更</strong>，以当前 Learn <em>Requirements</em> 覆盖旧记忆。</p>
+</blockquote>
+<hr>
+<h2 id="八小结">八、小结</h2>
+<p>Windows 版本体系可以记成一句话：</p>
+<blockquote>
+<p><strong>通道管“更新有多勤”，形态管“给谁用”，内核与 Build 管“兼容与补丁钉在哪一代”，安全特性管“这代有哪些刀、默不默认出鞘”。</strong></p>
+</blockquote>
+<ul>
+<li><strong>SAC / 功能通道</strong>：跟得上新能力，测试要勤。</li>
+<li><strong>LTSC</strong>：功能面稳，仍要安全更新与换代计划。</li>
+<li><strong>PC vs Server vs IoT vs PE</strong>：组件集和攻击面不同。</li>
+<li><strong>NT 3.1→5.2→6.x→10.0</strong>：粗分世代；<strong>NT 10.0 必须落到 Build</strong>。</li>
+<li><strong>安全能力</strong>：6.0 起有 UAC；Win10 起逐步具备 VBS/CG（约 1607+）、ASR（约 1709+）、AMSI 等；Win11 叠加更强硬件门槛与可选默认——<strong>查「有没有」看代际，查「开没开」看本机与许可证</strong>。</li>
+</ul>
+<p>把这些字段写进 CMDB / 实验环境目录名，比单独一个「Windows 10」字段可靠一个数量级。</p>
+<hr>
+<h2 id="九参考方向">九、参考方向</h2>
+<ul>
+<li>Microsoft Learn：Windows / Server 生命周期、LTSC 说明、发布健康与 Build 说明</li>
+<li>Microsoft Learn：Credential Guard、WDAC、ASR、BitLocker、VBS / Memory Integrity</li>
+<li>注册表 <code>HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion</code></li>
+<li>官方生命周期与产品页（EOL 日期以官方当前页面为准，本文刻意不写死日期以免过时）</li>
+<li>安全基线（Microsoft Security Baselines）与 Defender for Endpoint 文档</li>
+<li>ADK / WinPE 文档（救援环境版本）</li>
+<li>各云厂商 Marketplace 镜像说明（云 PC / 黄金镜像）</li>
+</ul>
+<hr>
+<h2 id="附录-a--客户端商品线时间线极简">附录 A — 客户端商品线时间线（极简）</h2>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="text"><code><span class="line"><span>NT 工作站: 3.1 → 3.5/3.51 → 4.0 → 2000 → XP</span></span>
+<span class="line"><span>Vista → 7 → 8 → 8.1 → 10 → 11</span></span>
+<span class="line"><span>（并行：RT、ARM64 客户端、IoT、LTSC 分支）</span></span></code></pre>
+<h2 id="附录-b--服务器商品线时间线极简">附录 B — 服务器商品线时间线（极简）</h2>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="text"><code><span class="line"><span>NT Server 3.x/4.0 → 2000 → 2003/R2</span></span>
+<span class="line"><span>→ 2008 → 2008 R2 → 2012 → 2012 R2</span></span>
+<span class="line"><span>→ 2016 → 2019 → 2022 → 2025</span></span>
+<span class="line"><span>（并行：Core、容器镜像、云多会话等）</span></span></code></pre>
+<h2 id="附录-c--资产盘点字段建议">附录 C — 资产盘点字段建议</h2>
+<table>
+<thead>
+<tr>
+<th>字段</th>
+<th>示例</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>os_family</td>
+<td>Windows</td>
+</tr>
+<tr>
+<td>os_form</td>
+<td>client / server / iot / pe</td>
+</tr>
+<tr>
+<td>os_sku</td>
+<td>Enterprise / Datacenter / …</td>
+</tr>
+<tr>
+<td>os_channel</td>
+<td>sac / ltsc / insider / server-ltsc</td>
+</tr>
+<tr>
+<td>os_nt</td>
+<td>10.0</td>
+</tr>
+<tr>
+<td>os_display</td>
+<td>22H2 / LTSC2021</td>
+</tr>
+<tr>
+<td>os_build</td>
+<td>19045</td>
+</tr>
+<tr>
+<td>os_ubr</td>
+<td>（随累积更新变化，以本机为准）</td>
+</tr>
+<tr>
+<td>os_arch</td>
+<td>x64 / arm64</td>
+</tr>
+<tr>
+<td>os_install</td>
+<td>client / server / servercore</td>
+</tr>
+<tr>
+<td>os_domain_role</td>
+<td>workstation / member / dc（可选）</td>
+</tr>
+</tbody>
+</table>
+<h2 id="附录-d--事实核对摘要本文修订时">附录 D — 事实核对摘要（本文修订时）</h2>
+<table>
+<thead>
+<tr>
+<th>主题</th>
+<th>采用的可靠说法</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>SAC → GAC</td>
+<td>功能更新通道的<strong>命名演进</strong>，不是两套内核</td>
+</tr>
+<tr>
+<td>LTSC 年限</td>
+<td>Enterprise 与 IoT LTSC <strong>条款不同</strong>；不写死 EOL</td>
+</tr>
+<tr>
+<td>Server 2022 Build</td>
+<td><strong>20348</strong>（≠ 客户端 19045）</td>
+</tr>
+<tr>
+<td>Server 2016/2019</td>
+<td>与 1607/1809 同建系 <strong>14393 / 17763</strong></td>
+</tr>
+<tr>
+<td>Win11 LTSC 2024</td>
+<td><strong>24H2 / 26100 系</strong></td>
+</tr>
+<tr>
+<td>版本谎言</td>
+<td>无清单时 <code>GetVersion*</code> 可能报 <strong>6.2</strong></td>
+</tr>
+<tr>
+<td>CFG</td>
+<td><strong>Windows 8.1 Update 3</strong> 起更广泛可用；Win10+ 更常见</td>
+</tr>
+<tr>
+<td>ASR</td>
+<td><strong>Windows 10 1709</strong> 起</td>
+</tr>
+<tr>
+<td>Credential Guard</td>
+<td><strong>Windows 10 1607 / Server 2016</strong> 起可配</td>
+</tr>
+<tr>
+<td>AppLocker</td>
+<td>Win7 企业向引入；其后 SKU/GPO/MDM 规则有调整</td>
+</tr>
+<tr>
+<td>Smart App Control</td>
+<td><strong>仅 Windows 11</strong> 且条件满足</td>
+</tr>
+<tr>
+<td>BitLocker @ Win7</td>
+<td>Enterprise/Ultimate，<strong>不是</strong>当时 Pro 的标配完整功能</td>
+</tr>
+<tr>
+<td>KMCS x64</td>
+<td><strong>Vista x64</strong> 起</td>
+</tr>
+<tr>
+<td>MDE/EDR</td>
+<td><strong>额外产品/许可</strong>，非所有 Windows 自带</td>
+</tr>
+<tr>
+<td>宏默认拦</td>
+<td>主要是 <strong>Office + MOTW/策略</strong>，勿写成单一 OS 开关</td>
+</tr>
+</tbody>
+</table>
+</div></div><aside class="toc" data-toc hidden aria-label="目录" data-astro-cid-sgg5joot><p class="toc-label" data-astro-cid-sgg5joot>目录</p><nav class="toc-nav" data-toc-nav data-astro-cid-sgg5joot></nav></aside></div></article></main><footer data-astro-cid-jo6i4kqk><div class="inner" data-astro-cid-jo6i4kqk><p class="line" data-astro-cid-jo6i4kqk>© 2026 Zumpyx</p><p class="note" data-astro-cid-jo6i4kqk>notes · exploit · write · repeat</p></div></footer><script type="module">function e(e){return e.trim().toLowerCase().replace(/\s+/g,`-`).replace(/[^\w\u4e00-\u9fff-]+/g,``).replace(/-+/g,`-`).replace(/^-|-$/g,``)||`section`}var t=null;function n(){let n=document.querySelector(`[data-article-content]`),r=document.querySelector(`[data-toc]`),i=document.querySelector(`[data-toc-nav]`);if(!n||!r||!i)return;t?.disconnect(),t=null,i.replaceChildren();let a=Array.from(n.querySelectorAll(`h2, h3`)).filter(e=>(e.textContent??``).trim().length>0);if(a.length===0){r.hidden=!0;return}r.hidden=!1;let o=new Set,s=[];for(let t of a){let n=t.id;if(!n){let r=e(t.textContent??``);n=r;let i=2;for(;o.has(n)||document.getElementById(n);)n=`${r}-${i}`,i+=1;t.id=n}o.add(n);let r=document.createElement(`a`);r.href=`#${n}`,r.textContent=(t.textContent??``).trim(),r.className=t.tagName===`H3`?`toc-h3`:`toc-h2`,r.dataset.target=n,i.appendChild(r),s.push(r)}let c=e=>{for(let t of s)t.classList.toggle(`active`,t.dataset.target===e)};t=new IntersectionObserver(e=>{let t=e.filter(e=>e.isIntersecting).sort((e,t)=>e.target.offsetTop-t.target.offsetTop);t[0]&&c(t[0].target.id)},{rootMargin:`-15% 0px -70% 0px`,threshold:[0,1]});for(let e of a)t.observe(e);location.hash?c(decodeURIComponent(location.hash.slice(1))):a[0]&&c(a[0].id)}n(),document.addEventListener(`article-content-unlocked`,()=>{n()});</script></body></html>

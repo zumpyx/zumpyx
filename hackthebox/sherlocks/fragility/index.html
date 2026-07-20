@@ -1,0 +1,133 @@
+<!DOCTYPE html><html lang="zh-CN" data-astro-cid-sgg5joot><head><!-- Global Metadata --><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="icon" type="image/png" href="/favicon.png"><link rel="icon" href="/favicon.ico" sizes="any"><link rel="apple-touch-icon" href="/apple-touch-icon.png"><link rel="sitemap" href="/sitemap-index.xml"><link rel="alternate" type="application/rss+xml" title="Zumpyx's Blog" href="https://blog.zumpyx.com/rss.xml"><meta name="generator" content="Astro v7.1.0"><meta name="color-scheme" content="light dark"><meta name="theme-color" content="#0b0d11" media="(prefers-color-scheme: dark)"><meta name="theme-color" content="#f4f5f7" media="(prefers-color-scheme: light)"><script>
+	(() => {
+		try {
+			const t = localStorage.getItem('theme');
+			if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t);
+			else document.documentElement.removeAttribute('data-theme');
+		} catch {}
+	})();
+</script><style>@font-face{font-family:Atkinson-c7f4c4e8b285552f;src:url("/_astro/fonts/89758defcfa85239.woff") format("woff");font-display:swap;font-weight:400;font-style:normal;}@font-face{font-family:Atkinson-c7f4c4e8b285552f;src:url("/_astro/fonts/14aa8dd5744dd4bc.woff") format("woff");font-display:swap;font-weight:700;font-style:normal;}@font-face{font-family:"Atkinson-c7f4c4e8b285552f fallback: Arial";src:local("Arial");font-display:swap;font-weight:400;font-style:normal;size-adjust:99.3717%;ascent-override:80.1033%;descent-override:25.2587%;line-gap-override:0%;}@font-face{font-family:"Atkinson-c7f4c4e8b285552f fallback: Arial Bold";src:local("Arial Bold");font-display:swap;font-weight:700;font-style:normal;size-adjust:92.2954%;ascent-override:86.2448%;descent-override:27.1953%;line-gap-override:0%;}:root{--font-atkinson:Atkinson-c7f4c4e8b285552f,"Atkinson-c7f4c4e8b285552f fallback: Arial","Atkinson-c7f4c4e8b285552f fallback: Arial Bold",sans-serif;}</style><link rel="preload" href="/_astro/fonts/89758defcfa85239.woff" as="font" type="font/woff" crossorigin><link rel="preload" href="/_astro/fonts/14aa8dd5744dd4bc.woff" as="font" type="font/woff" crossorigin><!-- Canonical URL --><link rel="canonical" href="https://blog.zumpyx.com/hackthebox/sherlocks/fragility/"><!-- Primary Meta Tags --><title>Fragility · Zumpyx&#39;s Blog</title><meta name="description" content="在我们公司的监控团队中，每个成员都可以使用 Splunk 管理员帐户访问 Splunk Web UI。其中，John 可以完全控制托管整个 Splunk 系统的机器。有一天，他惊慌失措地向我们报告说，他电脑上的一个重要文件消失了。而且，他还在登录界面上发现了一个新的账户。我们怀疑这是攻击的结果，因此从他的计算机上收集了一些证据，并获得了网络捕获。你能帮我们调查一下吗？"><!-- Open Graph / Facebook --><meta property="og:type" content="website"><meta property="og:url" content="https://blog.zumpyx.com/hackthebox/sherlocks/fragility/"><meta property="og:title" content="Fragility · Zumpyx's Blog"><meta property="og:description" content="在我们公司的监控团队中，每个成员都可以使用 Splunk 管理员帐户访问 Splunk Web UI。其中，John 可以完全控制托管整个 Splunk 系统的机器。有一天，他惊慌失措地向我们报告说，他电脑上的一个重要文件消失了。而且，他还在登录界面上发现了一个新的账户。我们怀疑这是攻击的结果，因此从他的计算机上收集了一些证据，并获得了网络捕获。你能帮我们调查一下吗？"><meta property="og:image" content="https://blog.zumpyx.com/_astro/head.CE6FOIKY.png"><!-- Twitter --><meta name="twitter:card" content="summary_large_image"><meta name="twitter:url" content="https://blog.zumpyx.com/hackthebox/sherlocks/fragility/"><meta name="twitter:title" content="Fragility · Zumpyx's Blog"><meta name="twitter:description" content="在我们公司的监控团队中，每个成员都可以使用 Splunk 管理员帐户访问 Splunk Web UI。其中，John 可以完全控制托管整个 Splunk 系统的机器。有一天，他惊慌失措地向我们报告说，他电脑上的一个重要文件消失了。而且，他还在登录界面上发现了一个新的账户。我们怀疑这是攻击的结果，因此从他的计算机上收集了一些证据，并获得了网络捕获。你能帮我们调查一下吗？"><meta name="twitter:image" content="https://blog.zumpyx.com/_astro/head.CE6FOIKY.png"><link rel="stylesheet" href="/_astro/Header.CMmW25g2.css"><style>.machine-list[data-astro-cid-twh6cqtg]{border:1px solid var(--border);border-radius:var(--radius);background:var(--bg-elevated);box-shadow:var(--shadow);margin-bottom:2rem;padding:1rem 1.15rem}.machine-list[data-astro-cid-twh6cqtg] h2[data-astro-cid-twh6cqtg]{font-size:1.1rem;font-family:var(--font-mono);color:var(--accent);margin:0 0 .65rem}.machine-list[data-astro-cid-twh6cqtg] ul[data-astro-cid-twh6cqtg]{margin:0;padding-left:1.2rem}.machine-list[data-astro-cid-twh6cqtg] li[data-astro-cid-twh6cqtg]{margin:.35rem 0}.machine-ref[data-astro-cid-twh6cqtg]{color:var(--text-bright);align-items:center;gap:.5rem;text-decoration:none;display:inline-flex}.machine-ref[data-astro-cid-twh6cqtg]:hover{color:var(--accent)}.machine-ref[data-astro-cid-twh6cqtg] img[data-astro-cid-twh6cqtg]{object-fit:cover;border:1px solid var(--border);border-radius:6px}.missing[data-astro-cid-twh6cqtg]{color:var(--text-muted);font-family:var(--font-mono);font-size:.9em}.diff[data-astro-cid-twh6cqtg]{color:var(--text-muted);font-size:.9em}.diff[data-astro-cid-twh6cqtg].very-easy{color:var(--very-easy)}.diff[data-astro-cid-twh6cqtg].easy{color:var(--easy)}.diff[data-astro-cid-twh6cqtg].medium{color:var(--medium)}.diff[data-astro-cid-twh6cqtg].hard{color:var(--hard)}.diff[data-astro-cid-twh6cqtg].insane{color:var(--insane)}.meta .badge.locked{color:var(--medium,#fc0);background:#ffcc001a;border-color:#ffcc0059}
+</style><link rel="stylesheet" href="/_astro/ArticleLayout.DA3idRZl.css"><style>.nav-link[data-astro-cid-evkijfd6]{color:var(--text-muted);font-family:var(--font-mono);letter-spacing:.04em;text-transform:uppercase;white-space:nowrap;border:1px solid #0000;border-radius:999px;justify-content:center;align-items:center;padding:.5em .95em;font-size:.78rem;font-weight:500;text-decoration:none;transition:color .18s,background .18s,border-color .18s,box-shadow .18s;display:inline-flex}.nav-link[data-astro-cid-evkijfd6]:hover{color:var(--text-bright);background:var(--surface-hover);text-decoration:none}.nav-link[data-astro-cid-evkijfd6].active{color:var(--on-accent);background:linear-gradient(135deg, var(--accent-hover), var(--accent));box-shadow:0 0 0 1px var(--border-strong), 0 6px 16px var(--accent-glow-strong);text-shadow:none;border-color:#0000;font-weight:700;text-decoration:none}
+</style><script type="module" src="/_astro/page.CTxKKjGj.js"></script></head><body data-astro-cid-sgg5joot><div class="scanline" aria-hidden="true" data-astro-cid-sgg5joot></div><header data-astro-cid-nen7h5rs><div class="bar" data-astro-cid-nen7h5rs><a class="brand" href="/" data-astro-cid-nen7h5rs><span class="logo" aria-hidden="true" data-astro-cid-nen7h5rs><img src="/_astro/head.CE6FOIKY_1SW1hc.webp" srcset="/_astro/head.CE6FOIKY_1SW1hc.webp 1x, /_astro/head.CE6FOIKY_scYzG.webp 2x" alt data-astro-cid-nen7h5rs="true" loading="lazy" decoding="async" width="64" height="64" class="logo-img"></span><span class="brand-text" data-astro-cid-nen7h5rs><span class="brand-name" data-astro-cid-nen7h5rs>Zumpyx&#39;s Blog</span></span></a><nav class="nav-pill" aria-label="Primary" data-astro-cid-nen7h5rs><div class="nav-track" data-astro-cid-nen7h5rs><a href="/" class="nav-link" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>Home</a><a href="/blog" class="nav-link" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>Blog</a><a href="/hackthebox" class="nav-link active" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>HackTheBox</a><a href="/projects" class="nav-link" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>Projects</a><a href="/about" class="nav-link" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>About</a></div></nav><div class="actions" data-astro-cid-nen7h5rs><button type="button" class="icon-btn search-trigger" data-search-open aria-label="搜索" title="搜索 (Ctrl/⌘+K)" data-astro-cid-7yy3665x><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true" data-astro-cid-7yy3665x><circle cx="11" cy="11" r="6.5" data-astro-cid-7yy3665x></circle><path d="M16.5 16.5 21 21" stroke-linecap="round" data-astro-cid-7yy3665x></path></svg></button><div class="search-root" data-search-root hidden data-astro-cid-7yy3665x><div class="search-backdrop" data-search-close data-astro-cid-7yy3665x></div><div class="search-panel" role="dialog" aria-modal="true" aria-label="全站搜索" data-astro-cid-7yy3665x><div class="search-bar" data-astro-cid-7yy3665x><svg class="search-ico" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true" data-astro-cid-7yy3665x><circle cx="11" cy="11" r="6.5" data-astro-cid-7yy3665x></circle><path d="M16.5 16.5 21 21" stroke-linecap="round" data-astro-cid-7yy3665x></path></svg><input type="search" class="search-input" data-search-input placeholder="全文搜索：标题 / 正文 / 标签…" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="search" data-astro-cid-7yy3665x><kbd class="search-kbd" data-search-close-hint data-astro-cid-7yy3665x>Esc</kbd></div><div class="search-meta" data-search-meta data-astro-cid-7yy3665x>输入关键词开始搜索</div><ul class="search-results" data-search-results role="listbox" aria-label="搜索结果" data-astro-cid-7yy3665x></ul></div></div><script type="module" src="/_astro/SiteSearch.astro_astro_type_script_index_0_lang.CiT4pk6n.js"></script><button type="button" class="icon-btn theme-toggle" data-theme-toggle aria-label="主题：跟随系统" title="主题：跟随系统（点击切换）" data-astro-cid-l6lhmie6><span class="icon icon-system" aria-hidden="true" data-astro-cid-l6lhmie6><!-- auto / system --><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" data-astro-cid-l6lhmie6><rect x="3" y="4" width="18" height="12" rx="2" data-astro-cid-l6lhmie6></rect><path d="M8 20h8M12 16v4" data-astro-cid-l6lhmie6></path></svg></span><span class="icon icon-light" aria-hidden="true" hidden data-astro-cid-l6lhmie6><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" data-astro-cid-l6lhmie6><circle cx="12" cy="12" r="4" data-astro-cid-l6lhmie6></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" data-astro-cid-l6lhmie6></path></svg></span><span class="icon icon-dark" aria-hidden="true" hidden data-astro-cid-l6lhmie6><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" data-astro-cid-l6lhmie6><path d="M21 14.5A8.5 8.5 0 1 1 9.5 3a7 7 0 0 0 11.5 11.5z" stroke-linejoin="round" data-astro-cid-l6lhmie6></path></svg></span></button><script>
+	(() => {
+		const KEY = 'theme';
+		const ORDER = ['system', 'light', 'dark'];
+		const LABELS = {
+			system: '主题：跟随系统',
+			light: '主题：亮色',
+			dark: '主题：暗色',
+		};
+
+		const getStored = () => {
+			try {
+				const v = localStorage.getItem(KEY);
+				if (v === 'light' || v === 'dark' || v === 'system') return v;
+			} catch {}
+			return 'system';
+		};
+
+		const apply = (mode) => {
+			const root = document.documentElement;
+			if (mode === 'light' || mode === 'dark') root.setAttribute('data-theme', mode);
+			else root.removeAttribute('data-theme');
+			try {
+				if (mode === 'system') localStorage.removeItem(KEY);
+				else localStorage.setItem(KEY, mode);
+			} catch {}
+		};
+
+		const syncButton = (mode) => {
+			document.querySelectorAll('[data-theme-toggle]').forEach((btn) => {
+				btn.setAttribute('data-mode', mode);
+				btn.setAttribute('aria-label', LABELS[mode]);
+				btn.setAttribute('title', `${LABELS[mode]}（点击切换）`);
+				btn.querySelectorAll('.icon').forEach((el) => {
+					el.hidden = true;
+				});
+				const icon = btn.querySelector(`.icon-${mode}`);
+				if (icon) icon.hidden = false;
+			});
+		};
+
+		const mode = getStored();
+		apply(mode);
+		syncButton(mode);
+
+		document.querySelectorAll('[data-theme-toggle]').forEach((btn) => {
+			btn.addEventListener('click', () => {
+				const cur = getStored();
+				const next = ORDER[(ORDER.indexOf(cur) + 1) % ORDER.length];
+				apply(next);
+				syncButton(next);
+			});
+		});
+
+		// If following system, react to OS changes
+		try {
+			const mq = window.matchMedia('(prefers-color-scheme: dark)');
+			mq.addEventListener?.('change', () => {
+				if (getStored() === 'system') apply('system');
+			});
+		} catch {}
+	})();
+</script><a class="icon-btn" href="/rss.xml" target="_blank" rel="noopener noreferrer" title="RSS" aria-label="RSS 订阅" data-astro-cid-nen7h5rs><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true" data-astro-cid-nen7h5rs><path d="M5 19a1.5 1.5 0 1 0 0.01 0" fill="currentColor" stroke="none" data-astro-cid-nen7h5rs></path><path d="M4 11a9 9 0 0 1 9 9" stroke-linecap="round" data-astro-cid-nen7h5rs></path><path d="M4 5a15 15 0 0 1 15 15" stroke-linecap="round" data-astro-cid-nen7h5rs></path></svg></a></div></div></header><main data-astro-cid-sgg5joot><article data-astro-cid-sgg5joot><div class="article-shell" data-astro-cid-sgg5joot><div class="prose" data-article-body data-astro-cid-sgg5joot><div class="title" data-astro-cid-sgg5joot><div class="date" data-astro-cid-sgg5joot><time datetime="2024-06-18T00:00:00.000Z">2024-06-18</time></div><div class="title-row" data-astro-cid-sgg5joot><h1 data-astro-cid-sgg5joot>Fragility</h1></div><div class="meta" data-astro-cid-sgg5joot><span class="badge" data-astro-cid-twh6cqtg>Sherlocks</span><span class="badge difficulty-very-easy" data-astro-cid-twh6cqtg>Very Easy</span><span class="badge" data-astro-cid-twh6cqtg>dfir</span></div><div class="links" data-astro-cid-sgg5joot><a href="/hackthebox/sherlocks/" data-astro-cid-twh6cqtg>← Sherlocks</a></div><hr data-astro-cid-sgg5joot></div><div class="content" data-article-content data-astro-cid-sgg5joot><h1 id="fragility">Fragility</h1>
+<p><img alt="Pasted-image-20240711170140.png" loading="lazy" decoding="async" width="800" height="800" src="/_astro/Pasted-image-20240711170140.DKvWZukE_264XeB.webp" srcset=""></p>
+<blockquote>
+<p>In the monitoring team at our company, each member has access to Splunk web UI using an admin Splunk account. Among them, John has full control over the machine that hosts the entire Splunk system. One day, he panicked and reported to us that an important file on his computer had disappeared. Moreover, he also discovered a new account on the login screen. Suspecting this to be the result of an attack, we proceeded to collect some evidence from his computer and also obtained network capture. Can you help us investigate it?</p>
+</blockquote>
+<p>在我们公司的监控团队中，每个成员都可以使用 Splunk 管理员帐户访问 Splunk Web UI。其中，John 可以完全控制托管整个 Splunk 系统的机器。有一天，他惊慌失措地向我们报告说，他电脑上的一个重要文件消失了。而且，他还在登录界面上发现了一个新的账户。我们怀疑这是攻击的结果，因此从他的计算机上收集了一些证据，并获得了网络捕获。你能帮我们调查一下吗？</p>
+<h2 id="任务列表">任务列表</h2>
+<h3 id="1攻击者使用什么cve来利用该漏洞">1、攻击者使用什么CVE来利用该漏洞？</h3>
+<blockquote>
+<p>What CVE did the attacker use to exploit the vulnerability?</p>
+</blockquote>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>answer</span></span></code></pre>
+<h3 id="2-攻击者使用什么-mitre-技术来维持持久性">2 、攻击者使用什么 MITRE 技术来维持持久性？</h3>
+<blockquote>
+<p>What MITRE technique does the attacker use to maintain persistence?</p>
+</blockquote>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>answer</span></span></code></pre>
+<h3 id="3john-已调整时区但尚未重新启动计算机这导致某些内容要么更新要么未使用新时区更新确定时区可以帮助您进一步进行调查这台机器的默认时区和john调整后的时区是多少">3、John 已调整时区，但尚未重新启动计算机，这导致某些内容要么更新，要么未使用新时区更新。确定时区可以帮助您进一步进行调查。这台机器的默认时区和John调整后的时区是多少？</h3>
+<blockquote>
+<p>John has adjusted the timezone but hasn’t rebooted the computer yet, which has led to some things either being updated or not updated with the new timezone. Identifying the timezone can assist you further in your investigation. What was the default timezone and the timezone after John’s adjustment on this machine?</p>
+</blockquote>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>answer</span></span></code></pre>
+<h3 id="4攻击者何时通过-ssh-登录-世界标准时间">4、攻击者何时通过 SSH 登录？ （世界标准时间）</h3>
+<blockquote>
+<p>When did the attacker SSH in? (UTC)</p>
+</blockquote>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>answer</span></span></code></pre>
+<h3 id="5从首次创建用户到攻击者停止使用-ssh-过去了多长时间">5、从首次创建用户到攻击者停止使用 SSH 过去了多长时间？</h3>
+<blockquote>
+<p>How much time has passed from when the user was first created to when the attacker stopped using SSH?</p>
+</blockquote>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>answer</span></span></code></pre>
+<h3 id="6攻击者用于后门的帐户密码是什么">6、攻击者用于后门的帐户密码是什么？</h3>
+<blockquote>
+<p>What is the password for the account that the attacker used to backdoor?</p>
+</blockquote>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>answer</span></span></code></pre>
+<h3 id="7泄露的文件里有秘密它的内容是什么">7、泄露的文件里有秘密，它的内容是什么？</h3>
+<blockquote>
+<p>There is a secret in the exfiltrated file, what is its content?</p>
+</blockquote>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>answer</span></span></code></pre>
+<h3 id="8攻击者用来访问-splunk-的用户名和密码是什么">8、攻击者用来访问 Splunk 的用户名和密码是什么？</h3>
+<blockquote>
+<p>What are the username and password that the attacker uses to access Splunk?</p>
+</blockquote>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>answer</span></span></code></pre>
+<h2 id="分析">分析</h2>
+<h3 id="log">Log</h3>
+<h2 id="hints">Hints</h2>
+<ol>
+<li>None</li>
+<li>None</li>
+<li>None</li>
+<li>None</li>
+<li>None</li>
+<li>None</li>
+<li>None</li>
+<li>None</li>
+</ol>
+</div></div><aside class="toc" data-toc hidden aria-label="目录" data-astro-cid-sgg5joot><p class="toc-label" data-astro-cid-sgg5joot>目录</p><nav class="toc-nav" data-toc-nav data-astro-cid-sgg5joot></nav></aside></div></article></main><footer data-astro-cid-jo6i4kqk><div class="inner" data-astro-cid-jo6i4kqk><p class="line" data-astro-cid-jo6i4kqk>© 2026 Zumpyx</p><p class="note" data-astro-cid-jo6i4kqk>notes · exploit · write · repeat</p></div></footer><script type="module">function e(e){return e.trim().toLowerCase().replace(/\s+/g,`-`).replace(/[^\w\u4e00-\u9fff-]+/g,``).replace(/-+/g,`-`).replace(/^-|-$/g,``)||`section`}var t=null;function n(){let n=document.querySelector(`[data-article-content]`),r=document.querySelector(`[data-toc]`),i=document.querySelector(`[data-toc-nav]`);if(!n||!r||!i)return;t?.disconnect(),t=null,i.replaceChildren();let a=Array.from(n.querySelectorAll(`h2, h3`)).filter(e=>(e.textContent??``).trim().length>0);if(a.length===0){r.hidden=!0;return}r.hidden=!1;let o=new Set,s=[];for(let t of a){let n=t.id;if(!n){let r=e(t.textContent??``);n=r;let i=2;for(;o.has(n)||document.getElementById(n);)n=`${r}-${i}`,i+=1;t.id=n}o.add(n);let r=document.createElement(`a`);r.href=`#${n}`,r.textContent=(t.textContent??``).trim(),r.className=t.tagName===`H3`?`toc-h3`:`toc-h2`,r.dataset.target=n,i.appendChild(r),s.push(r)}let c=e=>{for(let t of s)t.classList.toggle(`active`,t.dataset.target===e)};t=new IntersectionObserver(e=>{let t=e.filter(e=>e.isIntersecting).sort((e,t)=>e.target.offsetTop-t.target.offsetTop);t[0]&&c(t[0].target.id)},{rootMargin:`-15% 0px -70% 0px`,threshold:[0,1]});for(let e of a)t.observe(e);location.hash?c(decodeURIComponent(location.hash.slice(1))):a[0]&&c(a[0].id)}n(),document.addEventListener(`article-content-unlocked`,()=>{n()});</script></body></html>

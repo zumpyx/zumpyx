@@ -1,0 +1,602 @@
+<!DOCTYPE html><html lang="zh-CN" data-astro-cid-sgg5joot><head><!-- Global Metadata --><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="icon" type="image/png" href="/favicon.png"><link rel="icon" href="/favicon.ico" sizes="any"><link rel="apple-touch-icon" href="/apple-touch-icon.png"><link rel="sitemap" href="/sitemap-index.xml"><link rel="alternate" type="application/rss+xml" title="Zumpyx's Blog" href="https://blog.zumpyx.com/rss.xml"><meta name="generator" content="Astro v7.1.0"><meta name="color-scheme" content="light dark"><meta name="theme-color" content="#0b0d11" media="(prefers-color-scheme: dark)"><meta name="theme-color" content="#f4f5f7" media="(prefers-color-scheme: light)"><script>
+	(() => {
+		try {
+			const t = localStorage.getItem('theme');
+			if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t);
+			else document.documentElement.removeAttribute('data-theme');
+		} catch {}
+	})();
+</script><style>@font-face{font-family:Atkinson-c7f4c4e8b285552f;src:url("/_astro/fonts/89758defcfa85239.woff") format("woff");font-display:swap;font-weight:400;font-style:normal;}@font-face{font-family:Atkinson-c7f4c4e8b285552f;src:url("/_astro/fonts/14aa8dd5744dd4bc.woff") format("woff");font-display:swap;font-weight:700;font-style:normal;}@font-face{font-family:"Atkinson-c7f4c4e8b285552f fallback: Arial";src:local("Arial");font-display:swap;font-weight:400;font-style:normal;size-adjust:99.3717%;ascent-override:80.1033%;descent-override:25.2587%;line-gap-override:0%;}@font-face{font-family:"Atkinson-c7f4c4e8b285552f fallback: Arial Bold";src:local("Arial Bold");font-display:swap;font-weight:700;font-style:normal;size-adjust:92.2954%;ascent-override:86.2448%;descent-override:27.1953%;line-gap-override:0%;}:root{--font-atkinson:Atkinson-c7f4c4e8b285552f,"Atkinson-c7f4c4e8b285552f fallback: Arial","Atkinson-c7f4c4e8b285552f fallback: Arial Bold",sans-serif;}</style><link rel="preload" href="/_astro/fonts/89758defcfa85239.woff" as="font" type="font/woff" crossorigin><link rel="preload" href="/_astro/fonts/14aa8dd5744dd4bc.woff" as="font" type="font/woff" crossorigin><!-- Canonical URL --><link rel="canonical" href="https://blog.zumpyx.com/blog/file-exchange-system-design/"><!-- Primary Meta Tags --><title>文件交换系统构思 · Zumpyx&#39;s Blog</title><meta name="description" content="基于「硬件端加密 + 多中转分卷 + 轻量信令」的点对点安全文件交换方案构思：威胁模型、密钥与通道、收发流程、失败恢复与实现建议。"><!-- Open Graph / Facebook --><meta property="og:type" content="website"><meta property="og:url" content="https://blog.zumpyx.com/blog/file-exchange-system-design/"><meta property="og:title" content="文件交换系统构思 · Zumpyx's Blog"><meta property="og:description" content="基于「硬件端加密 + 多中转分卷 + 轻量信令」的点对点安全文件交换方案构思：威胁模型、密钥与通道、收发流程、失败恢复与实现建议。"><meta property="og:image" content="https://blog.zumpyx.com/_astro/head.CE6FOIKY.png"><!-- Twitter --><meta name="twitter:card" content="summary_large_image"><meta name="twitter:url" content="https://blog.zumpyx.com/blog/file-exchange-system-design/"><meta name="twitter:title" content="文件交换系统构思 · Zumpyx's Blog"><meta name="twitter:description" content="基于「硬件端加密 + 多中转分卷 + 轻量信令」的点对点安全文件交换方案构思：威胁模型、密钥与通道、收发流程、失败恢复与实现建议。"><meta name="twitter:image" content="https://blog.zumpyx.com/_astro/head.CE6FOIKY.png"><link rel="stylesheet" href="/_astro/Header.CMmW25g2.css"><link rel="stylesheet" href="/_astro/ArticleLayout.DA3idRZl.css"><style>.nav-link[data-astro-cid-evkijfd6]{color:var(--text-muted);font-family:var(--font-mono);letter-spacing:.04em;text-transform:uppercase;white-space:nowrap;border:1px solid #0000;border-radius:999px;justify-content:center;align-items:center;padding:.5em .95em;font-size:.78rem;font-weight:500;text-decoration:none;transition:color .18s,background .18s,border-color .18s,box-shadow .18s;display:inline-flex}.nav-link[data-astro-cid-evkijfd6]:hover{color:var(--text-bright);background:var(--surface-hover);text-decoration:none}.nav-link[data-astro-cid-evkijfd6].active{color:var(--on-accent);background:linear-gradient(135deg, var(--accent-hover), var(--accent));box-shadow:0 0 0 1px var(--border-strong), 0 6px 16px var(--accent-glow-strong);text-shadow:none;border-color:#0000;font-weight:700;text-decoration:none}
+</style><script type="module" src="/_astro/page.CTxKKjGj.js"></script></head><body data-astro-cid-sgg5joot><div class="scanline" aria-hidden="true" data-astro-cid-sgg5joot></div><header data-astro-cid-nen7h5rs><div class="bar" data-astro-cid-nen7h5rs><a class="brand" href="/" data-astro-cid-nen7h5rs><span class="logo" aria-hidden="true" data-astro-cid-nen7h5rs><img src="/_astro/head.CE6FOIKY_1SW1hc.webp" srcset="/_astro/head.CE6FOIKY_1SW1hc.webp 1x, /_astro/head.CE6FOIKY_scYzG.webp 2x" alt data-astro-cid-nen7h5rs="true" loading="lazy" decoding="async" width="64" height="64" class="logo-img"></span><span class="brand-text" data-astro-cid-nen7h5rs><span class="brand-name" data-astro-cid-nen7h5rs>Zumpyx&#39;s Blog</span></span></a><nav class="nav-pill" aria-label="Primary" data-astro-cid-nen7h5rs><div class="nav-track" data-astro-cid-nen7h5rs><a href="/" class="nav-link" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>Home</a><a href="/blog" class="nav-link active" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>Blog</a><a href="/hackthebox" class="nav-link" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>HackTheBox</a><a href="/projects" class="nav-link" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>Projects</a><a href="/about" class="nav-link" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>About</a></div></nav><div class="actions" data-astro-cid-nen7h5rs><button type="button" class="icon-btn search-trigger" data-search-open aria-label="搜索" title="搜索 (Ctrl/⌘+K)" data-astro-cid-7yy3665x><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true" data-astro-cid-7yy3665x><circle cx="11" cy="11" r="6.5" data-astro-cid-7yy3665x></circle><path d="M16.5 16.5 21 21" stroke-linecap="round" data-astro-cid-7yy3665x></path></svg></button><div class="search-root" data-search-root hidden data-astro-cid-7yy3665x><div class="search-backdrop" data-search-close data-astro-cid-7yy3665x></div><div class="search-panel" role="dialog" aria-modal="true" aria-label="全站搜索" data-astro-cid-7yy3665x><div class="search-bar" data-astro-cid-7yy3665x><svg class="search-ico" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true" data-astro-cid-7yy3665x><circle cx="11" cy="11" r="6.5" data-astro-cid-7yy3665x></circle><path d="M16.5 16.5 21 21" stroke-linecap="round" data-astro-cid-7yy3665x></path></svg><input type="search" class="search-input" data-search-input placeholder="全文搜索：标题 / 正文 / 标签…" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="search" data-astro-cid-7yy3665x><kbd class="search-kbd" data-search-close-hint data-astro-cid-7yy3665x>Esc</kbd></div><div class="search-meta" data-search-meta data-astro-cid-7yy3665x>输入关键词开始搜索</div><ul class="search-results" data-search-results role="listbox" aria-label="搜索结果" data-astro-cid-7yy3665x></ul></div></div><script type="module" src="/_astro/SiteSearch.astro_astro_type_script_index_0_lang.CiT4pk6n.js"></script><button type="button" class="icon-btn theme-toggle" data-theme-toggle aria-label="主题：跟随系统" title="主题：跟随系统（点击切换）" data-astro-cid-l6lhmie6><span class="icon icon-system" aria-hidden="true" data-astro-cid-l6lhmie6><!-- auto / system --><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" data-astro-cid-l6lhmie6><rect x="3" y="4" width="18" height="12" rx="2" data-astro-cid-l6lhmie6></rect><path d="M8 20h8M12 16v4" data-astro-cid-l6lhmie6></path></svg></span><span class="icon icon-light" aria-hidden="true" hidden data-astro-cid-l6lhmie6><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" data-astro-cid-l6lhmie6><circle cx="12" cy="12" r="4" data-astro-cid-l6lhmie6></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" data-astro-cid-l6lhmie6></path></svg></span><span class="icon icon-dark" aria-hidden="true" hidden data-astro-cid-l6lhmie6><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" data-astro-cid-l6lhmie6><path d="M21 14.5A8.5 8.5 0 1 1 9.5 3a7 7 0 0 0 11.5 11.5z" stroke-linejoin="round" data-astro-cid-l6lhmie6></path></svg></span></button><script>
+	(() => {
+		const KEY = 'theme';
+		const ORDER = ['system', 'light', 'dark'];
+		const LABELS = {
+			system: '主题：跟随系统',
+			light: '主题：亮色',
+			dark: '主题：暗色',
+		};
+
+		const getStored = () => {
+			try {
+				const v = localStorage.getItem(KEY);
+				if (v === 'light' || v === 'dark' || v === 'system') return v;
+			} catch {}
+			return 'system';
+		};
+
+		const apply = (mode) => {
+			const root = document.documentElement;
+			if (mode === 'light' || mode === 'dark') root.setAttribute('data-theme', mode);
+			else root.removeAttribute('data-theme');
+			try {
+				if (mode === 'system') localStorage.removeItem(KEY);
+				else localStorage.setItem(KEY, mode);
+			} catch {}
+		};
+
+		const syncButton = (mode) => {
+			document.querySelectorAll('[data-theme-toggle]').forEach((btn) => {
+				btn.setAttribute('data-mode', mode);
+				btn.setAttribute('aria-label', LABELS[mode]);
+				btn.setAttribute('title', `${LABELS[mode]}（点击切换）`);
+				btn.querySelectorAll('.icon').forEach((el) => {
+					el.hidden = true;
+				});
+				const icon = btn.querySelector(`.icon-${mode}`);
+				if (icon) icon.hidden = false;
+			});
+		};
+
+		const mode = getStored();
+		apply(mode);
+		syncButton(mode);
+
+		document.querySelectorAll('[data-theme-toggle]').forEach((btn) => {
+			btn.addEventListener('click', () => {
+				const cur = getStored();
+				const next = ORDER[(ORDER.indexOf(cur) + 1) % ORDER.length];
+				apply(next);
+				syncButton(next);
+			});
+		});
+
+		// If following system, react to OS changes
+		try {
+			const mq = window.matchMedia('(prefers-color-scheme: dark)');
+			mq.addEventListener?.('change', () => {
+				if (getStored() === 'system') apply('system');
+			});
+		} catch {}
+	})();
+</script><a class="icon-btn" href="/rss.xml" target="_blank" rel="noopener noreferrer" title="RSS" aria-label="RSS 订阅" data-astro-cid-nen7h5rs><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true" data-astro-cid-nen7h5rs><path d="M5 19a1.5 1.5 0 1 0 0.01 0" fill="currentColor" stroke="none" data-astro-cid-nen7h5rs></path><path d="M4 11a9 9 0 0 1 9 9" stroke-linecap="round" data-astro-cid-nen7h5rs></path><path d="M4 5a15 15 0 0 1 15 15" stroke-linecap="round" data-astro-cid-nen7h5rs></path></svg></a></div></div></header><main data-astro-cid-sgg5joot><article data-astro-cid-sgg5joot><div class="article-shell" data-astro-cid-sgg5joot><div class="prose" data-article-body data-astro-cid-sgg5joot><div class="title" data-astro-cid-sgg5joot><div class="date" data-astro-cid-sgg5joot><time datetime="2026-07-20T00:00:00.000Z">2026-07-20</time></div><div class="title-row" data-astro-cid-sgg5joot><h1 data-astro-cid-sgg5joot>文件交换系统构思</h1></div><div class="meta" data-astro-cid-sgg5joot><span class="badge">安全设计</span><span class="badge">加密</span><span class="badge">文件传输</span><span class="badge">隐私</span><span class="badge">架构</span></div><hr data-astro-cid-sgg5joot></div><div class="content" data-article-content data-astro-cid-sgg5joot><blockquote>
+<p>本文由早期草稿整理扩展。当前是<strong>可落地的设计构思</strong>，尚未对应某一开源实现；算法与流程已对齐表述，并补上威胁模型、密钥管理与失败恢复。</p>
+</blockquote>
+<h2 id="1-目标与非目标">1. 目标与非目标</h2>
+<h3 id="11-想解决什么">1.1 想解决什么</h3>
+<p>在<strong>不依赖双方同时在线的专用中继服务器</strong>、也不希望明文经过「自己可控的中心存储」的前提下，完成<strong>单文件</strong>的点对点交换：</p>
+<ul>
+<li>载荷只以密文形式出现在<strong>多个互不相关的匿名/半匿名中转站</strong>；</li>
+<li>密钥与下载线索走<strong>另一条信令通道</strong>（草稿里用 note.ms 一类可写即焚页面）；</li>
+<li>加解密与密钥保管尽量落在<strong>双方各自的小型硬件设备</strong>上，减少在通用 PC 上暴露明文与主密钥的时间。</li>
+</ul>
+<h3 id="12-明确不做">1.2 明确不做</h3>
+<table>
+<thead>
+<tr>
+<th>非目标</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>大流量同步盘</td>
+<td>不做多文件目录同步，单次任务 = 一个文件</td>
+</tr>
+<tr>
+<td>完美匿名对抗国家级对手</td>
+<td>中转站与信令仍可能被关联分析</td>
+</tr>
+<tr>
+<td>实时双向聊天</td>
+<td>只做文件投递 + 状态机</td>
+</tr>
+<tr>
+<td>中心化账号体系</td>
+<td>不引入统一用户 ID 服务</td>
+</tr>
+</tbody>
+</table>
+<h3 id="13-设计原则">1.3 设计原则</h3>
+<ol>
+<li><strong>密钥与载荷分离</strong>：密文分卷上中转站，密钥材料只走信令。</li>
+<li><strong>多层不同算法</strong>：对称层叠加 + 分卷，单点泄露不至于「一键还原」。</li>
+<li><strong>分卷分散托管</strong>：三个分卷三个站，少一卷则无法解压还原。</li>
+<li><strong>短时信令</strong>：note 页写入后尽快取走清空，降低信令驻留。</li>
+<li><strong>状态可观测</strong>：收发 UI 用阶段条表达进度，便于人工值守。</li>
+</ol>
+<hr>
+<h2 id="2-角色与组件">2. 角色与组件</h2>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="text"><code><span class="line"><span>┌─────────────┐         信令（加密元数据）          ┌─────────────┐</span></span>
+<span class="line"><span>│  设备 A     │ ──── note 路径 / 轮询 ──────────► │  设备 B     │</span></span>
+<span class="line"><span>│ (发送侧)    │                                   │ (接收侧)    │</span></span>
+<span class="line"><span>└──────┬──────┘                                   └──────▲──────┘</span></span>
+<span class="line"><span>       │ 密文分卷 ×3                                      │ 下载分卷 ×3</span></span>
+<span class="line"><span>       ▼                                                  │</span></span>
+<span class="line"><span>  中转站1 / 中转站2 / 中转站3  ────────────────────────────┘</span></span></code></pre>
+<table>
+<thead>
+<tr>
+<th>组件</th>
+<th>职责</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>硬件设备</td>
+<td>本地生成/保管密钥、加解密、分卷、上传下载、轮询信令</td>
+</tr>
+<tr>
+<td>信令面</td>
+<td>存放 <strong>RSA 加密后的元数据 JSON</strong>（密钥、哈希、链接）</td>
+</tr>
+<tr>
+<td>载荷面</td>
+<td>三个互异的匿名文件中转，各存一个 7z 分卷</td>
+</tr>
+<tr>
+<td>控制 UI</td>
+<td>展示发送/接收阶段（可跑在设备 Web UI 或配对 App）</td>
+</tr>
+</tbody>
+</table>
+<p><strong>设备对</strong>：预先绑定的一对设备（A↔B）。可扩展多对，用「设备对号」区分。</p>
+<hr>
+<h2 id="3-威胁模型简要">3. 威胁模型（简要）</h2>
+<table>
+<thead>
+<tr>
+<th>对手能力</th>
+<th>假设</th>
+<th>本方案应对思路</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>单个中转站运营方</td>
+<td>可见一个分卷密文</td>
+<td>缺另外两卷 + 外层密钥，无法还原</td>
+</tr>
+<tr>
+<td>信令页被第三方先读到</td>
+<td>可见 RSA 密文</td>
+<td>无私钥则无法解元数据</td>
+</tr>
+<tr>
+<td>网络窃听</td>
+<td>可见 HTTPS/中转流量</td>
+<td>载荷已是多层密文</td>
+</tr>
+<tr>
+<td>设备被物理拿走</td>
+<td>可能有密钥与明文</td>
+<td>需设备 PIN/安全元件；明文尽快删</td>
+</tr>
+<tr>
+<td>全球被动关联</td>
+<td>时间与体量关联三站+信令</td>
+<td>降风险：随机延迟、体积填充、多通道；<strong>不能指望绝对抗关联</strong></td>
+</tr>
+<tr>
+<td>note 类服务被封/投毒</td>
+<td>可用性、完整性</td>
+<td>双信令备份、元数据带 HMAC/签名</td>
+</tr>
+</tbody>
+</table>
+<p><strong>不防</strong>：两端设备都被植入木马；用户主动把明文再拷到不可信电脑且长期存放。</p>
+<hr>
+<h2 id="4-密钥与标识">4. 密钥与标识</h2>
+<h3 id="41-非对称密钥长期按设备对">4.1 非对称密钥（长期，按设备对）</h3>
+<p>草稿表述易混，这里定成清晰模型：</p>
+<ul>
+<li>每台设备持有自己的 <strong>RSA-4096</strong>（或 <strong>X25519 + 签名用 Ed25519</strong>，实现阶段可升级）密钥对。</li>
+<li><strong>发往 B 的元数据</strong>：用 <strong>B 的公钥</strong>加密（只有 B 能解）。</li>
+<li><strong>可选</strong>：元数据外层再由 A <strong>签名</strong>，B 验签防伪造信令。</li>
+</ul>
+<p>若坚持「RSA A 组 / B 组」双组密钥，建议语义固定为：</p>
+<table>
+<thead>
+<tr>
+<th>名称</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>设备身份密钥</td>
+<td>长期，出厂/初始化生成，私钥不出安全芯片</td>
+</tr>
+<tr>
+<td>会话封装</td>
+<td>每次发送用接收方<strong>身份公钥</strong>封装对称会话密钥</td>
+</tr>
+</tbody>
+</table>
+<h3 id="42-对称会话密钥每次发送临时生成">4.2 对称会话密钥（每次发送临时生成）</h3>
+<p>每次任务独立生成三把互不复用的随机密钥：</p>
+<table>
+<thead>
+<tr>
+<th>密钥</th>
+<th>算法</th>
+<th>长度</th>
+<th>用途</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>(K_1)</td>
+<td>ChaCha20-Poly1305（AEAD）</td>
+<td>256-bit</td>
+<td>明文 → <code>*.secretdata1</code></td>
+</tr>
+<tr>
+<td>(K_2)</td>
+<td>SM4-GCM（或 SM4-CTR+HMAC）</td>
+<td>128-bit</td>
+<td><code>secretdata1</code> → <code>*.secretdata2</code></td>
+</tr>
+<tr>
+<td>(K_3)</td>
+<td>7z 加密（AES-256，p7zip 实际能力）</td>
+<td>≥256-bit 口令材料</td>
+<td>分卷压缩包</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>与草稿 UI 对齐说明</strong>：早期草稿里「流程写 ChaCha20 / 界面写 AES256」不一致。实现上建议：</p>
+<ul>
+<li><strong>内容加密层</strong>明确用 ChaCha20-Poly1305 + SM4-AEAD；</li>
+<li><strong>分卷层</strong>使用 7z 自带 AES-256；</li>
+<li>UI 文案与真实算法一致，避免运维误判。</li>
+</ul>
+</blockquote>
+<h3 id="43-随机数与公共熵">4.3 随机数与「公共熵」</h3>
+<p>草稿：用 BTC 现价 + ETH 持持仓等作种子，欧意/火币双备。</p>
+<p>更稳妥的做法：</p>
+<ol>
+<li><strong>主熵</strong>：设备 TRNG / <code>getrandom</code> / 安全芯片。</li>
+<li><strong>辅助熵（可选）</strong>：多源行情 API 的哈希混入，抗「单一 RNG 实现烂」——<strong>不能替代</strong>系统 CSPRNG。</li>
+<li>盐 <code>S</code>：设备对初始化时协商或预置，写入安全存储。</li>
+</ol>
+<p>通道路径示例：</p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="text"><code><span class="line"><span>path = hex( SHA256( date_utc + channel_id + pair_id + S ) )</span></span>
+<span class="line"><span>信令 URL = https://note.ms/{path}   # 或自建等价「可写短文本」服务</span></span></code></pre>
+<p>建议用 <strong>SHA-256</strong> 而非 MD5；日期用 <strong>UTC</strong> 并约定切换点（如每日 00:00 UTC），避免双方时区不一致。</p>
+<h3 id="44-通道">4.4 通道</h3>
+<ul>
+<li>每对设备可配置多个 <strong>channel_id</strong>（业务隔离：合同、影像、应急…）。</li>
+<li>设备循环轮询当日路径；可同时监听「今日 + 昨日」防止跨日边界丢信令。</li>
+</ul>
+<hr>
+<h2 id="5-元数据格式信令明文-json">5. 元数据格式（信令明文 JSON）</h2>
+<p>RSA/ECIES 封装前的明文示例：</p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="json"><code><span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">{</span></span>
+<span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#4BF3C8">  "v"</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">: </span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493">1</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">,</span></span>
+<span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#4BF3C8">  "pair_id"</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">: </span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">"AB-001"</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">,</span></span>
+<span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#4BF3C8">  "channel_id"</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">: </span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493">3</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">,</span></span>
+<span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#4BF3C8">  "task_id"</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">: </span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">"01J…"</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">,</span></span>
+<span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#4BF3C8">  "filename"</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">: </span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">"report.pdf"</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">,</span></span>
+<span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#4BF3C8">  "filesize"</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">: </span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493">10485760</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">,</span></span>
+<span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#4BF3C8">  "created_at"</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">: </span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">"2026-07-20T12:00:00Z"</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">,</span></span>
+<span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#4BF3C8">  "k1"</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">: </span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">"&lt;base64&gt;"</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">,</span></span>
+<span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#4BF3C8">  "k2"</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">: </span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">"&lt;base64&gt;"</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">,</span></span>
+<span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#4BF3C8">  "k3"</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">: </span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">"&lt;base64-or-passphrase&gt;"</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">,</span></span>
+<span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#4BF3C8">  "parts"</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">: [</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">    {</span></span>
+<span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#4BF3C8">      "idx"</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">: </span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493">1</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">,</span></span>
+<span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#4BF3C8">      "sha256"</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">: </span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">"…"</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">,</span></span>
+<span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#4BF3C8">      "url"</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">: </span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">"https://mirror-a.example/…"</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">,</span></span>
+<span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#4BF3C8">      "expires_at"</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">: </span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">"2026-07-21T12:00:00Z"</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">    },</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">    { </span><span style="--shiki-light:#005CC5;--shiki-dark:#4BF3C8">"idx"</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">: </span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493">2</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">, </span><span style="--shiki-light:#005CC5;--shiki-dark:#4BF3C8">"sha256"</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">: </span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">"…"</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">, </span><span style="--shiki-light:#005CC5;--shiki-dark:#4BF3C8">"url"</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">: </span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">"…"</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">, </span><span style="--shiki-light:#005CC5;--shiki-dark:#4BF3C8">"expires_at"</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">: </span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">"…"</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9"> },</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">    { </span><span style="--shiki-light:#005CC5;--shiki-dark:#4BF3C8">"idx"</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">: </span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493">3</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">, </span><span style="--shiki-light:#005CC5;--shiki-dark:#4BF3C8">"sha256"</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">: </span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">"…"</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">, </span><span style="--shiki-light:#005CC5;--shiki-dark:#4BF3C8">"url"</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">: </span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">"…"</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">, </span><span style="--shiki-light:#005CC5;--shiki-dark:#4BF3C8">"expires_at"</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">: </span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">"…"</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9"> }</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">  ],</span></span>
+<span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#4BF3C8">  "note"</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">: </span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">"optional human hint"</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">}</span></span></code></pre>
+<p>封装：<code>ciphertext = RSA-OAEP(B_pub, json)</code> 或「随机 DEK + RSA 封 DEK」以支持更长 JSON。<br>
+信令页<strong>只写密文</strong>；B 取走后<strong>立即清空</strong>。</p>
+<hr>
+<h2 id="6-发送流程设备-a--b">6. 发送流程（设备 A → B）</h2>
+<h3 id="61-步骤">6.1 步骤</h3>
+<ol>
+<li>用户在 A 侧选定<strong>单个文件</strong>，创建任务 <code>task_id</code>。</li>
+<li>设备生成 (K_1,K_2,K_3)。</li>
+<li><strong>一层</strong>：ChaCha20-Poly1305 加密明文 → <code>file.secretdata1</code>。</li>
+<li><strong>二层</strong>：SM4-GCM 加密 → <code>file.secretdata2</code>。</li>
+<li><strong>三层</strong>：p7zip/7z 使用 (K_3) 加密并<strong>切成 3 个分卷</strong>（体积尽量接近，可填充对齐）。</li>
+<li>对每个分卷计算 <strong>SHA-256</strong>。</li>
+<li>将分卷 <strong>分别上传</strong> 到三个不同中转站，得到 <code>url1..3</code>（失败则换站重试）。</li>
+<li>组装元数据 JSON，用 <strong>B 的公钥</strong>加密，写入当日信令路径。</li>
+<li>本地按策略删除中间态；仅保留任务日志（可无密钥）。</li>
+</ol>
+<h3 id="62-发送侧-ui-阶段与算法一致">6.2 发送侧 UI 阶段（与算法一致）</h3>
+<table>
+<thead>
+<tr>
+<th>阶段</th>
+<th>显示文案</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>发送任务创建</td>
+</tr>
+<tr>
+<td>2</td>
+<td>一级加密（ChaCha20-Poly1305）</td>
+</tr>
+<tr>
+<td>3</td>
+<td>二级加密（SM4-GCM）</td>
+</tr>
+<tr>
+<td>4</td>
+<td>三级加密分卷（7z AES-256）</td>
+</tr>
+<tr>
+<td>5–7</td>
+<td>上传分卷 1 / 2 / 3</td>
+</tr>
+<tr>
+<td>8</td>
+<td>信令已发布，等待对方拉取</td>
+</tr>
+<tr>
+<td>9</td>
+<td>对方已取信令 / 分卷已被下载（若中转可探测）</td>
+</tr>
+<tr>
+<td>10</td>
+<td>任务完成或超时失败</td>
+</tr>
+</tbody>
+</table>
+<p>「已被下载」依赖中转站是否提供次数/状态；没有则只能靠 B 回执信令（可选 ACK 通道）。</p>
+<hr>
+<h2 id="7-接收流程设备-b">7. 接收流程（设备 B）</h2>
+<ol>
+<li>轮询信令路径，发现非空 → <strong>先下载密文再清空页面</strong>（防他人二次读）。</li>
+<li>用 <strong>B 私钥</strong>解密元数据；校验 <code>pair_id</code> / 签名 / 时间窗。</li>
+<li>并行下载三个分卷；逐个校验 SHA-256，失败则有限次重试或换镜像字段（若元数据带备用 URL）。</li>
+<li>用 (K_3) 解 7z 合并 → <code>secretdata2</code>。</li>
+<li>(K_2) 解 SM4 → <code>secretdata1</code>。</li>
+<li>(K_1) 解 ChaCha20 → 明文，存设备保险区。</li>
+<li>擦除分卷与中间文件；通知用户「可取回」。</li>
+</ol>
+<h3 id="71-接收侧-ui-阶段">7.1 接收侧 UI 阶段</h3>
+<table>
+<thead>
+<tr>
+<th>阶段</th>
+<th>显示文案</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>接收任务创建</td>
+</tr>
+<tr>
+<td>2–4</td>
+<td>下载分卷 1 / 2 / 3</td>
+</tr>
+<tr>
+<td>5</td>
+<td>分卷校验通过，合并解密（7z）</td>
+</tr>
+<tr>
+<td>6</td>
+<td>二级解密（SM4-GCM）</td>
+</tr>
+<tr>
+<td>7</td>
+<td>一级解密（ChaCha20-Poly1305）</td>
+</tr>
+<tr>
+<td>8</td>
+<td>清除过程文件</td>
+</tr>
+<tr>
+<td>9</td>
+<td>等待用户下载到可信终端</td>
+</tr>
+<tr>
+<td>10</td>
+<td>用户已取走 / 本地副本已按策略销毁</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="8-失败恢复与边界情况">8. 失败恢复与边界情况</h2>
+<table>
+<thead>
+<tr>
+<th>情况</th>
+<th>处理</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>某一中转上传失败</td>
+<td>自动换提供商；三站都失败则任务失败，不写信令</td>
+</tr>
+<tr>
+<td>信令写入失败</td>
+<td>载荷可先不删，指数退避重试；超时则删分卷防孤儿密文长期挂公网</td>
+</tr>
+<tr>
+<td>跨日路径不一致</td>
+<td>同时听「UTC 今日+昨日」</td>
+</tr>
+<tr>
+<td>分卷哈希不符</td>
+<td>重下；仍失败则信令标 <code>failed</code>，A 可重发新任务（新密钥）</td>
+</tr>
+<tr>
+<td>中转提前删档</td>
+<td>任务失败；可要求 A 在有效期内重传</td>
+</tr>
+<tr>
+<td>元数据被串改</td>
+<td>公钥加密下攻击者难精确定制；加签名后可直接拒收</td>
+</tr>
+<tr>
+<td>大文件</td>
+<td>单文件上限（如 2GB）由设备磁盘与中转限制决定；超时与断点续传按中转能力实现</td>
+</tr>
+</tbody>
+</table>
+<p><strong>重发</strong>：永远生成新的 (K_1..K_3) 与 <code>task_id</code>，禁止复用会话密钥。</p>
+<hr>
+<h2 id="9-中转站与信令选型建议">9. 中转站与信令选型建议</h2>
+<h3 id="91-载荷中转">9.1 载荷中转</h3>
+<ul>
+<li>条件：匿名/免登录、直链下载、尽量支持 HTTPS、有过期时间。</li>
+<li>策略：<strong>三个不同运营主体</strong>；避免同一集团 CDN。</li>
+<li>上传出口可用不同网络路径（降低「同一 IP 传三站」的简单关联）。</li>
+</ul>
+<h3 id="92-信令">9.2 信令</h3>
+<ul>
+<li>草稿：note.ms 类「猜路径即可读写」——实现简单，但<strong>可用性与投毒</strong>是风险。</li>
+<li>增强选项：
+<ul>
+<li>自建短 TTL 的 KV（Cloudflare Workers + 鉴权）；</li>
+<li>双写两个信令后端，元数据相同；</li>
+<li>路径仍由日期+通道+盐派生，不把真实 pair 写进 URL。</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="10-安全加固清单">10. 安全加固清单</h2>
+<ol>
+<li>私钥与 (K_i) 仅在设备安全元件/加密分区使用，UI 进程不落盘明文密钥。</li>
+<li>AEAD 必用（ChaCha20-Poly1305、SM4-GCM），避免「只加密不校验」。</li>
+<li>明文与中间文件：任务结束 <code>shred</code>/安全擦除。</li>
+<li>任务日志默认<strong>不含</strong>密钥与完整 URL，或单独加密审计库。</li>
+<li>速率限制：防信令路径被扫（盐长度足够，如 128-bit）。</li>
+<li>固件签名升级；调试口出厂关闭。</li>
+<li>法律与合规：匿名中转与跨境传输需按使用地区自行评估。</li>
+</ol>
+<hr>
+<h2 id="11-实现分期从构思到原型">11. 实现分期（从构思到原型）</h2>
+<table>
+<thead>
+<tr>
+<th>阶段</th>
+<th>交付</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>P0</td>
+<td>Linux 上 CLI：本地三层加密 + 7z 分卷 + 手动上传 + RSA 封 JSON</td>
+</tr>
+<tr>
+<td>P1</td>
+<td>接入 2～3 个中转 API + note/自建信令轮询</td>
+</tr>
+<tr>
+<td>P2</td>
+<td>设备镜像（ARM 小主机）、Web UI 状态机、双日路径</td>
+</tr>
+<tr>
+<td>P3</td>
+<td>安全芯片存钥、ACK 回执通道、多通道 QoS、可观测指标</td>
+</tr>
+</tbody>
+</table>
+<p><strong>技术栈示例（无强制）</strong>：Rust/Go 做加解密与状态机；7z 调 <code>7zz</code>；硬件用带 eMMC 的 ARM + 可选 TPM。</p>
+<hr>
+<h2 id="12-流程总览对照表">12. 流程总览（对照表）</h2>
+<table>
+<thead>
+<tr>
+<th>步骤</th>
+<th>发送方 A</th>
+<th>接收方 B</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>选文件，生成会话密钥</td>
+<td>轮询信令</td>
+</tr>
+<tr>
+<td>2</td>
+<td>ChaCha20 加密</td>
+<td>取信令并清空</td>
+</tr>
+<tr>
+<td>3</td>
+<td>SM4 加密</td>
+<td>RSA 解密元数据</td>
+</tr>
+<tr>
+<td>4</td>
+<td>7z 加密分卷 ×3</td>
+<td>下载分卷并校验哈希</td>
+</tr>
+<tr>
+<td>5</td>
+<td>分上传三站</td>
+<td>7z → SM4 → ChaCha20 解密</td>
+</tr>
+<tr>
+<td>6</td>
+<td>RSA 封元数据写信令</td>
+<td>擦除中间文件，用户取回</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="13-开放问题后续可写专题">13. 开放问题（后续可写专题）</h2>
+<ul>
+<li>是否引入<strong>邮筒模式</strong>（A 离线后 B 才上线的持久邮箱，但仍无明文服务器）？</li>
+<li>三人以上群组如何做信封（多公钥封装同一 DEK）？</li>
+<li>中转站 API 频繁变更时的「驱动插件化」？</li>
+<li>与「家用存储 / Johnny.Decimal」归档流程如何衔接（收件后自动入库分类）？</li>
+</ul>
+<hr>
+<h2 id="修订说明">修订说明</h2>
+<table>
+<thead>
+<tr>
+<th>项</th>
+<th>处理</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>原文</td>
+<td>点对点收发步骤草稿，算法与 UI 表述不一致</td>
+</tr>
+<tr>
+<td>补全</td>
+<td>威胁模型、密钥语义、JSON 元数据、失败恢复、分期实现</td>
+</tr>
+<tr>
+<td>修正</td>
+<td>统一 ChaCha20 / SM4 / 7z-AES 与界面文案；MD5→SHA-256；RSA 方向改为「接收方公钥加密」</td>
+</tr>
+<tr>
+<td>定位</td>
+<td>设计构思文，非已上线产品说明书</td>
+</tr>
+</tbody>
+</table>
+</div></div><aside class="toc" data-toc hidden aria-label="目录" data-astro-cid-sgg5joot><p class="toc-label" data-astro-cid-sgg5joot>目录</p><nav class="toc-nav" data-toc-nav data-astro-cid-sgg5joot></nav></aside></div></article></main><footer data-astro-cid-jo6i4kqk><div class="inner" data-astro-cid-jo6i4kqk><p class="line" data-astro-cid-jo6i4kqk>© 2026 Zumpyx</p><p class="note" data-astro-cid-jo6i4kqk>notes · exploit · write · repeat</p></div></footer><script type="module">function e(e){return e.trim().toLowerCase().replace(/\s+/g,`-`).replace(/[^\w\u4e00-\u9fff-]+/g,``).replace(/-+/g,`-`).replace(/^-|-$/g,``)||`section`}var t=null;function n(){let n=document.querySelector(`[data-article-content]`),r=document.querySelector(`[data-toc]`),i=document.querySelector(`[data-toc-nav]`);if(!n||!r||!i)return;t?.disconnect(),t=null,i.replaceChildren();let a=Array.from(n.querySelectorAll(`h2, h3`)).filter(e=>(e.textContent??``).trim().length>0);if(a.length===0){r.hidden=!0;return}r.hidden=!1;let o=new Set,s=[];for(let t of a){let n=t.id;if(!n){let r=e(t.textContent??``);n=r;let i=2;for(;o.has(n)||document.getElementById(n);)n=`${r}-${i}`,i+=1;t.id=n}o.add(n);let r=document.createElement(`a`);r.href=`#${n}`,r.textContent=(t.textContent??``).trim(),r.className=t.tagName===`H3`?`toc-h3`:`toc-h2`,r.dataset.target=n,i.appendChild(r),s.push(r)}let c=e=>{for(let t of s)t.classList.toggle(`active`,t.dataset.target===e)};t=new IntersectionObserver(e=>{let t=e.filter(e=>e.isIntersecting).sort((e,t)=>e.target.offsetTop-t.target.offsetTop);t[0]&&c(t[0].target.id)},{rootMargin:`-15% 0px -70% 0px`,threshold:[0,1]});for(let e of a)t.observe(e);location.hash?c(decodeURIComponent(location.hash.slice(1))):a[0]&&c(a[0].id)}n(),document.addEventListener(`article-content-unlocked`,()=>{n()});</script></body></html>

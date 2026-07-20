@@ -1,0 +1,912 @@
+<!DOCTYPE html><html lang="zh-CN" data-astro-cid-sgg5joot><head><!-- Global Metadata --><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="icon" type="image/png" href="/favicon.png"><link rel="icon" href="/favicon.ico" sizes="any"><link rel="apple-touch-icon" href="/apple-touch-icon.png"><link rel="sitemap" href="/sitemap-index.xml"><link rel="alternate" type="application/rss+xml" title="Zumpyx's Blog" href="https://blog.zumpyx.com/rss.xml"><meta name="generator" content="Astro v7.1.0"><meta name="color-scheme" content="light dark"><meta name="theme-color" content="#0b0d11" media="(prefers-color-scheme: dark)"><meta name="theme-color" content="#f4f5f7" media="(prefers-color-scheme: light)"><script>
+	(() => {
+		try {
+			const t = localStorage.getItem('theme');
+			if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t);
+			else document.documentElement.removeAttribute('data-theme');
+		} catch {}
+	})();
+</script><style>@font-face{font-family:Atkinson-c7f4c4e8b285552f;src:url("/_astro/fonts/89758defcfa85239.woff") format("woff");font-display:swap;font-weight:400;font-style:normal;}@font-face{font-family:Atkinson-c7f4c4e8b285552f;src:url("/_astro/fonts/14aa8dd5744dd4bc.woff") format("woff");font-display:swap;font-weight:700;font-style:normal;}@font-face{font-family:"Atkinson-c7f4c4e8b285552f fallback: Arial";src:local("Arial");font-display:swap;font-weight:400;font-style:normal;size-adjust:99.3717%;ascent-override:80.1033%;descent-override:25.2587%;line-gap-override:0%;}@font-face{font-family:"Atkinson-c7f4c4e8b285552f fallback: Arial Bold";src:local("Arial Bold");font-display:swap;font-weight:700;font-style:normal;size-adjust:92.2954%;ascent-override:86.2448%;descent-override:27.1953%;line-gap-override:0%;}:root{--font-atkinson:Atkinson-c7f4c4e8b285552f,"Atkinson-c7f4c4e8b285552f fallback: Arial","Atkinson-c7f4c4e8b285552f fallback: Arial Bold",sans-serif;}</style><link rel="preload" href="/_astro/fonts/89758defcfa85239.woff" as="font" type="font/woff" crossorigin><link rel="preload" href="/_astro/fonts/14aa8dd5744dd4bc.woff" as="font" type="font/woff" crossorigin><!-- Canonical URL --><link rel="canonical" href="https://blog.zumpyx.com/blog/windows-maldev-ita-hide-obfuscate/"><!-- Primary Meta Tags --><title>Windows Maldev - ITA 隐藏与混淆 · Zumpyx&#39;s Blog</title><meta name="description" content="通过自实现 GetModuleHandle / GetProcAddress、API Hash 与 IAT 伪装，隐藏 PE 导入表中的敏感 API 痕迹。"><!-- Open Graph / Facebook --><meta property="og:type" content="website"><meta property="og:url" content="https://blog.zumpyx.com/blog/windows-maldev-ita-hide-obfuscate/"><meta property="og:title" content="Windows Maldev - ITA 隐藏与混淆 · Zumpyx's Blog"><meta property="og:description" content="通过自实现 GetModuleHandle / GetProcAddress、API Hash 与 IAT 伪装，隐藏 PE 导入表中的敏感 API 痕迹。"><meta property="og:image" content="https://blog.zumpyx.com/_astro/head.CE6FOIKY.png"><!-- Twitter --><meta name="twitter:card" content="summary_large_image"><meta name="twitter:url" content="https://blog.zumpyx.com/blog/windows-maldev-ita-hide-obfuscate/"><meta name="twitter:title" content="Windows Maldev - ITA 隐藏与混淆 · Zumpyx's Blog"><meta name="twitter:description" content="通过自实现 GetModuleHandle / GetProcAddress、API Hash 与 IAT 伪装，隐藏 PE 导入表中的敏感 API 痕迹。"><meta name="twitter:image" content="https://blog.zumpyx.com/_astro/head.CE6FOIKY.png"><link rel="stylesheet" href="/_astro/Header.CMmW25g2.css"><link rel="stylesheet" href="/_astro/ArticleLayout.DA3idRZl.css"><style>.nav-link[data-astro-cid-evkijfd6]{color:var(--text-muted);font-family:var(--font-mono);letter-spacing:.04em;text-transform:uppercase;white-space:nowrap;border:1px solid #0000;border-radius:999px;justify-content:center;align-items:center;padding:.5em .95em;font-size:.78rem;font-weight:500;text-decoration:none;transition:color .18s,background .18s,border-color .18s,box-shadow .18s;display:inline-flex}.nav-link[data-astro-cid-evkijfd6]:hover{color:var(--text-bright);background:var(--surface-hover);text-decoration:none}.nav-link[data-astro-cid-evkijfd6].active{color:var(--on-accent);background:linear-gradient(135deg, var(--accent-hover), var(--accent));box-shadow:0 0 0 1px var(--border-strong), 0 6px 16px var(--accent-glow-strong);text-shadow:none;border-color:#0000;font-weight:700;text-decoration:none}
+</style><script type="module" src="/_astro/page.CTxKKjGj.js"></script></head><body data-astro-cid-sgg5joot><div class="scanline" aria-hidden="true" data-astro-cid-sgg5joot></div><header data-astro-cid-nen7h5rs><div class="bar" data-astro-cid-nen7h5rs><a class="brand" href="/" data-astro-cid-nen7h5rs><span class="logo" aria-hidden="true" data-astro-cid-nen7h5rs><img src="/_astro/head.CE6FOIKY_1SW1hc.webp" srcset="/_astro/head.CE6FOIKY_1SW1hc.webp 1x, /_astro/head.CE6FOIKY_scYzG.webp 2x" alt data-astro-cid-nen7h5rs="true" loading="lazy" decoding="async" width="64" height="64" class="logo-img"></span><span class="brand-text" data-astro-cid-nen7h5rs><span class="brand-name" data-astro-cid-nen7h5rs>Zumpyx&#39;s Blog</span></span></a><nav class="nav-pill" aria-label="Primary" data-astro-cid-nen7h5rs><div class="nav-track" data-astro-cid-nen7h5rs><a href="/" class="nav-link" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>Home</a><a href="/blog" class="nav-link active" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>Blog</a><a href="/hackthebox" class="nav-link" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>HackTheBox</a><a href="/projects" class="nav-link" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>Projects</a><a href="/about" class="nav-link" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>About</a></div></nav><div class="actions" data-astro-cid-nen7h5rs><button type="button" class="icon-btn search-trigger" data-search-open aria-label="搜索" title="搜索 (Ctrl/⌘+K)" data-astro-cid-7yy3665x><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true" data-astro-cid-7yy3665x><circle cx="11" cy="11" r="6.5" data-astro-cid-7yy3665x></circle><path d="M16.5 16.5 21 21" stroke-linecap="round" data-astro-cid-7yy3665x></path></svg></button><div class="search-root" data-search-root hidden data-astro-cid-7yy3665x><div class="search-backdrop" data-search-close data-astro-cid-7yy3665x></div><div class="search-panel" role="dialog" aria-modal="true" aria-label="全站搜索" data-astro-cid-7yy3665x><div class="search-bar" data-astro-cid-7yy3665x><svg class="search-ico" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true" data-astro-cid-7yy3665x><circle cx="11" cy="11" r="6.5" data-astro-cid-7yy3665x></circle><path d="M16.5 16.5 21 21" stroke-linecap="round" data-astro-cid-7yy3665x></path></svg><input type="search" class="search-input" data-search-input placeholder="全文搜索：标题 / 正文 / 标签…" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="search" data-astro-cid-7yy3665x><kbd class="search-kbd" data-search-close-hint data-astro-cid-7yy3665x>Esc</kbd></div><div class="search-meta" data-search-meta data-astro-cid-7yy3665x>输入关键词开始搜索</div><ul class="search-results" data-search-results role="listbox" aria-label="搜索结果" data-astro-cid-7yy3665x></ul></div></div><script type="module" src="/_astro/SiteSearch.astro_astro_type_script_index_0_lang.CiT4pk6n.js"></script><button type="button" class="icon-btn theme-toggle" data-theme-toggle aria-label="主题：跟随系统" title="主题：跟随系统（点击切换）" data-astro-cid-l6lhmie6><span class="icon icon-system" aria-hidden="true" data-astro-cid-l6lhmie6><!-- auto / system --><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" data-astro-cid-l6lhmie6><rect x="3" y="4" width="18" height="12" rx="2" data-astro-cid-l6lhmie6></rect><path d="M8 20h8M12 16v4" data-astro-cid-l6lhmie6></path></svg></span><span class="icon icon-light" aria-hidden="true" hidden data-astro-cid-l6lhmie6><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" data-astro-cid-l6lhmie6><circle cx="12" cy="12" r="4" data-astro-cid-l6lhmie6></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" data-astro-cid-l6lhmie6></path></svg></span><span class="icon icon-dark" aria-hidden="true" hidden data-astro-cid-l6lhmie6><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" data-astro-cid-l6lhmie6><path d="M21 14.5A8.5 8.5 0 1 1 9.5 3a7 7 0 0 0 11.5 11.5z" stroke-linejoin="round" data-astro-cid-l6lhmie6></path></svg></span></button><script>
+	(() => {
+		const KEY = 'theme';
+		const ORDER = ['system', 'light', 'dark'];
+		const LABELS = {
+			system: '主题：跟随系统',
+			light: '主题：亮色',
+			dark: '主题：暗色',
+		};
+
+		const getStored = () => {
+			try {
+				const v = localStorage.getItem(KEY);
+				if (v === 'light' || v === 'dark' || v === 'system') return v;
+			} catch {}
+			return 'system';
+		};
+
+		const apply = (mode) => {
+			const root = document.documentElement;
+			if (mode === 'light' || mode === 'dark') root.setAttribute('data-theme', mode);
+			else root.removeAttribute('data-theme');
+			try {
+				if (mode === 'system') localStorage.removeItem(KEY);
+				else localStorage.setItem(KEY, mode);
+			} catch {}
+		};
+
+		const syncButton = (mode) => {
+			document.querySelectorAll('[data-theme-toggle]').forEach((btn) => {
+				btn.setAttribute('data-mode', mode);
+				btn.setAttribute('aria-label', LABELS[mode]);
+				btn.setAttribute('title', `${LABELS[mode]}（点击切换）`);
+				btn.querySelectorAll('.icon').forEach((el) => {
+					el.hidden = true;
+				});
+				const icon = btn.querySelector(`.icon-${mode}`);
+				if (icon) icon.hidden = false;
+			});
+		};
+
+		const mode = getStored();
+		apply(mode);
+		syncButton(mode);
+
+		document.querySelectorAll('[data-theme-toggle]').forEach((btn) => {
+			btn.addEventListener('click', () => {
+				const cur = getStored();
+				const next = ORDER[(ORDER.indexOf(cur) + 1) % ORDER.length];
+				apply(next);
+				syncButton(next);
+			});
+		});
+
+		// If following system, react to OS changes
+		try {
+			const mq = window.matchMedia('(prefers-color-scheme: dark)');
+			mq.addEventListener?.('change', () => {
+				if (getStored() === 'system') apply('system');
+			});
+		} catch {}
+	})();
+</script><a class="icon-btn" href="/rss.xml" target="_blank" rel="noopener noreferrer" title="RSS" aria-label="RSS 订阅" data-astro-cid-nen7h5rs><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true" data-astro-cid-nen7h5rs><path d="M5 19a1.5 1.5 0 1 0 0.01 0" fill="currentColor" stroke="none" data-astro-cid-nen7h5rs></path><path d="M4 11a9 9 0 0 1 9 9" stroke-linecap="round" data-astro-cid-nen7h5rs></path><path d="M4 5a15 15 0 0 1 15 15" stroke-linecap="round" data-astro-cid-nen7h5rs></path></svg></a></div></div></header><main data-astro-cid-sgg5joot><article data-astro-cid-sgg5joot><div class="article-shell" data-astro-cid-sgg5joot><div class="prose" data-article-body data-astro-cid-sgg5joot><div class="title" data-astro-cid-sgg5joot><div class="date" data-astro-cid-sgg5joot><time datetime="2024-10-24T00:00:00.000Z">2024-10-24</time></div><div class="title-row" data-astro-cid-sgg5joot><h1 data-astro-cid-sgg5joot>Windows Maldev - ITA 隐藏与混淆</h1></div><div class="meta" data-astro-cid-sgg5joot><span class="badge">maldev</span><span class="badge">Windows</span><span class="badge">PE</span><span class="badge">ITA</span><span class="badge">obfuscation</span><span class="badge">Maldev</span></div><hr data-astro-cid-sgg5joot></div><div class="content" data-article-content data-astro-cid-sgg5joot><h2 id="简介">简介</h2>
+<p>ITA(Import Table Address) 包含有关 PE 文件的信息，例如使用的函数名以及 DLL，此类信息常用于对二进制文件进行标记和检测。例如：</p>
+<p><img alt="image-20241024083658530.png" loading="lazy" decoding="async" width="1212" height="954" src="/_astro/image-20241024083658530.5sBHBu39_Z1VKcUh.webp" srcset=""></p>
+<p>可以看到，这个 PE 文件导入了 <code>CreateRemoteThread</code>、<code>OpenProcess</code>、<code>VirtualAllocEx</code>、<code>WriteProcessMemory</code> 等函数，Shellcode 加载流程尽收眼底。</p>
+<p>想要隐藏这些内容，可以使用 <code>GetProcAddress</code>、<code>GetModuleHandle</code> 或 <code>LoadLibrary</code> 在运行时动态加载这些函数。</p>
+<p>但这又会出现其他问题。</p>
+<ul>
+<li>动态导入的函数相关字符串会出现在 PE 文件中，这个可以用于签名检测</li>
+<li><code>GetProcAddress</code> 和 <code>GetModuleHandle</code> 函数的导入信息也会出现在 ITA 中</li>
+</ul>
+<p>想隐藏字符串，那只能通过替换，可以通过字符串加密、Hash 运算等方法；对于 <code>GetProcAddress</code> 和 <code>GetModuleHandle</code> 函数的信息，可以通过自实现来隐藏。两者结合。</p>
+<h2 id="hash-函数">Hash 函数</h2>
+<p>Hash 函数的选择，最好是能够轻量实现，并且分布均匀（以防冲突），这里的 Demo 选用 <code>JenkinsOneAtATime32Bit</code> 算法，实现来自 <a href="https://github.com/vxunderground/VX-API/blob/main/VX-API/HashStringJenkinsOneAtATime32Bit.cpp">VX-API GitHub 仓库</a>。</p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>#define HASHA(API) (HashStringJenkinsOneAtATime32BitA((PCHAR) API))</span></span>
+<span class="line"><span>UINT32 HashStringJenkinsOneAtATime32BitA(_In_ PCHAR String)</span></span>
+<span class="line"><span>{</span></span>
+<span class="line"><span>	SIZE_T Index = 0;</span></span>
+<span class="line"><span>	UINT32 Hash = 0;</span></span>
+<span class="line"><span>	SIZE_T Length = strlen(String);</span></span>
+<span class="line"><span>	while (Index != Length)</span></span>
+<span class="line"><span>	{</span></span>
+<span class="line"><span>		Hash += String[Index++];</span></span>
+<span class="line"><span>		Hash += Hash &lt;&lt; 7; // 这里的种子可以更改</span></span>
+<span class="line"><span>		Hash ^= Hash &gt;&gt; 6;</span></span>
+<span class="line"><span>	}</span></span>
+<span class="line"><span>	Hash += Hash &lt;&lt; 3;</span></span>
+<span class="line"><span>	Hash ^= Hash &gt;&gt; 11;</span></span>
+<span class="line"><span>	Hash += Hash &lt;&lt; 15;</span></span>
+<span class="line"><span>	return Hash;</span></span>
+<span class="line"><span>}</span></span></code></pre>
+<p>为了灵活和方便使用，设置了 <code>HASHA</code> 宏。</p>
+<h2 id="实现-getmodulehandle">实现 GetModuleHandle</h2>
+<p><code>GetModuleHandle</code> 函数用于在内存中检索指定 DLL 的句柄。函数返回 DLL 的句柄 (<code>HMODULE</code>) 或 <code>NULL</code> 。</p>
+<h3 id="getmodulehandle-原理">GetModuleHandle 原理</h3>
+<p><code>HMODULE</code> 数据类型是加载的 DLL 的基地址，表示 DLL 在进程地址空间中的位置。因此，替换函数的目标是检索指定 DLL 的基地址。</p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>typedef struct _PEB {</span></span>
+<span class="line"><span>  BYTE                          Reserved1[2];</span></span>
+<span class="line"><span>  BYTE                          BeingDebugged;</span></span>
+<span class="line"><span>  BYTE                          Reserved2[1];</span></span>
+<span class="line"><span>  PVOID                         Reserved3[2];</span></span>
+<span class="line"><span>  PPEB_LDR_DATA                 Ldr; // 该结构包含关于进程加载模块的信息。</span></span>
+<span class="line"><span>  PRTL_USER_PROCESS_PARAMETERS  ProcessParameters;</span></span>
+<span class="line"><span>  PVOID                         Reserved4[3];</span></span>
+<span class="line"><span>  PVOID                         AtlThunkSListPtr;</span></span>
+<span class="line"><span>  PVOID                         Reserved5;</span></span>
+<span class="line"><span>  ULONG                         Reserved6;</span></span>
+<span class="line"><span>  PVOID                         Reserved7;</span></span>
+<span class="line"><span>  ULONG                         Reserved8;</span></span>
+<span class="line"><span>  ULONG                         AtlThunkSListPtr32;</span></span>
+<span class="line"><span>  PVOID                         Reserved9[45];</span></span>
+<span class="line"><span>  BYTE                          Reserved10[96];</span></span>
+<span class="line"><span>  PPS_POST_PROCESS_INIT_ROUTINE PostProcessInitRoutine;</span></span>
+<span class="line"><span>  BYTE                          Reserved11[128];</span></span>
+<span class="line"><span>  PVOID                         Reserved12[1];</span></span>
+<span class="line"><span>  ULONG                         SessionId;</span></span>
+<span class="line"><span>} PEB, *PPEB;</span></span></code></pre>
+<p>PEB 结构的 <code>PEB_LDR_DATA Ldr</code> 成员包含进程中加载的 DLL 的信息。</p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>typedef struct _PEB_LDR_DATA {</span></span>
+<span class="line"><span>  BYTE       Reserved1[8];</span></span>
+<span class="line"><span>  PVOID      Reserved2[3];</span></span>
+<span class="line"><span>  LIST_ENTRY InMemoryOrderModuleList;  // 内存中模块列表</span></span>
+<span class="line"><span>} PEB_LDR_DATA, *PPEB_LDR_DATA;</span></span></code></pre>
+<p>对应 <code>LIST_ENTRY</code> 结构是一个双向链表，</p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>typedef struct _LIST_ENTRY {</span></span>
+<span class="line"><span>   struct _LIST_ENTRY *Flink;</span></span>
+<span class="line"><span>   struct _LIST_ENTRY *Blink;</span></span>
+<span class="line"><span>} LIST_ENTRY, *PLIST_ENTRY, *RESTRICTED_POINTER PRLIST_ENTRY;</span></span></code></pre>
+<p><img alt="image-20241025085631337.png" loading="lazy" decoding="async" width="1282" height="909" src="/_astro/image-20241025085631337.bGhX9fdd_2hv7i2.webp" srcset=""></p>
+<p>微软文档中说明，<code>_PEB_LDR_DATA</code> 的 InMemeoryOrderModuleList 成员包含进程加载模块的双向链表的头部。列表中的每个项都是指向 LDR_DATA_TABLE_ENTRY 结构的指针。并且给出了 <code>_LDR_DATA_TABLE_ENTRY</code> 结构</p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>typedef struct _LDR_DATA_TABLE_ENTRY {</span></span>
+<span class="line"><span>    PVOID Reserved1[2];</span></span>
+<span class="line"><span>    LIST_ENTRY InMemoryOrderLinks;</span></span>
+<span class="line"><span>    PVOID Reserved2[2];</span></span>
+<span class="line"><span>    PVOID DllBase;     // DLL 基地址</span></span>
+<span class="line"><span>    PVOID EntryPoint;</span></span>
+<span class="line"><span>    PVOID Reserved3;</span></span>
+<span class="line"><span>    UNICODE_STRING FullDllName;  // 已加载 DLL 模块的文件名</span></span>
+<span class="line"><span>    BYTE Reserved4[8];</span></span>
+<span class="line"><span>    PVOID Reserved5[3];</span></span>
+<span class="line"><span>    union {</span></span>
+<span class="line"><span>        ULONG CheckSum;</span></span>
+<span class="line"><span>        PVOID Reserved6;</span></span>
+<span class="line"><span>    };</span></span>
+<span class="line"><span>    ULONG TimeDateStamp;</span></span>
+<span class="line"><span>} LDR_DATA_TABLE_ENTRY, *PLDR_DATA_TABLE_ENTRY;</span></span></code></pre>
+<p>因此，需要关注的两个重点变量已经找到</p>
+<ul>
+<li>DLL 基地址: PEB -&gt; Ldr -&gt; InMemoryOrderModuleList -&gt; Flink -&gt; DllBase （这个其实不是）</li>
+<li>DLL 文件名: PEB -&gt; Ldr -&gt; InMemoryOrderModuleList -&gt; Flink -&gt; FullDllName</li>
+</ul>
+<h3 id="简单实现">简单实现</h3>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>#include &lt;stdio.h&gt;</span></span>
+<span class="line"><span>#include &lt;Windows.h&gt;</span></span>
+<span class="line"><span>#include &lt;winternl.h&gt;</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>HMODULE Yes_GetModuleHandle(IN LPCWSTR szModuleName) {</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>	// 获取 peb</span></span>
+<span class="line"><span>#ifdef _WIN64 // 如果编译为 x64</span></span>
+<span class="line"><span>	PPEB            pPeb = (PEB*)(__readgsqword(0x60));</span></span>
+<span class="line"><span>#elif _WIN32 // 如果编译为 x32</span></span>
+<span class="line"><span>	PPEB            pPeb = (PEB*)(__readfsdword(0x30));</span></span>
+<span class="line"><span>#endif</span></span>
+<span class="line"><span>	// 获取 Ldr</span></span>
+<span class="line"><span>	PPEB_LDR_DATA pLdr = (PPEB_LDR_DATA)(pPeb-&gt;Ldr);</span></span>
+<span class="line"><span>	// 获取链表中的第一个元素，其中包含第一个模块的信息 </span></span>
+<span class="line"><span>	PLDR_DATA_TABLE_ENTRY pDte = (PLDR_DATA_TABLE_ENTRY)(pLdr-&gt;InMemoryOrderModuleList.Flink);</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>    while (pDte-&gt;FullDllName.Length != NULL) {</span></span>
+<span class="line"><span>		printf("[+] Found Dll %-15ls DLLBase: 0x%p Reserved2[0]: 0x%p \n", pDte-&gt;FullDllName.Buffer, pDte-&gt;DllBase, pDte-&gt;Reserved2[0]);</span></span>
+<span class="line"><span>        pDte = *(PLDR_DATA_TABLE_ENTRY*)(pDte);</span></span>
+<span class="line"><span>    }</span></span>
+<span class="line"><span>    return NULL;</span></span>
+<span class="line"><span>}</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>int main() {</span></span>
+<span class="line"><span>	GetModuleHandleH("");</span></span>
+<span class="line"><span>	getchar();</span></span>
+<span class="line"><span>	return 0;</span></span>
+<span class="line"><span>}</span></span></code></pre>
+<p><img alt="image-20241025093521044.png" loading="lazy" decoding="async" width="1269" height="288" src="/_astro/image-20241025093521044.D0bB0VhS_ZHdiqQ.webp" srcset=""></p>
+<p>对比 Process Hacker 打开的进程信息</p>
+<p><img alt="image-20241025093502653.png" loading="lazy" decoding="async" width="769" height="346" src="/_astro/image-20241025093502653.B2M8fWKK_4XTXL.webp" srcset=""></p>
+<p>发现 <code>pDte-&gt;Reserved2[0]</code> 成员是需要的 DLL 基地址。</p>
+<p>现在枚举 DLL 文件名，通过 Hash 校验来确定目标 DLL 基地址。可以实现对函数名进行 Hash 计算</p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>#define DEBUG</span></span>
+<span class="line"><span>#ifdef DEBUG</span></span>
+<span class="line"><span>#define DLL_NUM 3</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>void showHash() {</span></span>
+<span class="line"><span>	int i, j;</span></span>
+<span class="line"><span>	char dllName;</span></span>
+<span class="line"><span>	char* dllList[DLL_NUM] = {</span></span>
+<span class="line"><span>		"NTDLL.DLL",</span></span>
+<span class="line"><span>		"USER32.DLL",</span></span>
+<span class="line"><span>		"KERNEL32.DLL",</span></span>
+<span class="line"><span>	};</span></span>
+<span class="line"><span>	for (i = 0; i &lt; DLL_NUM; i++) {</span></span>
+<span class="line"><span>		char temp;</span></span>
+<span class="line"><span>		printf("#define ");</span></span>
+<span class="line"><span>		for (j = 0; dllList[i][j] != '.'; j++)</span></span>
+<span class="line"><span>			printf("%c", dllList[i][j]);</span></span>
+<span class="line"><span>		if (j &lt; 7)</span></span>
+<span class="line"><span>			printf("\t");</span></span>
+<span class="line"><span>		printf("\t0x%0.8X \n", HASHA(dllList[i]));</span></span>
+<span class="line"><span>	}</span></span>
+<span class="line"><span>}</span></span>
+<span class="line"><span>#endif // DEBUG</span></span></code></pre>
+<p><img alt="image-20241025100804977.png" loading="lazy" decoding="async" width="1000" height="118" src="/_astro/image-20241025100804977.D4G_NDSt_c94z2.webp" srcset=""></p>
+<p>这样比较方便去定义，并且统一转换成大写。</p>
+<p>接下来更新一下 <code>Yes_GetModuleHandle</code> 函数为 <code>Yes_GetModuleHandle_FromHash</code></p>
+<p>这里大小写使用三元运算符实现，可以定义为一个宏</p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>#define DLL_MAX_PATH	256</span></span>
+<span class="line"><span>#define TO_UPPER(C) C &gt;= 'a' &amp;&amp; C &lt;= 'z' ? C + 'A' - 'a' : C</span></span>
+<span class="line"><span>HMODULE GetModuleHandleH(IN UINT32 ui32DllHash) {</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>#ifdef _WIN64	// 获取 x64 peb</span></span>
+<span class="line"><span>	PPEB            pPeb = (PEB*)(__readgsqword(0x60));</span></span>
+<span class="line"><span>#elif _WIN32	// 获取 x86 peb</span></span>
+<span class="line"><span>	PPEB            pPeb = (PEB*)(__readfsdword(0x30));</span></span>
+<span class="line"><span>#endif</span></span>
+<span class="line"><span>	</span></span>
+<span class="line"><span>	PPEB_LDR_DATA pLdr = (PPEB_LDR_DATA)(pPeb-&gt;Ldr);		// 获取 Ldr</span></span>
+<span class="line"><span>	PLDR_DATA_TABLE_ENTRY pDte = (PLDR_DATA_TABLE_ENTRY)(pLdr-&gt;InMemoryOrderModuleList.Flink);</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>	while (pDte-&gt;FullDllName.Length != NULL) {</span></span>
+<span class="line"><span>		</span></span>
+<span class="line"><span>		CHAR UpperCaseDllName[MAX_PATH] = { 0 };</span></span>
+<span class="line"><span>		for (int i = 0; i &lt; pDte-&gt;FullDllName.Length; i++)	// 转化成大写</span></span>
+<span class="line"><span>			UpperCaseDllName[i] = (CHAR)TO_UPPER(pDte-&gt;FullDllName.Buffer[i]);</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>		if (ui32DllHash == HASHA(UpperCaseDllName))			// 判断 Hash 是否一致</span></span>
+<span class="line"><span>			return pDte-&gt;Reserved2[0];						// 返回 DLL Base Address</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>		pDte = *(PLDR_DATA_TABLE_ENTRY*)(pDte);				// 链表下一节点</span></span>
+<span class="line"><span>	}</span></span>
+<span class="line"><span>	return NULL;</span></span>
+<span class="line"><span>}</span></span></code></pre>
+<p>测试一下效果，没啥问题。</p>
+<p><img alt="image-20241025103841263.png" loading="lazy" decoding="async" width="1516" height="202" src="/_astro/image-20241025103841263.D10XRiLM_ZNIcit.webp" srcset=""></p>
+<blockquote>
+<p>上文的代码中关于 <code>GetModuleHandle</code> 的实现使用了 <code>winternl.h</code> 头文件，这里可以使用 <a href="https://www.nirsoft.net/">NirSoft</a> 与 <a href="https://github.com/winsiderss/systeminformer/blob/master/phnt/include/ntpebteb.h">Process Hacker</a> 的结构体来代替。最终效果 仅需导入 <code>&lt;windows.h&gt;</code> 头文件。</p>
+</blockquote>
+<h2 id="实现-getprocaddress">实现 GetProcAddress</h2>
+<p><code>GetProcAddress</code> 函数从 DLL 句柄中获取导出函数的地址。如果未找到函数名，返回 <code>NULL</code>。</p>
+<h3 id="getprocaddress-原理">GetProcAddress 原理</h3>
+<p>要访问导出的函数，需要访问 DLL 的导出表并在其中循环查找目标函数名称。</p>
+<p>PE 头模块时提到，导出表是定义为 <code>IMAGE_EXPORT_DIRECTORY</code> 的结构。<a href="https://learn.microsoft.com/en-us/windows/win32/debug/pe-format#export-directory-table">微软文档</a></p>
+<p><img alt="image-20241025110446188.png" loading="lazy" decoding="async" width="1239" height="1207" src="/_astro/image-20241025110446188.ChMKsHsQ_Z1WsDoA.webp" srcset=""></p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>typedef struct _IMAGE_EXPORT_DIRECTORY {</span></span>
+<span class="line"><span>    DWORD   Characteristics;</span></span>
+<span class="line"><span>    DWORD   TimeDateStamp;</span></span>
+<span class="line"><span>    WORD    MajorVersion;</span></span>
+<span class="line"><span>    WORD    MinorVersion;</span></span>
+<span class="line"><span>    DWORD   Name;</span></span>
+<span class="line"><span>    DWORD   Base;</span></span>
+<span class="line"><span>    DWORD   NumberOfFunctions;   // 导出地址表中的条目数量</span></span>
+<span class="line"><span>    DWORD   NumberOfNames;</span></span>
+<span class="line"><span>	DWORD AddressOfFunctions;    // 函数地址（相对于镜像基地址的 RVA）</span></span>
+<span class="line"><span>	DWORD AddressOfNames;        // 名称地址（相对于镜像基地址的 RVA）</span></span>
+<span class="line"><span>	DWORD AddressOfNameOrdinals; // 名称序号地址（相对于镜像基地址的 RVA）</span></span>
+<span class="line"><span>} IMAGE_EXPORT_DIRECTORY, *PIMAGE_EXPORT_DIRECTORY;</span></span></code></pre>
+<p>需要关注的就是最后三个成员</p>
+<ul>
+<li><code>AddressOfFunctions</code> - 指定导出函数地址数组的地址。</li>
+<li><code>AddressOfNames</code> - 指定导出函数名称地址数组的地址。</li>
+<li><code>AddressOfNameOrdinals</code> - 指定导出函数的序号数组的地址。</li>
+</ul>
+<h3 id="简单实现-1">简单实现</h3>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>FARPROC Yes_GetProcAddress(IN HMODULE hModule, IN LPCSTR lpApiName) {</span></span>
+<span class="line"><span>	PBYTE pBase = (PBYTE)hModule;	// 转化一下</span></span>
+<span class="line"><span>	</span></span>
+<span class="line"><span>	PIMAGE_DOS_HEADER pImgDosHdr = (PIMAGE_DOS_HEADER)pBase;	// 获取 DOS 头</span></span>
+<span class="line"><span>	if (pImgDosHdr-&gt;e_magic != IMAGE_DOS_SIGNATURE)				// 签名检查</span></span>
+<span class="line"><span>		return NULL;</span></span>
+<span class="line"><span>	PIMAGE_NT_HEADERS pImgNtHdrs = (PIMAGE_NT_HEADERS)(pBase + pImgDosHdr-&gt;e_lfanew);	// 获取 NT 头</span></span>
+<span class="line"><span>	if (pImgNtHdrs-&gt;Signature != IMAGE_NT_SIGNATURE)									// 签名检查</span></span>
+<span class="line"><span>		return NULL;</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>	IMAGE_OPTIONAL_HEADER ImgOptHdr = pImgNtHdrs-&gt;OptionalHeader;	// 获取可选头	</span></span>
+<span class="line"><span>	PIMAGE_EXPORT_DIRECTORY pImgExportDir = (PIMAGE_EXPORT_DIRECTORY)(pBase + ImgOptHdr.DataDirectory[IMAGE_DIRECTORY_ENTRY_EXPORT].VirtualAddress);	// 获取导出目录</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>	PDWORD FunctionNameArray = (PDWORD)(pBase + pImgExportDir-&gt;AddressOfNames);				// 获取函数名称数组指针</span></span>
+<span class="line"><span>	PDWORD FunctionAddressArray = (PDWORD)(pBase + pImgExportDir-&gt;AddressOfFunctions);		// 获取函数地址数组指针</span></span>
+<span class="line"><span>	PWORD  FunctionOrdinalArray = (PWORD)(pBase + pImgExportDir-&gt;AddressOfNameOrdinals);	// 获取函数序号数组指针</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>	for (DWORD i = 0; i &lt; pImgExportDir-&gt;NumberOfFunctions; i++) {</span></span>
+<span class="line"><span>		</span></span>
+<span class="line"><span>		CHAR* pFunctionName = (CHAR*)(pBase + FunctionNameArray[i]);						// 获取函数的名称</span></span>
+<span class="line"><span>		WORD wFunctionOrdinal = FunctionOrdinalArray[i];									// 获取函数的序号</span></span>
+<span class="line"><span>		PVOID pFunctionAddress = (PVOID)(pBase + FunctionAddressArray[wFunctionOrdinal]);	// 通过函数序数值获取函数地址</span></span>
+<span class="line"><span>		printf("[ No.%0.4d ] addr：0x%p Name：%s \n", wFunctionOrdinal, pFunctionAddress, pFunctionName);</span></span>
+<span class="line"><span>	}</span></span>
+<span class="line"><span>}</span></span></code></pre>
+<p><img alt="image-20241025122811847.png" loading="lazy" decoding="async" width="1171" height="823" src="/_astro/image-20241025122811847.D1Pn7WeB_v55XJ.webp" srcset=""></p>
+<p>效果还可以，与 GetModuleHandle 一样，可以加入 Hash 校验，来确定目标函数。</p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>FARPROC Yes_GetProcAddress_FromHash(IN HMODULE hModule, IN UINT32 ui32FuncHash) {</span></span>
+<span class="line"><span>	PBYTE pBase = (PBYTE)hModule;	// 转化一下</span></span>
+<span class="line"><span>	</span></span>
+<span class="line"><span>	PIMAGE_DOS_HEADER pImgDosHdr = (PIMAGE_DOS_HEADER)pBase;	// 获取 DOS 头</span></span>
+<span class="line"><span>	if (pImgDosHdr-&gt;e_magic != IMAGE_DOS_SIGNATURE)				// 签名检查</span></span>
+<span class="line"><span>		return NULL;</span></span>
+<span class="line"><span>	PIMAGE_NT_HEADERS pImgNtHdrs = (PIMAGE_NT_HEADERS)(pBase + pImgDosHdr-&gt;e_lfanew);	// 获取 NT 头</span></span>
+<span class="line"><span>	if (pImgNtHdrs-&gt;Signature != IMAGE_NT_SIGNATURE)									// 签名检查</span></span>
+<span class="line"><span>		return NULL;</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>	IMAGE_OPTIONAL_HEADER ImgOptHdr = pImgNtHdrs-&gt;OptionalHeader;	// 获取可选头	</span></span>
+<span class="line"><span>	PIMAGE_EXPORT_DIRECTORY pImgExportDir = (PIMAGE_EXPORT_DIRECTORY)(pBase + ImgOptHdr.DataDirectory[IMAGE_DIRECTORY_ENTRY_EXPORT].VirtualAddress);	// 获取导出目录</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>	PDWORD FunctionNameArray = (PDWORD)(pBase + pImgExportDir-&gt;AddressOfNames);				// 获取函数名称数组指针</span></span>
+<span class="line"><span>	PDWORD FunctionAddressArray = (PDWORD)(pBase + pImgExportDir-&gt;AddressOfFunctions);		// 获取函数地址数组指针</span></span>
+<span class="line"><span>	PWORD  FunctionOrdinalArray = (PWORD)(pBase + pImgExportDir-&gt;AddressOfNameOrdinals);	// 获取函数序号数组指针</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>	for (DWORD i = 0; i &lt; pImgExportDir-&gt;NumberOfFunctions; i++)</span></span>
+<span class="line"><span>		if (HASHA(pBase + FunctionNameArray[i]) == ui32FuncHash)							// 比较函数名的 Hash</span></span>
+<span class="line"><span>			return (PVOID)(pBase + FunctionAddressArray[FunctionOrdinalArray[i]]);			// 通过函数序数值获取函数地址</span></span>
+<span class="line"><span>}</span></span></code></pre>
+<p>在 Main 函数中调用检查</p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>#define KERNEL32        0xD4D19933</span></span>
+<span class="line"><span>#define LoadLibraryA                    0x000000000FA9B202</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>int main() {</span></span>
+<span class="line"><span>	printf("[+] WinApi: 0x%p - HashApi: 0x%p Func: %s", GetProcAddress(Yes_GetModuleHandle_FromHash(KERNEL32), "LoadLibraryA"), Yes_GetProcAddress_FromHash(Yes_GetModuleHandle_FromHash(KERNEL32), LoadLibraryA), "LoadLibraryA");</span></span>
+<span class="line"><span>	return 0;</span></span>
+<span class="line"><span>}</span></span></code></pre>
+<p><img alt="image-20241025131445933.png" loading="lazy" decoding="async" width="1167" height="78" src="/_astro/image-20241025131445933.ZITQI9uz_1tUNgQ.webp" srcset=""></p>
+<h2 id="动态加载-win-api">动态加载 Win Api</h2>
+<p>目前已经实现了 GetModuleHandle 和 GetProcAddress，可以动态加载函数了，在加载之前，需要声明函数类型，以便在获取函数地址后进行强制转换。</p>
+<p>Demo 计划实现一个代替 printf 函数的宏实现</p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>#define PRINTA( STR, ... )																        \</span></span>
+<span class="line"><span>    if (1) {																			        \</span></span>
+<span class="line"><span>        LPSTR buf = (LPSTR)pRtlAllocateHeap(pGetProcessHeap(), HEAP_ZERO_MEMORY, 1024 );		\</span></span>
+<span class="line"><span>        if ( buf != NULL ) {															        \</span></span>
+<span class="line"><span>            int len = pwsprintfA( buf, STR, __VA_ARGS__ );								        \</span></span>
+<span class="line"><span>            pWriteConsoleA( pGetStdHandle( STD_OUTPUT_HANDLE ), buf, len, NULL, NULL );	        \</span></span>
+<span class="line"><span>            pHeapFree( pGetProcessHeap(), 0, buf );										        \</span></span>
+<span class="line"><span>        }																				        \</span></span>
+<span class="line"><span>    }</span></span></code></pre>
+<p>其中用到了以下函数</p>
+<ul>
+<li>wsprintfA (user32.dll)</li>
+<li>HeapFree (kernel32.dll)</li>
+<li>RtlAllocateHeap (ntdll.dll)</li>
+<li>GetStdHandle (kernel32.dll)</li>
+<li>GetProcessHeap (kernel32.dll)</li>
+<li>WriteConsoleA (kernel32.dll)</li>
+</ul>
+<p>另外还会用到 LoadLibraryA (kernel32.dll)，在某些情况进程中没有 user32.dll 时来加载它。</p>
+<h3 id="函数定义">函数定义</h3>
+<p>按照声明格式写好模板</p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>typedef HMODULE(WINAPI* fnLoadLibraryA)(LPCSTR lpLibFileName);</span></span>
+<span class="line"><span>typedef BOOL(WINAPI* fnHeapFree)(HANDLE hHeap, DWORD dwFlags, _Frees_ptr_opt_ LPVOID lpMem);</span></span>
+<span class="line"><span>typedef LPVOID(WINAPI* fnRtlAllocateHeap)(PVOID HeapHandle, ULONG Flags, SIZE_T Size);</span></span>
+<span class="line"><span>typedef HANDLE(WINAPI* fnGetProcessHeap)();</span></span>
+<span class="line"><span>typedef HANDLE(WINAPI* fnGetStdHandle)(DWORD nStdHandle);</span></span>
+<span class="line"><span>typedef BOOL(WINAPI* fnWriteConsoleA)(HANDLE  hConsoleOutput, const VOID* lpBuffer, DWORD nNumberOfCharsToWrite, LPDWORD lpNumberOfCharsWritten, LPVOID  lpReserved);</span></span>
+<span class="line"><span>typedef HANDLE(WINAPI* fnGetProcessHeap)();</span></span>
+<span class="line"><span>typedef int(WINAPIV* fnwsprintfA)(LPSTR unnamedParam1, LPCSTR unnamedParam2, ...);</span></span></code></pre>
+<p>准备好 Hash</p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>// DLL Name Hash</span></span>
+<span class="line"><span>#define HASH_NTDLL              0x4898F593</span></span>
+<span class="line"><span>#define HASH_USER32             0x81E3778E</span></span>
+<span class="line"><span>#define HASH_KERNEL32           0x367DC15A</span></span>
+<span class="line"><span>// WIN API Name Hash</span></span>
+<span class="line"><span>#define Hash_LoadLibraryA       0x19F0EEAF</span></span>
+<span class="line"><span>#define Hash_wsprintfA          0x2AF0CBF4</span></span>
+<span class="line"><span>#define Hash_HeapFree           0x1154459B</span></span>
+<span class="line"><span>#define Hash_HeapAlloc          0x2F9B708A</span></span>
+<span class="line"><span>#define Hash_RtlAllocateHeap    0xF5613878</span></span>
+<span class="line"><span>#define Hash_GetStdHandle       0x0C685B0E</span></span>
+<span class="line"><span>#define Hash_WriteConsoleA      0x65304EA1</span></span>
+<span class="line"><span>#define Hash_GetProcessHeap     0x3BCCFAC6</span></span></code></pre>
+<p>创建全局函数指针变量，用 api_init 函数初始化所有函数指针</p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>fnLoadLibraryA pLoadLibraryA;</span></span>
+<span class="line"><span>fnHeapFree pHeapFree;</span></span>
+<span class="line"><span>fnHeapAlloc pHeapAlloc;</span></span>
+<span class="line"><span>fnGetStdHandle pGetStdHandle;</span></span>
+<span class="line"><span>fnWriteConsoleA pWriteConsoleA;</span></span>
+<span class="line"><span>fnGetProcessHeap pGetProcessHeap;</span></span>
+<span class="line"><span>fnwsprintfA pwsprintfA;</span></span>
+<span class="line"><span>fnRtlAllocateHeap pRtlAllocateHeap;</span></span>
+<span class="line"><span>void api_init() {</span></span>
+<span class="line"><span>	HMODULE hModule_Kernel32 = Yes_GetModuleHandle_FromHash(HASH_KERNEL32);</span></span>
+<span class="line"><span>	if (hModule_Kernel32 == NULL) {</span></span>
+<span class="line"><span>		printf("[+] K32_DLL Get Fail. \n");</span></span>
+<span class="line"><span>		return -1;</span></span>
+<span class="line"><span>	}</span></span>
+<span class="line"><span>	pLoadLibraryA = (fnLoadLibraryA)Yes_GetProcAddress_FromHash(hModule_Kernel32, Hash_LoadLibraryA);</span></span>
+<span class="line"><span>	pHeapFree = (fnHeapFree)Yes_GetProcAddress_FromHash(hModule_Kernel32, Hash_HeapFree);</span></span>
+<span class="line"><span>	pHeapAlloc = (fnHeapAlloc)Yes_GetProcAddress_FromHash(hModule_Kernel32, Hash_HeapAlloc);</span></span>
+<span class="line"><span>	pGetStdHandle = (fnGetStdHandle)Yes_GetProcAddress_FromHash(hModule_Kernel32, Hash_GetStdHandle);</span></span>
+<span class="line"><span>	pWriteConsoleA = (fnWriteConsoleA)Yes_GetProcAddress_FromHash(hModule_Kernel32, Hash_WriteConsoleA);</span></span>
+<span class="line"><span>	pGetProcessHeap = (fnGetProcessHeap)Yes_GetProcAddress_FromHash(hModule_Kernel32, Hash_GetProcessHeap);</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>	HMODULE hModule_User32 = Yes_GetModuleHandle_FromHash(HASH_USER32);</span></span>
+<span class="line"><span>	if (hModule_User32 == NULL) {</span></span>
+<span class="line"><span>		printf("[+] U32_DLL Get Fail.\n[+] Try Load U32_DLL.\n");</span></span>
+<span class="line"><span>		char User32_dll[] = { 'U', 'S', 'E', 'R', '3', '2', '.', 'D', 'L', 'L', '\x00' };</span></span>
+<span class="line"><span>		hModule_User32 = pLoadLibraryA(User32_dll);</span></span>
+<span class="line"><span>		if (hModule_User32 == NULL) {</span></span>
+<span class="line"><span>			printf("[-] U32_DLL Load Fail. \n");</span></span>
+<span class="line"><span>			return -1;</span></span>
+<span class="line"><span>		}</span></span>
+<span class="line"><span>	}</span></span>
+<span class="line"><span>	pwsprintfA = (fnwsprintfA)Yes_GetProcAddress_FromHash(hModule_User32, Hash_wsprintfA);</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>	</span></span>
+<span class="line"><span>	HMODULE hModule_NtDll = Yes_GetModuleHandle_FromHash(HASH_NTDLL);</span></span>
+<span class="line"><span>	if (hModule_NtDll == NULL) {</span></span>
+<span class="line"><span>		printf("[+] U32_DLL Get Fail.\n[+] Try Load U32_DLL.\n");</span></span>
+<span class="line"><span>		char NtDll_dll[] = { 'N', 'T', 'D', 'L', 'L', '.', 'D', 'L', 'L', '\x00' };</span></span>
+<span class="line"><span>		hModule_NtDll = pLoadLibraryA(NtDll_dll);</span></span>
+<span class="line"><span>		if (hModule_NtDll == NULL) {</span></span>
+<span class="line"><span>			printf("[-] U32_DLL Load Fail. \n");</span></span>
+<span class="line"><span>			return -1;</span></span>
+<span class="line"><span>		}</span></span>
+<span class="line"><span>	}</span></span>
+<span class="line"><span>	pRtlAllocateHeap = (fnwsprintfA)Yes_GetProcAddress_FromHash(hModule_NtDll, Hash_RtlAllocateHeap);</span></span>
+<span class="line"><span>}</span></span></code></pre>
+<p>这样就完成了预期需求。</p>
+<h2 id="测试">测试</h2>
+<p><strong>main.c</strong></p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>int main() {</span></span>
+<span class="line"><span>	api_init();</span></span>
+<span class="line"><span>	PRINTA("[+] pLLA Func Addr: 0x%p \n", pLoadLibraryA);</span></span>
+<span class="line"><span>	PRINTA("[+] pRAH Func Addr: 0x%p \n", pRtlAllocateHeap);</span></span>
+<span class="line"><span>	return 0;</span></span>
+<span class="line"><span>}</span></span></code></pre>
+<p>main 函数调用 api_init 对自定义 API 进行初始化，然后使用 PRINTA 宏打印信息。</p>
+<p><img alt="image-20241025163259037.png" loading="lazy" decoding="async" width="696" height="96" src="/_astro/image-20241025163259037.dfzvw7Hl_ZSmoON.webp" srcset=""></p>
+<p>整个项目仅需包含 <code>Windows.h</code> 头文件，来到 Pe-Bear 可以看到，Kernel32.dll 的导入表中的敏感函数导入信息已经去掉，同样加载的 User32.dll 和 NTDLL.dll 也没有显示。</p>
+<p><img alt="image-20241025163633851.png" loading="lazy" decoding="async" width="1768" height="1162" src="/_astro/image-20241025163633851.ZhMIKjOI_ZzwzMs.webp" srcset=""></p>
+<h3 id="代码">代码</h3>
+<p><strong>api.c</strong></p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>#include &lt;Windows.h&gt;</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>extern void* __cdecl memset(void*, int, size_t);</span></span>
+<span class="line"><span>#pragma intrinsic(memset)</span></span>
+<span class="line"><span>#pragma function(memset)</span></span>
+<span class="line"><span>void* __cdecl memset(void* Destination, int Value, size_t Size) {</span></span>
+<span class="line"><span>    unsigned char* p = (unsigned char*)Destination;</span></span>
+<span class="line"><span>    while (Size &gt; 0) {</span></span>
+<span class="line"><span>        *p = (unsigned char)Value;</span></span>
+<span class="line"><span>        p++;</span></span>
+<span class="line"><span>        Size--;</span></span>
+<span class="line"><span>    }</span></span>
+<span class="line"><span>    return Destination;</span></span>
+<span class="line"><span>}</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>typedef PVOID PAPI_SET_NAMESPACE;</span></span>
+<span class="line"><span>typedef PVOID PACTIVATION_CONTEXT;</span></span>
+<span class="line"><span>typedef PVOID PRTL_USER_PROCESS_PARAMETERS;</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>typedef struct _UNICODE_STRING {</span></span>
+<span class="line"><span>    USHORT Length;</span></span>
+<span class="line"><span>    USHORT MaximumLength;</span></span>
+<span class="line"><span>    PWSTR  Buffer;</span></span>
+<span class="line"><span>} UNICODE_STRING;</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>typedef struct _LDR_DATA_TABLE_ENTRY {</span></span>
+<span class="line"><span>    LIST_ENTRY InLoadOrderLinks;</span></span>
+<span class="line"><span>    LIST_ENTRY InMemoryOrderLinks;</span></span>
+<span class="line"><span>    LIST_ENTRY InInitializationOrderLinks;</span></span>
+<span class="line"><span>    PVOID DllBase;</span></span>
+<span class="line"><span>    PVOID EntryPoint;</span></span>
+<span class="line"><span>    ULONG SizeOfImage;</span></span>
+<span class="line"><span>    UNICODE_STRING FullDllName;</span></span>
+<span class="line"><span>    UNICODE_STRING BaseDllName;</span></span>
+<span class="line"><span>    ULONG Flags;</span></span>
+<span class="line"><span>    WORD LoadCount;</span></span>
+<span class="line"><span>    WORD TlsIndex;</span></span>
+<span class="line"><span>    union {</span></span>
+<span class="line"><span>        LIST_ENTRY HashLinks;</span></span>
+<span class="line"><span>        struct {</span></span>
+<span class="line"><span>            PVOID SectionPointer;</span></span>
+<span class="line"><span>            ULONG CheckSum;</span></span>
+<span class="line"><span>        };</span></span>
+<span class="line"><span>    };</span></span>
+<span class="line"><span>    union {</span></span>
+<span class="line"><span>        ULONG TimeDateStamp;</span></span>
+<span class="line"><span>        PVOID LoadedImports;</span></span>
+<span class="line"><span>    };</span></span>
+<span class="line"><span>    PACTIVATION_CONTEXT EntryPointActivationContext;</span></span>
+<span class="line"><span>    PVOID PatchInformation;</span></span>
+<span class="line"><span>    LIST_ENTRY ForwarderLinks;</span></span>
+<span class="line"><span>    LIST_ENTRY ServiceTagLinks;</span></span>
+<span class="line"><span>    LIST_ENTRY StaticLinks;</span></span>
+<span class="line"><span>} LDR_DATA_TABLE_ENTRY, * PLDR_DATA_TABLE_ENTRY;</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>typedef struct _PEB_LDR_DATA {</span></span>
+<span class="line"><span>    ULONG                   Length;</span></span>
+<span class="line"><span>    ULONG                   Initialized;</span></span>
+<span class="line"><span>    PVOID                   SsHandle;</span></span>
+<span class="line"><span>    LIST_ENTRY              InLoadOrderModuleList;</span></span>
+<span class="line"><span>    LIST_ENTRY              InMemoryOrderModuleList;</span></span>
+<span class="line"><span>    LIST_ENTRY              InInitializationOrderModuleList;</span></span>
+<span class="line"><span>} PEB_LDR_DATA, * PPEB_LDR_DATA;</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>typedef struct _PEB {</span></span>
+<span class="line"><span>    BOOLEAN InheritedAddressSpace;</span></span>
+<span class="line"><span>    BOOLEAN ReadImageFileExecOptions;</span></span>
+<span class="line"><span>    BOOLEAN BeingDebugged;</span></span>
+<span class="line"><span>    union {</span></span>
+<span class="line"><span>        BOOLEAN BitField;</span></span>
+<span class="line"><span>        struct {</span></span>
+<span class="line"><span>            BOOLEAN ImageUsesLargePages : 1;</span></span>
+<span class="line"><span>            BOOLEAN IsProtectedProcess : 1;</span></span>
+<span class="line"><span>            BOOLEAN IsImageDynamicallyRelocated : 1;</span></span>
+<span class="line"><span>            BOOLEAN SkipPatchingUser32Forwarders : 1;</span></span>
+<span class="line"><span>            BOOLEAN IsPackagedProcess : 1;</span></span>
+<span class="line"><span>            BOOLEAN IsAppContainer : 1;</span></span>
+<span class="line"><span>            BOOLEAN IsProtectedProcessLight : 1;</span></span>
+<span class="line"><span>            BOOLEAN IsLongPathAwareProcess : 1;</span></span>
+<span class="line"><span>        };</span></span>
+<span class="line"><span>    };</span></span>
+<span class="line"><span>    HANDLE Mutant;</span></span>
+<span class="line"><span>    PVOID ImageBaseAddress;</span></span>
+<span class="line"><span>    PPEB_LDR_DATA Ldr;</span></span>
+<span class="line"><span>    PRTL_USER_PROCESS_PARAMETERS ProcessParameters;</span></span>
+<span class="line"><span>    PVOID SubSystemData;</span></span>
+<span class="line"><span>    PVOID ProcessHeap;</span></span>
+<span class="line"><span>    PRTL_CRITICAL_SECTION FastPebLock;</span></span>
+<span class="line"><span>    PSLIST_HEADER AtlThunkSListPtr;</span></span>
+<span class="line"><span>    PVOID IFEOKey;</span></span>
+<span class="line"><span>    union {</span></span>
+<span class="line"><span>        ULONG CrossProcessFlags;</span></span>
+<span class="line"><span>        struct {</span></span>
+<span class="line"><span>            ULONG ProcessInJob : 1;</span></span>
+<span class="line"><span>            ULONG ProcessInitializing : 1;</span></span>
+<span class="line"><span>            ULONG ProcessUsingVEH : 1;</span></span>
+<span class="line"><span>            ULONG ProcessUsingVCH : 1;</span></span>
+<span class="line"><span>            ULONG ProcessUsingFTH : 1;</span></span>
+<span class="line"><span>            ULONG ProcessPreviouslyThrottled : 1;</span></span>
+<span class="line"><span>            ULONG ProcessCurrentlyThrottled : 1;</span></span>
+<span class="line"><span>            ULONG ProcessImagesHotPatched : 1; // REDSTONE5</span></span>
+<span class="line"><span>            ULONG ReservedBits0 : 24;</span></span>
+<span class="line"><span>        };</span></span>
+<span class="line"><span>    };</span></span>
+<span class="line"><span>    union {</span></span>
+<span class="line"><span>        PVOID KernelCallbackTable;</span></span>
+<span class="line"><span>        PVOID UserSharedInfoPtr;</span></span>
+<span class="line"><span>    };</span></span>
+<span class="line"><span>    ULONG SystemReserved;</span></span>
+<span class="line"><span>    ULONG AtlThunkSListPtr32;</span></span>
+<span class="line"><span>    PAPI_SET_NAMESPACE ApiSetMap;</span></span>
+<span class="line"><span>    ULONG TlsExpansionCounter;</span></span>
+<span class="line"><span>    PVOID TlsBitmap;</span></span>
+<span class="line"><span>    ULONG TlsBitmapBits[2];</span></span>
+<span class="line"><span>    PVOID ReadOnlySharedMemoryBase;</span></span>
+<span class="line"><span>    PVOID SharedData;                   // HotpatchInformation</span></span>
+<span class="line"><span>    PVOID* ReadOnlyStaticServerData;</span></span>
+<span class="line"><span>    PVOID AnsiCodePageData;             // PCPTABLEINFO</span></span>
+<span class="line"><span>    PVOID OemCodePageData;              // PCPTABLEINFO</span></span>
+<span class="line"><span>    PVOID UnicodeCaseTableData;         // PNLSTABLEINFO</span></span>
+<span class="line"><span>    ULONG NumberOfProcessors;</span></span>
+<span class="line"><span>    ULONG NtGlobalFlag;</span></span>
+<span class="line"><span>    ULARGE_INTEGER CriticalSectionTimeout;</span></span>
+<span class="line"><span>    SIZE_T HeapSegmentReserve;</span></span>
+<span class="line"><span>    SIZE_T HeapSegmentCommit;</span></span>
+<span class="line"><span>    SIZE_T HeapDeCommitTotalFreeThreshold;</span></span>
+<span class="line"><span>    SIZE_T HeapDeCommitFreeBlockThreshold;</span></span>
+<span class="line"><span>    ULONG NumberOfHeaps;</span></span>
+<span class="line"><span>    ULONG MaximumNumberOfHeaps;</span></span>
+<span class="line"><span>    PVOID* ProcessHeaps;                // PHEAP</span></span>
+<span class="line"><span>    PVOID GdiSharedHandleTable;</span></span>
+<span class="line"><span>    PVOID ProcessStarterHelper;</span></span>
+<span class="line"><span>    ULONG GdiDCAttributeList;</span></span>
+<span class="line"><span>    PRTL_CRITICAL_SECTION LoaderLock;</span></span>
+<span class="line"><span>    ULONG OSMajorVersion;</span></span>
+<span class="line"><span>    ULONG OSMinorVersion;</span></span>
+<span class="line"><span>    USHORT OSBuildNumber;</span></span>
+<span class="line"><span>    USHORT OSCSDVersion;</span></span>
+<span class="line"><span>    ULONG OSPlatformId;</span></span>
+<span class="line"><span>    ULONG ImageSubsystem;</span></span>
+<span class="line"><span>    ULONG ImageSubsystemMajorVersion;</span></span>
+<span class="line"><span>    ULONG ImageSubsystemMinorVersion;</span></span>
+<span class="line"><span>    KAFFINITY ActiveProcessAffinityMask;</span></span>
+<span class="line"><span>    ULONG GdiHandleBuffer[60];</span></span>
+<span class="line"><span>    PVOID PostProcessInitRoutine;</span></span>
+<span class="line"><span>    PVOID TlsExpansionBitmap;</span></span>
+<span class="line"><span>    ULONG TlsExpansionBitmapBits[32];</span></span>
+<span class="line"><span>    ULONG SessionId;</span></span>
+<span class="line"><span>    ULARGE_INTEGER AppCompatFlags;</span></span>
+<span class="line"><span>    ULARGE_INTEGER AppCompatFlagsUser;</span></span>
+<span class="line"><span>    PVOID pShimData;</span></span>
+<span class="line"><span>    PVOID AppCompatInfo;                        // APPCOMPAT_EXE_DATA</span></span>
+<span class="line"><span>    UNICODE_STRING CSDVersion;</span></span>
+<span class="line"><span>    PVOID ActivationContextData;                // ACTIVATION_CONTEXT_DATA</span></span>
+<span class="line"><span>    PVOID ProcessAssemblyStorageMap;            // ASSEMBLY_STORAGE_MAP</span></span>
+<span class="line"><span>    PVOID SystemDefaultActivationContextData;   // ACTIVATION_CONTEXT_DATA</span></span>
+<span class="line"><span>    PVOID SystemAssemblyStorageMap;             // ASSEMBLY_STORAGE_MAP</span></span>
+<span class="line"><span>    SIZE_T MinimumStackCommit;</span></span>
+<span class="line"><span>    PVOID SparePointers[2];                     // 19H1 (previously FlsCallback to FlsHighIndex)</span></span>
+<span class="line"><span>    PVOID PatchLoaderData;</span></span>
+<span class="line"><span>    PVOID ChpeV2ProcessInfo;                    // _CHPEV2_PROCESS_INFO</span></span>
+<span class="line"><span>    ULONG AppModelFeatureState;</span></span>
+<span class="line"><span>    ULONG SpareUlongs[2];</span></span>
+<span class="line"><span>    USHORT ActiveCodePage;</span></span>
+<span class="line"><span>    USHORT OemCodePage;</span></span>
+<span class="line"><span>    USHORT UseCaseMapping;</span></span>
+<span class="line"><span>    USHORT UnusedNlsField;</span></span>
+<span class="line"><span>    PVOID WerRegistrationData;</span></span>
+<span class="line"><span>    PVOID WerShipAssertPtr;</span></span>
+<span class="line"><span>    union {</span></span>
+<span class="line"><span>        PVOID pContextData; // WIN7</span></span>
+<span class="line"><span>        PVOID pUnused; // WIN10</span></span>
+<span class="line"><span>        PVOID EcCodeBitMap; // WIN11</span></span>
+<span class="line"><span>    };</span></span>
+<span class="line"><span>    PVOID pImageHeaderHash;</span></span>
+<span class="line"><span>    union {</span></span>
+<span class="line"><span>        ULONG TracingFlags;</span></span>
+<span class="line"><span>        struct {</span></span>
+<span class="line"><span>            ULONG HeapTracingEnabled : 1;</span></span>
+<span class="line"><span>            ULONG CritSecTracingEnabled : 1;</span></span>
+<span class="line"><span>            ULONG LibLoaderTracingEnabled : 1;</span></span>
+<span class="line"><span>            ULONG SpareTracingBits : 29;</span></span>
+<span class="line"><span>        };</span></span>
+<span class="line"><span>    };</span></span>
+<span class="line"><span>    ULONGLONG CsrServerReadOnlySharedMemoryBase;</span></span>
+<span class="line"><span>    PRTL_CRITICAL_SECTION TppWorkerpListLock;</span></span>
+<span class="line"><span>    LIST_ENTRY TppWorkerpList;</span></span>
+<span class="line"><span>    PVOID WaitOnAddressHashTable[128];</span></span>
+<span class="line"><span>    PVOID TelemetryCoverageHeader;              // REDSTONE3</span></span>
+<span class="line"><span>    ULONG CloudFileFlags;</span></span>
+<span class="line"><span>    ULONG CloudFileDiagFlags;                   // REDSTONE4</span></span>
+<span class="line"><span>    CHAR PlaceholderCompatibilityMode;</span></span>
+<span class="line"><span>    CHAR PlaceholderCompatibilityModeReserved[7];</span></span>
+<span class="line"><span>    struct _LEAP_SECOND_DATA* LeapSecondData;   // REDSTONE5</span></span>
+<span class="line"><span>    union {</span></span>
+<span class="line"><span>        ULONG LeapSecondFlags;</span></span>
+<span class="line"><span>        struct {</span></span>
+<span class="line"><span>            ULONG SixtySecondEnabled : 1;</span></span>
+<span class="line"><span>            ULONG Reserved : 31;</span></span>
+<span class="line"><span>        };</span></span>
+<span class="line"><span>    };</span></span>
+<span class="line"><span>    ULONG NtGlobalFlag2;</span></span>
+<span class="line"><span>    ULONGLONG ExtendedFeatureDisableMask; // since WIN11</span></span>
+<span class="line"><span>} PEB, * PPEB;</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>#define HASHA(API) (HashStringJenkinsOneAtATime32BitA((PCHAR) API))</span></span>
+<span class="line"><span>UINT32 HashStringJenkinsOneAtATime32BitA(IN PCHAR String) {</span></span>
+<span class="line"><span>    SIZE_T Index = 0;</span></span>
+<span class="line"><span>    UINT32 Hash = 0;</span></span>
+<span class="line"><span>    SIZE_T Length = strlen(String);</span></span>
+<span class="line"><span>    while (Index != Length) {</span></span>
+<span class="line"><span>        Hash += String[Index++];</span></span>
+<span class="line"><span>        Hash += Hash &lt;&lt; 7; // seed</span></span>
+<span class="line"><span>        Hash ^= Hash &gt;&gt; 6;</span></span>
+<span class="line"><span>    }</span></span>
+<span class="line"><span>    Hash += Hash &lt;&lt; 3;</span></span>
+<span class="line"><span>    Hash ^= Hash &gt;&gt; 11;</span></span>
+<span class="line"><span>    Hash += Hash &lt;&lt; 15;</span></span>
+<span class="line"><span>    return Hash;</span></span>
+<span class="line"><span>}</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>#define DLL_MAX_PATH	256</span></span>
+<span class="line"><span>#define TO_UPPER(C) C &gt;= 'a' &amp;&amp; C &lt;= 'z' ? C + 'A' - 'a' : C</span></span>
+<span class="line"><span>HMODULE Yes_GetModuleHandle_FromHash(IN UINT32 ui32DllHash) {</span></span>
+<span class="line"><span>#ifdef _WIN64	// 获取 x64 peb</span></span>
+<span class="line"><span>    PPEB            pPeb = (PEB*)(__readgsqword(0x60));</span></span>
+<span class="line"><span>#elif _WIN32	// 获取 x86 peb</span></span>
+<span class="line"><span>    PPEB            pPeb = (PEB*)(__readfsdword(0x30));</span></span>
+<span class="line"><span>#endif</span></span>
+<span class="line"><span>    PPEB_LDR_DATA pLdr = (PPEB_LDR_DATA)(pPeb-&gt;Ldr);		// 获取 Ldr</span></span>
+<span class="line"><span>    PLDR_DATA_TABLE_ENTRY pDte = (PLDR_DATA_TABLE_ENTRY)(pLdr-&gt;InMemoryOrderModuleList.Flink);</span></span>
+<span class="line"><span>    while (pDte-&gt;FullDllName.Length != NULL) {</span></span>
+<span class="line"><span>        CHAR UpperCaseDllName[MAX_PATH] = { 0 };</span></span>
+<span class="line"><span>        for (int i = 0; i &lt; pDte-&gt;FullDllName.Length; i++)	// 转化成大写</span></span>
+<span class="line"><span>            UpperCaseDllName[i] = (CHAR)TO_UPPER(pDte-&gt;FullDllName.Buffer[i]);</span></span>
+<span class="line"><span>        if (ui32DllHash == HASHA(UpperCaseDllName))			// 判断 Hash 是否一致</span></span>
+<span class="line"><span>            return pDte-&gt;InInitializationOrderLinks.Flink;	// 返回 DLL Base Address</span></span>
+<span class="line"><span>        pDte = *(PLDR_DATA_TABLE_ENTRY*)(pDte);				// 链表下一节点</span></span>
+<span class="line"><span>    }</span></span>
+<span class="line"><span>    return NULL;</span></span>
+<span class="line"><span>}</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>FARPROC Yes_GetProcAddress_FromHash(IN HMODULE hModule, IN UINT32 ui32FuncHash) {</span></span>
+<span class="line"><span>    PBYTE pBase = (PBYTE)hModule;	// 转化一下</span></span>
+<span class="line"><span>    PIMAGE_DOS_HEADER pImgDosHdr = (PIMAGE_DOS_HEADER)pBase;	// 获取 DOS 头</span></span>
+<span class="line"><span>    if (pImgDosHdr-&gt;e_magic != IMAGE_DOS_SIGNATURE)				// 签名检查</span></span>
+<span class="line"><span>        return NULL;</span></span>
+<span class="line"><span>    PIMAGE_NT_HEADERS pImgNtHdrs = (PIMAGE_NT_HEADERS)(pBase + pImgDosHdr-&gt;e_lfanew);	// 获取 NT 头</span></span>
+<span class="line"><span>    if (pImgNtHdrs-&gt;Signature != IMAGE_NT_SIGNATURE)									// 签名检查</span></span>
+<span class="line"><span>        return NULL;</span></span>
+<span class="line"><span>    IMAGE_OPTIONAL_HEADER ImgOptHdr = pImgNtHdrs-&gt;OptionalHeader;	// 获取可选头	</span></span>
+<span class="line"><span>    PIMAGE_EXPORT_DIRECTORY pImgExportDir = (PIMAGE_EXPORT_DIRECTORY)(pBase + ImgOptHdr.DataDirectory[IMAGE_DIRECTORY_ENTRY_EXPORT].VirtualAddress);	// 获取导出目录</span></span>
+<span class="line"><span>    PDWORD FunctionNameArray = (PDWORD)(pBase + pImgExportDir-&gt;AddressOfNames);				// 获取函数名称数组指针</span></span>
+<span class="line"><span>    PDWORD FunctionAddressArray = (PDWORD)(pBase + pImgExportDir-&gt;AddressOfFunctions);		// 获取函数地址数组指针</span></span>
+<span class="line"><span>    PWORD  FunctionOrdinalArray = (PWORD)(pBase + pImgExportDir-&gt;AddressOfNameOrdinals);	// 获取函数序号数组指针</span></span>
+<span class="line"><span>    for (DWORD i = 0; i &lt; pImgExportDir-&gt;NumberOfFunctions; i++)</span></span>
+<span class="line"><span>        if (HASHA(pBase + FunctionNameArray[i]) == ui32FuncHash)							// 比较函数名的 Hash</span></span>
+<span class="line"><span>            return (PVOID)(pBase + FunctionAddressArray[FunctionOrdinalArray[i]]);			// 通过函数序数值获取函数地址</span></span>
+<span class="line"><span>}</span></span></code></pre>
+<p><strong>main.h</strong></p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>#pragma once</span></span>
+<span class="line"><span>#include &lt;Windows.h&gt;</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>#define PRINTA( STR, ... )																\</span></span>
+<span class="line"><span>    if (1) {																			\</span></span>
+<span class="line"><span>        LPSTR buf = (LPSTR)pRtlAllocateHeap(pGetProcessHeap(), HEAP_ZERO_MEMORY, 1024 );		\</span></span>
+<span class="line"><span>        if ( buf != NULL ) {															\</span></span>
+<span class="line"><span>            int len = pwsprintfA( buf, STR, __VA_ARGS__ );								\</span></span>
+<span class="line"><span>            pWriteConsoleA( pGetStdHandle( STD_OUTPUT_HANDLE ), buf, len, NULL, NULL );	\</span></span>
+<span class="line"><span>            pHeapFree( pGetProcessHeap(), 0, buf );										\</span></span>
+<span class="line"><span>        }																				\</span></span>
+<span class="line"><span>    }</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>UINT32 HashStringJenkinsOneAtATime32BitA(IN PCHAR String);</span></span>
+<span class="line"><span>HMODULE Yes_GetModuleHandle_FromHash(IN UINT32 ui32DllHash);</span></span>
+<span class="line"><span>FARPROC Yes_GetProcAddress_FromHash(IN HMODULE hModule, IN UINT32 ui32FuncHash);</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>#define HASHA(API) (HashStringJenkinsOneAtATime32BitA((PCHAR) API))</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>// DLL Name Hash</span></span>
+<span class="line"><span>#define HASH_NTDLL              0x4898F593</span></span>
+<span class="line"><span>#define HASH_USER32             0x81E3778E</span></span>
+<span class="line"><span>#define HASH_KERNEL32           0x367DC15A</span></span>
+<span class="line"><span>// WIN API Name Hash</span></span>
+<span class="line"><span>#define Hash_LoadLibraryA       0x19F0EEAF</span></span>
+<span class="line"><span>#define Hash_wsprintfA          0x2AF0CBF4</span></span>
+<span class="line"><span>#define Hash_HeapFree           0x1154459B</span></span>
+<span class="line"><span>#define Hash_HeapAlloc          0x2F9B708A</span></span>
+<span class="line"><span>#define Hash_RtlAllocateHeap    0xF5613878</span></span>
+<span class="line"><span>#define Hash_GetStdHandle       0x0C685B0E</span></span>
+<span class="line"><span>#define Hash_WriteConsoleA      0x65304EA1</span></span>
+<span class="line"><span>#define Hash_GetProcessHeap     0x3BCCFAC6</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>// https://learn.microsoft.com/en-us/windows/win32/api/libloaderapi/nf-libloaderapi-loadlibrarya</span></span>
+<span class="line"><span>typedef HMODULE(WINAPI* fnLoadLibraryA)(LPCSTR lpLibFileName);</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>// https://learn.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-heapfree</span></span>
+<span class="line"><span>typedef BOOL(WINAPI* fnHeapFree)(HANDLE hHeap, DWORD dwFlags, _Frees_ptr_opt_ LPVOID lpMem);</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>// https://learn.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-heapalloc</span></span>
+<span class="line"><span>typedef LPVOID(WINAPI* fnHeapAlloc)(HANDLE hHeap, DWORD dwFlags, SIZE_T dwBytes);</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>// https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-rtlallocateheap</span></span>
+<span class="line"><span>typedef LPVOID(WINAPI* fnRtlAllocateHeap)(PVOID HeapHandle, ULONG Flags, SIZE_T Size);</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>// https://learn.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-getprocessheap</span></span>
+<span class="line"><span>typedef HANDLE(WINAPI* fnGetProcessHeap)();</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>// https://learn.microsoft.com/en-us/windows/console/getstdhandle</span></span>
+<span class="line"><span>typedef HANDLE(WINAPI* fnGetStdHandle)(DWORD nStdHandle);</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>// https://learn.microsoft.com/en-us/windows/console/writeconsole</span></span>
+<span class="line"><span>typedef BOOL(WINAPI* fnWriteConsoleA)(HANDLE  hConsoleOutput, const VOID* lpBuffer, DWORD nNumberOfCharsToWrite, LPDWORD lpNumberOfCharsWritten, LPVOID  lpReserved);</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>// https://learn.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-getprocessheap</span></span>
+<span class="line"><span>typedef HANDLE(WINAPI* fnGetProcessHeap)();</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>// https://learn.microsoft.com/zh-cn/windows/win32/api/winuser/nf-winuser-wsprintfw</span></span>
+<span class="line"><span>typedef int(WINAPIV* fnwsprintfA)(LPSTR unnamedParam1, LPCSTR unnamedParam2, ...);</span></span></code></pre>
+<p><strong>main.c</strong></p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>#include "main.h"</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>//#define DEBUG</span></span>
+<span class="line"><span>#ifdef DEBUG</span></span>
+<span class="line"><span>#define DLL_NUM 3</span></span>
+<span class="line"><span>#define FUNC_NUM 8</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>void showHash() {</span></span>
+<span class="line"><span>	int i, j;</span></span>
+<span class="line"><span>	char* dllList[DLL_NUM] = {</span></span>
+<span class="line"><span>		"NTDLL.DLL",</span></span>
+<span class="line"><span>		"USER32.DLL",</span></span>
+<span class="line"><span>		"KERNEL32.DLL",</span></span>
+<span class="line"><span>	};</span></span>
+<span class="line"><span>	char* funcList[FUNC_NUM] = {</span></span>
+<span class="line"><span>		"LoadLibraryA",</span></span>
+<span class="line"><span>		"wsprintfA",</span></span>
+<span class="line"><span>		"HeapFree",</span></span>
+<span class="line"><span>		"HeapAlloc",</span></span>
+<span class="line"><span>		"RtlAllocateHeap",</span></span>
+<span class="line"><span>		"GetStdHandle",</span></span>
+<span class="line"><span>		"WriteConsoleA",</span></span>
+<span class="line"><span>		"GetProcessHeap",</span></span>
+<span class="line"><span>	};</span></span>
+<span class="line"><span>	char* funcSysList[] = {</span></span>
+<span class="line"><span>		0</span></span>
+<span class="line"><span>	};</span></span>
+<span class="line"><span>	printf("// DLL Name Hash\n");</span></span>
+<span class="line"><span>	for (i = 0; i &lt; DLL_NUM; i++) {</span></span>
+<span class="line"><span>		char temp;</span></span>
+<span class="line"><span>		printf("#define HASH_");</span></span>
+<span class="line"><span>		for (j = 0; dllList[i][j] != '.'; j++)</span></span>
+<span class="line"><span>			printf("%c", dllList[i][j]);</span></span>
+<span class="line"><span>		if (j + 5 &lt; 8)</span></span>
+<span class="line"><span>			printf("\t");</span></span>
+<span class="line"><span>		printf("\t\t0x%0.8X \n", HASHA(dllList[i]));</span></span>
+<span class="line"><span>	}</span></span>
+<span class="line"><span>	printf("// WIN API Name Hash\n");</span></span>
+<span class="line"><span>	for (i = 0; i &lt; FUNC_NUM; i++) {</span></span>
+<span class="line"><span>		char temp;</span></span>
+<span class="line"><span>		printf("#define Hash_%s", funcList[i]);</span></span>
+<span class="line"><span>		for (j = 0; funcList[i][j] != '\x00'; j++);</span></span>
+<span class="line"><span>		if (j + 5 &lt; 8)</span></span>
+<span class="line"><span>			printf("\t");</span></span>
+<span class="line"><span>		if (j + 5 &lt; 16)</span></span>
+<span class="line"><span>			printf("\t");</span></span>
+<span class="line"><span>		if (j + 5 &lt; 24)</span></span>
+<span class="line"><span>			printf("\t");</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>		printf("0x%0.8X \n", HASHA(funcList[i]));</span></span>
+<span class="line"><span>	}</span></span>
+<span class="line"><span>}</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>int test() {</span></span>
+<span class="line"><span>	HMODULE hModule_Kernel32 = Yes_GetModuleHandle_FromHash(HASH_KERNEL32);</span></span>
+<span class="line"><span>	if (hModule_Kernel32 == NULL) {</span></span>
+<span class="line"><span>		printf("[+] K32_DLL Get Fail. \n");</span></span>
+<span class="line"><span>		return -1;</span></span>
+<span class="line"><span>	}</span></span>
+<span class="line"><span>	else {</span></span>
+<span class="line"><span>		printf("\n[+] Get DLL KERNEL32\t: 0x%p \n+------------------------------------------+\n", hModule_Kernel32);</span></span>
+<span class="line"><span>		printf("[+] LLA func address\t: 0x%p \n", Yes_GetProcAddress_FromHash(hModule_Kernel32, Hash_LoadLibraryA));</span></span>
+<span class="line"><span>		printf("[+] HFr func address\t: 0x%p \n", Yes_GetProcAddress_FromHash(hModule_Kernel32, Hash_HeapFree));</span></span>
+<span class="line"><span>		printf("[+] HAl func address\t: 0x%p \n", Yes_GetProcAddress_FromHash(hModule_Kernel32, Hash_HeapAlloc));</span></span>
+<span class="line"><span>		printf("[+] GSH func address\t: 0x%p \n", Yes_GetProcAddress_FromHash(hModule_Kernel32, Hash_GetStdHandle));</span></span>
+<span class="line"><span>		printf("[+] WCA func address\t: 0x%p \n", Yes_GetProcAddress_FromHash(hModule_Kernel32, Hash_WriteConsoleA));</span></span>
+<span class="line"><span>		printf("[+] GPH func address\t: 0x%p \n", Yes_GetProcAddress_FromHash(hModule_Kernel32, Hash_GetProcessHeap));</span></span>
+<span class="line"><span>	}</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>	HMODULE hModule_User32 = Yes_GetModuleHandle_FromHash(HASH_KERNEL32);</span></span>
+<span class="line"><span>	if (hModule_User32 == NULL) {</span></span>
+<span class="line"><span>		printf("[+] U32_DLL Get Fail.\n[+] Try Load U32_DLL.\n");</span></span>
+<span class="line"><span>		char User32_dll[] = { 'U', 'S', 'E', 'R', '3', '2', '.', 'D', 'L', 'L', '\x00' };</span></span>
+<span class="line"><span>		hModule_User32 = (fnLoadLibraryA)Yes_GetProcAddress_FromHash(hModule_Kernel32, Hash_LoadLibraryA)(User32_dll);</span></span>
+<span class="line"><span>		if (hModule_User32 == NULL) {</span></span>
+<span class="line"><span>			printf("[-] U32_DLL Load Fail. \n");</span></span>
+<span class="line"><span>			return -1;</span></span>
+<span class="line"><span>		}</span></span>
+<span class="line"><span>		else {</span></span>
+<span class="line"><span>			printf("\n[+] Load DLL USER32\t: 0x%p \n+------------------------------------------+\n", hModule_User32);</span></span>
+<span class="line"><span>		}</span></span>
+<span class="line"><span>	}</span></span>
+<span class="line"><span>	else {</span></span>
+<span class="line"><span>		printf("\n[+] Get DLL USER32\t: 0x%p \n+------------------------------------------+\n", hModule_User32);</span></span>
+<span class="line"><span>	}</span></span>
+<span class="line"><span>	printf("[+] wpf func address\t: 0x%p \n", Yes_GetProcAddress_FromHash(hModule_User32, Hash_wsprintfA));</span></span>
+<span class="line"><span>	printf("+------------------------------------------+\n");</span></span>
+<span class="line"><span>	return 0;</span></span>
+<span class="line"><span>}</span></span>
+<span class="line"><span>#endif // DEBUG</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>fnLoadLibraryA pLoadLibraryA;</span></span>
+<span class="line"><span>fnHeapFree pHeapFree;</span></span>
+<span class="line"><span>fnHeapAlloc pHeapAlloc;</span></span>
+<span class="line"><span>fnGetStdHandle pGetStdHandle;</span></span>
+<span class="line"><span>fnWriteConsoleA pWriteConsoleA;</span></span>
+<span class="line"><span>fnGetProcessHeap pGetProcessHeap;</span></span>
+<span class="line"><span>fnwsprintfA pwsprintfA;</span></span>
+<span class="line"><span>fnRtlAllocateHeap pRtlAllocateHeap;</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>int api_init() {</span></span>
+<span class="line"><span>	HMODULE hModule_Kernel32 = Yes_GetModuleHandle_FromHash(HASH_KERNEL32);</span></span>
+<span class="line"><span>	if (hModule_Kernel32 == NULL) {</span></span>
+<span class="line"><span>		return -1;</span></span>
+<span class="line"><span>	}</span></span>
+<span class="line"><span>	pLoadLibraryA = (fnLoadLibraryA)Yes_GetProcAddress_FromHash(hModule_Kernel32, Hash_LoadLibraryA);</span></span>
+<span class="line"><span>	pHeapFree = (fnHeapFree)Yes_GetProcAddress_FromHash(hModule_Kernel32, Hash_HeapFree);</span></span>
+<span class="line"><span>	pHeapAlloc = (fnHeapAlloc)Yes_GetProcAddress_FromHash(hModule_Kernel32, Hash_HeapAlloc);</span></span>
+<span class="line"><span>	pGetStdHandle = (fnGetStdHandle)Yes_GetProcAddress_FromHash(hModule_Kernel32, Hash_GetStdHandle);</span></span>
+<span class="line"><span>	pWriteConsoleA = (fnWriteConsoleA)Yes_GetProcAddress_FromHash(hModule_Kernel32, Hash_WriteConsoleA);</span></span>
+<span class="line"><span>	pGetProcessHeap = (fnGetProcessHeap)Yes_GetProcAddress_FromHash(hModule_Kernel32, Hash_GetProcessHeap);</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>	HMODULE hModule_User32 = Yes_GetModuleHandle_FromHash(HASH_USER32);</span></span>
+<span class="line"><span>	if (hModule_User32 == NULL) {</span></span>
+<span class="line"><span>		char User32_dll[] = { 'U', 'S', 'E', 'R', '3', '2', '.', 'D', 'L', 'L', '\x00' };</span></span>
+<span class="line"><span>		hModule_User32 = pLoadLibraryA(User32_dll);</span></span>
+<span class="line"><span>		if (hModule_User32 == NULL) {</span></span>
+<span class="line"><span>			return -2;</span></span>
+<span class="line"><span>		}</span></span>
+<span class="line"><span>	}</span></span>
+<span class="line"><span>	pwsprintfA = (fnwsprintfA)Yes_GetProcAddress_FromHash(hModule_User32, Hash_wsprintfA);</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>	HMODULE hModule_NtDll = Yes_GetModuleHandle_FromHash(HASH_NTDLL);</span></span>
+<span class="line"><span>	if (hModule_NtDll == NULL) {</span></span>
+<span class="line"><span>		char NtDll_dll[] = { 'N', 'T', 'D', 'L', 'L', '.', 'D', 'L', 'L', '\x00' };</span></span>
+<span class="line"><span>		hModule_NtDll = pLoadLibraryA(NtDll_dll);</span></span>
+<span class="line"><span>		if (hModule_NtDll == NULL) {</span></span>
+<span class="line"><span>			return -3;</span></span>
+<span class="line"><span>		}</span></span>
+<span class="line"><span>	}</span></span>
+<span class="line"><span>	pRtlAllocateHeap = (fnwsprintfA)Yes_GetProcAddress_FromHash(hModule_NtDll, Hash_RtlAllocateHeap);</span></span>
+<span class="line"><span>	return 0;</span></span>
+<span class="line"><span>}</span></span>
+<span class="line"><span>int main() {</span></span>
+<span class="line"><span>#ifdef DEBUG</span></span>
+<span class="line"><span>	showHash();</span></span>
+<span class="line"><span>	test();</span></span>
+<span class="line"><span>#endif // DEBUG</span></span>
+<span class="line"><span>	api_init();</span></span>
+<span class="line"><span>	PRINTA("[+] pLLA Func Addr: 0x%p \n", pLoadLibraryA);</span></span>
+<span class="line"><span>	PRINTA("[+] pRAH Func Addr: 0x%p \n", pRtlAllocateHeap);</span></span>
+<span class="line"><span>	//getchar();</span></span>
+<span class="line"><span>	return 0;</span></span>
+<span class="line"><span>}</span></span></code></pre>
+<p>Good Luck.</p>
+</div></div><aside class="toc" data-toc hidden aria-label="目录" data-astro-cid-sgg5joot><p class="toc-label" data-astro-cid-sgg5joot>目录</p><nav class="toc-nav" data-toc-nav data-astro-cid-sgg5joot></nav></aside></div></article></main><footer data-astro-cid-jo6i4kqk><div class="inner" data-astro-cid-jo6i4kqk><p class="line" data-astro-cid-jo6i4kqk>© 2026 Zumpyx</p><p class="note" data-astro-cid-jo6i4kqk>notes · exploit · write · repeat</p></div></footer><script type="module">function e(e){return e.trim().toLowerCase().replace(/\s+/g,`-`).replace(/[^\w\u4e00-\u9fff-]+/g,``).replace(/-+/g,`-`).replace(/^-|-$/g,``)||`section`}var t=null;function n(){let n=document.querySelector(`[data-article-content]`),r=document.querySelector(`[data-toc]`),i=document.querySelector(`[data-toc-nav]`);if(!n||!r||!i)return;t?.disconnect(),t=null,i.replaceChildren();let a=Array.from(n.querySelectorAll(`h2, h3`)).filter(e=>(e.textContent??``).trim().length>0);if(a.length===0){r.hidden=!0;return}r.hidden=!1;let o=new Set,s=[];for(let t of a){let n=t.id;if(!n){let r=e(t.textContent??``);n=r;let i=2;for(;o.has(n)||document.getElementById(n);)n=`${r}-${i}`,i+=1;t.id=n}o.add(n);let r=document.createElement(`a`);r.href=`#${n}`,r.textContent=(t.textContent??``).trim(),r.className=t.tagName===`H3`?`toc-h3`:`toc-h2`,r.dataset.target=n,i.appendChild(r),s.push(r)}let c=e=>{for(let t of s)t.classList.toggle(`active`,t.dataset.target===e)};t=new IntersectionObserver(e=>{let t=e.filter(e=>e.isIntersecting).sort((e,t)=>e.target.offsetTop-t.target.offsetTop);t[0]&&c(t[0].target.id)},{rootMargin:`-15% 0px -70% 0px`,threshold:[0,1]});for(let e of a)t.observe(e);location.hash?c(decodeURIComponent(location.hash.slice(1))):a[0]&&c(a[0].id)}n(),document.addEventListener(`article-content-unlocked`,()=>{n()});</script></body></html>

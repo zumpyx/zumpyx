@@ -1,0 +1,398 @@
+<!DOCTYPE html><html lang="zh-CN" data-astro-cid-sgg5joot><head><!-- Global Metadata --><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="icon" type="image/png" href="/favicon.png"><link rel="icon" href="/favicon.ico" sizes="any"><link rel="apple-touch-icon" href="/apple-touch-icon.png"><link rel="sitemap" href="/sitemap-index.xml"><link rel="alternate" type="application/rss+xml" title="Zumpyx's Blog" href="https://blog.zumpyx.com/rss.xml"><meta name="generator" content="Astro v7.1.0"><meta name="color-scheme" content="light dark"><meta name="theme-color" content="#0b0d11" media="(prefers-color-scheme: dark)"><meta name="theme-color" content="#f4f5f7" media="(prefers-color-scheme: light)"><script>
+	(() => {
+		try {
+			const t = localStorage.getItem('theme');
+			if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t);
+			else document.documentElement.removeAttribute('data-theme');
+		} catch {}
+	})();
+</script><style>@font-face{font-family:Atkinson-c7f4c4e8b285552f;src:url("/_astro/fonts/89758defcfa85239.woff") format("woff");font-display:swap;font-weight:400;font-style:normal;}@font-face{font-family:Atkinson-c7f4c4e8b285552f;src:url("/_astro/fonts/14aa8dd5744dd4bc.woff") format("woff");font-display:swap;font-weight:700;font-style:normal;}@font-face{font-family:"Atkinson-c7f4c4e8b285552f fallback: Arial";src:local("Arial");font-display:swap;font-weight:400;font-style:normal;size-adjust:99.3717%;ascent-override:80.1033%;descent-override:25.2587%;line-gap-override:0%;}@font-face{font-family:"Atkinson-c7f4c4e8b285552f fallback: Arial Bold";src:local("Arial Bold");font-display:swap;font-weight:700;font-style:normal;size-adjust:92.2954%;ascent-override:86.2448%;descent-override:27.1953%;line-gap-override:0%;}:root{--font-atkinson:Atkinson-c7f4c4e8b285552f,"Atkinson-c7f4c4e8b285552f fallback: Arial","Atkinson-c7f4c4e8b285552f fallback: Arial Bold",sans-serif;}</style><link rel="preload" href="/_astro/fonts/89758defcfa85239.woff" as="font" type="font/woff" crossorigin><link rel="preload" href="/_astro/fonts/14aa8dd5744dd4bc.woff" as="font" type="font/woff" crossorigin><!-- Canonical URL --><link rel="canonical" href="https://blog.zumpyx.com/blog/digital-forensics-intro/"><!-- Primary Meta Tags --><title>数字取证简介 · Zumpyx&#39;s Blog</title><meta name="description" content="到达上图场景时，在获得适当法律授权下，基本计划如下："><!-- Open Graph / Facebook --><meta property="og:type" content="website"><meta property="og:url" content="https://blog.zumpyx.com/blog/digital-forensics-intro/"><meta property="og:title" content="数字取证简介 · Zumpyx's Blog"><meta property="og:description" content="到达上图场景时，在获得适当法律授权下，基本计划如下："><meta property="og:image" content="https://blog.zumpyx.com/_astro/head.CE6FOIKY.png"><!-- Twitter --><meta name="twitter:card" content="summary_large_image"><meta name="twitter:url" content="https://blog.zumpyx.com/blog/digital-forensics-intro/"><meta name="twitter:title" content="数字取证简介 · Zumpyx's Blog"><meta name="twitter:description" content="到达上图场景时，在获得适当法律授权下，基本计划如下："><meta name="twitter:image" content="https://blog.zumpyx.com/_astro/head.CE6FOIKY.png"><link rel="stylesheet" href="/_astro/Header.CMmW25g2.css"><link rel="stylesheet" href="/_astro/ArticleLayout.DA3idRZl.css"><style>.nav-link[data-astro-cid-evkijfd6]{color:var(--text-muted);font-family:var(--font-mono);letter-spacing:.04em;text-transform:uppercase;white-space:nowrap;border:1px solid #0000;border-radius:999px;justify-content:center;align-items:center;padding:.5em .95em;font-size:.78rem;font-weight:500;text-decoration:none;transition:color .18s,background .18s,border-color .18s,box-shadow .18s;display:inline-flex}.nav-link[data-astro-cid-evkijfd6]:hover{color:var(--text-bright);background:var(--surface-hover);text-decoration:none}.nav-link[data-astro-cid-evkijfd6].active{color:var(--on-accent);background:linear-gradient(135deg, var(--accent-hover), var(--accent));box-shadow:0 0 0 1px var(--border-strong), 0 6px 16px var(--accent-glow-strong);text-shadow:none;border-color:#0000;font-weight:700;text-decoration:none}
+</style><script type="module" src="/_astro/page.CTxKKjGj.js"></script></head><body data-astro-cid-sgg5joot><div class="scanline" aria-hidden="true" data-astro-cid-sgg5joot></div><header data-astro-cid-nen7h5rs><div class="bar" data-astro-cid-nen7h5rs><a class="brand" href="/" data-astro-cid-nen7h5rs><span class="logo" aria-hidden="true" data-astro-cid-nen7h5rs><img src="/_astro/head.CE6FOIKY_1SW1hc.webp" srcset="/_astro/head.CE6FOIKY_1SW1hc.webp 1x, /_astro/head.CE6FOIKY_scYzG.webp 2x" alt data-astro-cid-nen7h5rs="true" loading="lazy" decoding="async" width="64" height="64" class="logo-img"></span><span class="brand-text" data-astro-cid-nen7h5rs><span class="brand-name" data-astro-cid-nen7h5rs>Zumpyx&#39;s Blog</span></span></a><nav class="nav-pill" aria-label="Primary" data-astro-cid-nen7h5rs><div class="nav-track" data-astro-cid-nen7h5rs><a href="/" class="nav-link" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>Home</a><a href="/blog" class="nav-link active" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>Blog</a><a href="/hackthebox" class="nav-link" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>HackTheBox</a><a href="/projects" class="nav-link" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>Projects</a><a href="/about" class="nav-link" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>About</a></div></nav><div class="actions" data-astro-cid-nen7h5rs><button type="button" class="icon-btn search-trigger" data-search-open aria-label="搜索" title="搜索 (Ctrl/⌘+K)" data-astro-cid-7yy3665x><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true" data-astro-cid-7yy3665x><circle cx="11" cy="11" r="6.5" data-astro-cid-7yy3665x></circle><path d="M16.5 16.5 21 21" stroke-linecap="round" data-astro-cid-7yy3665x></path></svg></button><div class="search-root" data-search-root hidden data-astro-cid-7yy3665x><div class="search-backdrop" data-search-close data-astro-cid-7yy3665x></div><div class="search-panel" role="dialog" aria-modal="true" aria-label="全站搜索" data-astro-cid-7yy3665x><div class="search-bar" data-astro-cid-7yy3665x><svg class="search-ico" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true" data-astro-cid-7yy3665x><circle cx="11" cy="11" r="6.5" data-astro-cid-7yy3665x></circle><path d="M16.5 16.5 21 21" stroke-linecap="round" data-astro-cid-7yy3665x></path></svg><input type="search" class="search-input" data-search-input placeholder="全文搜索：标题 / 正文 / 标签…" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="search" data-astro-cid-7yy3665x><kbd class="search-kbd" data-search-close-hint data-astro-cid-7yy3665x>Esc</kbd></div><div class="search-meta" data-search-meta data-astro-cid-7yy3665x>输入关键词开始搜索</div><ul class="search-results" data-search-results role="listbox" aria-label="搜索结果" data-astro-cid-7yy3665x></ul></div></div><script type="module" src="/_astro/SiteSearch.astro_astro_type_script_index_0_lang.CiT4pk6n.js"></script><button type="button" class="icon-btn theme-toggle" data-theme-toggle aria-label="主题：跟随系统" title="主题：跟随系统（点击切换）" data-astro-cid-l6lhmie6><span class="icon icon-system" aria-hidden="true" data-astro-cid-l6lhmie6><!-- auto / system --><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" data-astro-cid-l6lhmie6><rect x="3" y="4" width="18" height="12" rx="2" data-astro-cid-l6lhmie6></rect><path d="M8 20h8M12 16v4" data-astro-cid-l6lhmie6></path></svg></span><span class="icon icon-light" aria-hidden="true" hidden data-astro-cid-l6lhmie6><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" data-astro-cid-l6lhmie6><circle cx="12" cy="12" r="4" data-astro-cid-l6lhmie6></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" data-astro-cid-l6lhmie6></path></svg></span><span class="icon icon-dark" aria-hidden="true" hidden data-astro-cid-l6lhmie6><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" data-astro-cid-l6lhmie6><path d="M21 14.5A8.5 8.5 0 1 1 9.5 3a7 7 0 0 0 11.5 11.5z" stroke-linejoin="round" data-astro-cid-l6lhmie6></path></svg></span></button><script>
+	(() => {
+		const KEY = 'theme';
+		const ORDER = ['system', 'light', 'dark'];
+		const LABELS = {
+			system: '主题：跟随系统',
+			light: '主题：亮色',
+			dark: '主题：暗色',
+		};
+
+		const getStored = () => {
+			try {
+				const v = localStorage.getItem(KEY);
+				if (v === 'light' || v === 'dark' || v === 'system') return v;
+			} catch {}
+			return 'system';
+		};
+
+		const apply = (mode) => {
+			const root = document.documentElement;
+			if (mode === 'light' || mode === 'dark') root.setAttribute('data-theme', mode);
+			else root.removeAttribute('data-theme');
+			try {
+				if (mode === 'system') localStorage.removeItem(KEY);
+				else localStorage.setItem(KEY, mode);
+			} catch {}
+		};
+
+		const syncButton = (mode) => {
+			document.querySelectorAll('[data-theme-toggle]').forEach((btn) => {
+				btn.setAttribute('data-mode', mode);
+				btn.setAttribute('aria-label', LABELS[mode]);
+				btn.setAttribute('title', `${LABELS[mode]}（点击切换）`);
+				btn.querySelectorAll('.icon').forEach((el) => {
+					el.hidden = true;
+				});
+				const icon = btn.querySelector(`.icon-${mode}`);
+				if (icon) icon.hidden = false;
+			});
+		};
+
+		const mode = getStored();
+		apply(mode);
+		syncButton(mode);
+
+		document.querySelectorAll('[data-theme-toggle]').forEach((btn) => {
+			btn.addEventListener('click', () => {
+				const cur = getStored();
+				const next = ORDER[(ORDER.indexOf(cur) + 1) % ORDER.length];
+				apply(next);
+				syncButton(next);
+			});
+		});
+
+		// If following system, react to OS changes
+		try {
+			const mq = window.matchMedia('(prefers-color-scheme: dark)');
+			mq.addEventListener?.('change', () => {
+				if (getStored() === 'system') apply('system');
+			});
+		} catch {}
+	})();
+</script><a class="icon-btn" href="/rss.xml" target="_blank" rel="noopener noreferrer" title="RSS" aria-label="RSS 订阅" data-astro-cid-nen7h5rs><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true" data-astro-cid-nen7h5rs><path d="M5 19a1.5 1.5 0 1 0 0.01 0" fill="currentColor" stroke="none" data-astro-cid-nen7h5rs></path><path d="M4 11a9 9 0 0 1 9 9" stroke-linecap="round" data-astro-cid-nen7h5rs></path><path d="M4 5a15 15 0 0 1 15 15" stroke-linecap="round" data-astro-cid-nen7h5rs></path></svg></a></div></div></header><main data-astro-cid-sgg5joot><article data-astro-cid-sgg5joot><div class="article-shell" data-astro-cid-sgg5joot><div class="prose" data-article-body data-astro-cid-sgg5joot><div class="title" data-astro-cid-sgg5joot><div class="date" data-astro-cid-sgg5joot><time datetime="2024-06-01T00:00:00.000Z">2024-06-01</time></div><div class="title-row" data-astro-cid-sgg5joot><h1 data-astro-cid-sgg5joot>数字取证简介</h1></div><div class="meta" data-astro-cid-sgg5joot><span class="badge">dfir</span><span class="badge">blue-team</span><span class="badge">forensics</span></div><hr data-astro-cid-sgg5joot></div><div class="content" data-article-content data-astro-cid-sgg5joot><p><img alt="img" loading="lazy" decoding="async" width="1140" height="800" src="/_astro/b7ea0f594a8171f9198120d72e4f5e68.BIVHT_Tx_1NgOak.webp" srcset=""></p>
+<p>到达上图场景时，在获得适当法律授权下，基本计划如下：</p>
+<ol>
+<li>获取证据：收集数字设备，如笔记本电脑、存储设备和数码相机。（请注意，如果笔记本电脑和计算机处于打开状态，则需要特殊处理）</li>
+<li>建立监管链：适当填写相关表格(<a href="resources/Sample-Chain-of-Custody-Form.docx">样本表格</a>)。目的是确保只有授权的调查人员才能获得证据，没有人可以篡改证据。</li>
+<li>将证据放在安全的容器中：您希望确保证据不会损坏。对于智能手机，您希望确保它们无法访问网络，这样它们就不会被远程擦除。</li>
+<li>将证据传输到数字取证实验室。</li>
+</ol>
+<p>在取证实验室中，过程如下：</p>
+<ol>
+<li>从安全容器中检索数字证据。</li>
+<li>创建证据的取证副本：取证副本需要高级软件以避免修改原始数据。</li>
+<li>将数字证据返回到安全容器：您将处理副本。如果损坏了副本，则始终可以创建一个新副本。</li>
+<li>开始在取证工作站上处理副本。</li>
+</ol>
+<p>数字取证包括：</p>
+<ol>
+<li>适当的搜查权限：没有适当的法律授权，调查人员不能开始。</li>
+<li>监管链：这对于随时跟踪谁持有证据是必要的。</li>
+<li>用数学验证：使用一种特殊的数学函数，称为哈希函数，我们可以确认文件没有被修改。</li>
+<li>使用经过验证的工具：应验证数字取证中使用的工具，以确保它们正常工作。例如，如果要创建磁盘映像，则需要确保取证映像与磁盘上的数据相同。</li>
+<li>可重复性：只要有适当的技能和工具，就可以复制数字取证的结果。</li>
+<li>报告：数字取证调查以一份报告结束，该报告显示了与发现的案件相关的证据。</li>
+</ol>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>ExifTool Version Number         : 10.80</span></span>
+<span class="line"><span>File Name                       : letter-image.jpg</span></span>
+<span class="line"><span>Directory                       : .</span></span>
+<span class="line"><span>File Size                       : 124 kB</span></span>
+<span class="line"><span>File Modification Date/Time     : 2022:02:23 08:53:33+00:00</span></span>
+<span class="line"><span>File Access Date/Time           : 2022:02:23 09:12:00+00:00</span></span>
+<span class="line"><span>File Inode Change Date/Time     : 2022:03:04 12:15:19+00:00</span></span>
+<span class="line"><span>File Permissions                : rwxr-xr-x</span></span>
+<span class="line"><span>File Type                       : JPEG</span></span>
+<span class="line"><span>File Type Extension             : jpg</span></span>
+<span class="line"><span>MIME Type                       : image/jpeg</span></span>
+<span class="line"><span>JFIF Version                    : 1.01</span></span>
+<span class="line"><span>Exif Byte Order                 : Little-endian (Intel, II)</span></span>
+<span class="line"><span>Compression                     : JPEG (old-style)</span></span>
+<span class="line"><span>Make                            : Canon</span></span>
+<span class="line"><span>Camera Model Name               : Canon EOS R6</span></span>
+<span class="line"><span>Orientation                     : Horizontal (normal)</span></span>
+<span class="line"><span>X Resolution                    : 300</span></span>
+<span class="line"><span>Y Resolution                    : 300</span></span>
+<span class="line"><span>Resolution Unit                 : inches</span></span>
+<span class="line"><span>Software                        : GIMP 2.10.28</span></span>
+<span class="line"><span>Modify Date                     : 2022:02:15 17:23:40</span></span>
+<span class="line"><span>Exposure Time                   : 1/200</span></span>
+<span class="line"><span>F Number                        : 2.8</span></span>
+<span class="line"><span>Exposure Program                : Manual</span></span>
+<span class="line"><span>ISO                             : 640</span></span>
+<span class="line"><span>Sensitivity Type                : Recommended Exposure Index</span></span>
+<span class="line"><span>Recommended Exposure Index      : 640</span></span>
+<span class="line"><span>Exif Version                    : 0231</span></span>
+<span class="line"><span>Date/Time Original              : 2022:02:25 13:37:33</span></span>
+<span class="line"><span>Create Date                     : 2022:02:25 13:37:33</span></span>
+<span class="line"><span>Offset Time                     : +01:00</span></span>
+<span class="line"><span>Offset Time Original            : +03:00</span></span>
+<span class="line"><span>Offset Time Digitized           : +03:00</span></span>
+<span class="line"><span>Shutter Speed Value             : 1/200</span></span>
+<span class="line"><span>Aperture Value                  : 2.8</span></span>
+<span class="line"><span>Exposure Compensation           : 0</span></span>
+<span class="line"><span>Max Aperture Value              : 1.8</span></span>
+<span class="line"><span>Metering Mode                   : Multi-segment</span></span>
+<span class="line"><span>Flash                           : No Flash</span></span>
+<span class="line"><span>Focal Length                    : 50.0 mm</span></span>
+<span class="line"><span>User Comment                    : THM{238956}</span></span>
+<span class="line"><span>Sub Sec Time Original           : 42</span></span>
+<span class="line"><span>Sub Sec Time Digitized          : 42</span></span>
+<span class="line"><span>Color Space                     : sRGB</span></span>
+<span class="line"><span>Exif Image Width                : 7900</span></span>
+<span class="line"><span>Exif Image Height               : 5267</span></span>
+<span class="line"><span>Focal Plane X Resolution        : 1520</span></span>
+<span class="line"><span>Focal Plane Y Resolution        : 1520</span></span>
+<span class="line"><span>Focal Plane Resolution Unit     : cm</span></span>
+<span class="line"><span>Custom Rendered                 : Normal</span></span>
+<span class="line"><span>Exposure Mode                   : Manual</span></span>
+<span class="line"><span>White Balance                   : Auto</span></span>
+<span class="line"><span>Scene Capture Type              : Standard</span></span>
+<span class="line"><span>Serial Number                   : 083021002010</span></span>
+<span class="line"><span>Lens Info                       : 50mm f/?</span></span>
+<span class="line"><span>Lens Model                      : EF50mm f/1.8 STM</span></span>
+<span class="line"><span>Lens Serial Number              : 000029720b</span></span>
+<span class="line"><span>GPS Latitude Ref                : North</span></span>
+<span class="line"><span>GPS Longitude Ref               : West</span></span>
+<span class="line"><span>GPS Time Stamp                  : 13:37:33</span></span>
+<span class="line"><span>Subfile Type                    : Reduced-resolution image</span></span>
+<span class="line"><span>Photometric Interpretation      : YCbCr</span></span>
+<span class="line"><span>Samples Per Pixel               : 3</span></span>
+<span class="line"><span>Thumbnail Offset                : 1214</span></span>
+<span class="line"><span>Thumbnail Length                : 4941</span></span>
+<span class="line"><span>XMP Toolkit                     : XMP Core 4.4.0-Exiv2</span></span>
+<span class="line"><span>Api                             : 2.0</span></span>
+<span class="line"><span>Platform                        : Linux</span></span>
+<span class="line"><span>Time Stamp                      : 1644938627130718</span></span>
+<span class="line"><span>Approximate Focus Distance      : 0.79</span></span>
+<span class="line"><span>Distortion Correction Already Applied: True</span></span>
+<span class="line"><span>Firmware                        : 1.2.0</span></span>
+<span class="line"><span>Flash Compensation              : 0</span></span>
+<span class="line"><span>Image Number                    : 0</span></span>
+<span class="line"><span>Lateral Chromatic Aberration Correction Already Applied: True</span></span>
+<span class="line"><span>Lens                            : EF50mm f/1.8 STM</span></span>
+<span class="line"><span>Vignette Correction Already Applied: True</span></span>
+<span class="line"><span>Color Mode                      : RGB</span></span>
+<span class="line"><span>ICC Profile Name                : Adobe RGB (1998)</span></span>
+<span class="line"><span>Creator Tool                    : GIMP 2.10</span></span>
+<span class="line"><span>Metadata Date                   : 2021:12:02 13:32:48+01:00</span></span>
+<span class="line"><span>Rating                          : 2</span></span>
+<span class="line"><span>Document ID                     : adobe:docid:photoshop:de96cdf3-afbf-664d-9d4c-d5c1d0fdb4e1</span></span>
+<span class="line"><span>Instance ID                     : xmp.iid:b80f5656-424a-4d4d-9cd0-5a36706d26d6</span></span>
+<span class="line"><span>Original Document ID            : D3825C53382EED70DB7435B0CCF756F5</span></span>
+<span class="line"><span>Preserved File Name             : 5L0A2971.CR3</span></span>
+<span class="line"><span>Already Applied                 : True</span></span>
+<span class="line"><span>Auto Lateral CA                 : 1</span></span>
+<span class="line"><span>Blacks 2012                     : 0</span></span>
+<span class="line"><span>Blue Hue                        : 0</span></span>
+<span class="line"><span>Blue Saturation                 : 0</span></span>
+<span class="line"><span>Camera Profile                  : Adobe Standard</span></span>
+<span class="line"><span>Camera Profile Digest           : 441F68BD6BC3369B59256B103CE2CD5C</span></span>
+<span class="line"><span>Clarity 2012                    : 0</span></span>
+<span class="line"><span>Color Grade Blending            : 50</span></span>
+<span class="line"><span>Color Grade Global Hue          : 0</span></span>
+<span class="line"><span>Color Grade Global Lum          : 0</span></span>
+<span class="line"><span>Color Grade Global Sat          : 0</span></span>
+<span class="line"><span>Color Grade Highlight Lum       : 0</span></span>
+<span class="line"><span>Color Grade Midtone Hue         : 0</span></span>
+<span class="line"><span>Color Grade Midtone Lum         : 0</span></span>
+<span class="line"><span>Color Grade Midtone Sat         : 0</span></span>
+<span class="line"><span>Color Grade Shadow Lum          : 0</span></span>
+<span class="line"><span>Color Noise Reduction           : 25</span></span>
+<span class="line"><span>Color Noise Reduction Detail    : 50</span></span>
+<span class="line"><span>Color Noise Reduction Smoothness: 50</span></span>
+<span class="line"><span>Contrast 2012                   : 0</span></span>
+<span class="line"><span>Crop Angle                      : 0</span></span>
+<span class="line"><span>Crop Bottom                     : 1</span></span>
+<span class="line"><span>Crop Constrain To Warp          : 0</span></span>
+<span class="line"><span>Crop Left                       : 0</span></span>
+<span class="line"><span>Crop Right                      : 1</span></span>
+<span class="line"><span>Crop Top                        : 0</span></span>
+<span class="line"><span>Defringe Green Amount           : 0</span></span>
+<span class="line"><span>Defringe Green Hue Hi           : 60</span></span>
+<span class="line"><span>Defringe Green Hue Lo           : 40</span></span>
+<span class="line"><span>Defringe Purple Amount          : 0</span></span>
+<span class="line"><span>Defringe Purple Hue Hi          : 70</span></span>
+<span class="line"><span>Defringe Purple Hue Lo          : 30</span></span>
+<span class="line"><span>Dehaze                          : 0</span></span>
+<span class="line"><span>Exposure 2012                   : -0.40</span></span>
+<span class="line"><span>Grain Amount                    : 0</span></span>
+<span class="line"><span>Green Hue                       : 0</span></span>
+<span class="line"><span>Green Saturation                : 0</span></span>
+<span class="line"><span>Has Crop                        : False</span></span>
+<span class="line"><span>Has Settings                    : True</span></span>
+<span class="line"><span>Highlights 2012                 : -32</span></span>
+<span class="line"><span>Hue Adjustment Aqua             : 0</span></span>
+<span class="line"><span>Hue Adjustment Blue             : 0</span></span>
+<span class="line"><span>Hue Adjustment Green            : 0</span></span>
+<span class="line"><span>Hue Adjustment Magenta          : 0</span></span>
+<span class="line"><span>Hue Adjustment Orange           : 0</span></span>
+<span class="line"><span>Hue Adjustment Purple           : 0</span></span>
+<span class="line"><span>Hue Adjustment Red              : 0</span></span>
+<span class="line"><span>Hue Adjustment Yellow           : 0</span></span>
+<span class="line"><span>Lens Manual Distortion Amount   : 0</span></span>
+<span class="line"><span>Lens Profile Digest             : B23331240701D3B28825B46A4802290C</span></span>
+<span class="line"><span>Lens Profile Distortion Scale   : 100</span></span>
+<span class="line"><span>Lens Profile Enable             : 1</span></span>
+<span class="line"><span>Lens Profile Filename           : Canon EOS-1Ds Mark III (Canon EF 50mm f1.8 STM) - RAW.lcp</span></span>
+<span class="line"><span>Lens Profile Is Embedded        : False</span></span>
+<span class="line"><span>Lens Profile Name               : Adobe (Canon EF 50mm f/1.8 STM)</span></span>
+<span class="line"><span>Lens Profile Setup              : LensDefaults</span></span>
+<span class="line"><span>Lens Profile Vignetting Scale   : 100</span></span>
+<span class="line"><span>Luminance Adjustment Aqua       : 0</span></span>
+<span class="line"><span>Luminance Adjustment Blue       : 0</span></span>
+<span class="line"><span>Luminance Adjustment Green      : 0</span></span>
+<span class="line"><span>Luminance Adjustment Magenta    : 0</span></span>
+<span class="line"><span>Luminance Adjustment Orange     : 0</span></span>
+<span class="line"><span>Luminance Adjustment Purple     : 0</span></span>
+<span class="line"><span>Luminance Adjustment Red        : 0</span></span>
+<span class="line"><span>Luminance Adjustment Yellow     : 0</span></span>
+<span class="line"><span>Luminance Smoothing             : 0</span></span>
+<span class="line"><span>Override Look Vignette          : False</span></span>
+<span class="line"><span>Parametric Darks                : 0</span></span>
+<span class="line"><span>Parametric Highlight Split      : 75</span></span>
+<span class="line"><span>Parametric Highlights           : 0</span></span>
+<span class="line"><span>Parametric Lights               : 0</span></span>
+<span class="line"><span>Parametric Midtone Split        : 50</span></span>
+<span class="line"><span>Parametric Shadow Split         : 25</span></span>
+<span class="line"><span>Parametric Shadows              : 0</span></span>
+<span class="line"><span>Perspective Aspect              : 0</span></span>
+<span class="line"><span>Perspective Horizontal          : 0</span></span>
+<span class="line"><span>Perspective Rotate              : 0.0</span></span>
+<span class="line"><span>Perspective Scale               : 100</span></span>
+<span class="line"><span>Perspective Upright             : 0</span></span>
+<span class="line"><span>Perspective Vertical            : 0</span></span>
+<span class="line"><span>Perspective X                   : 0.00</span></span>
+<span class="line"><span>Perspective Y                   : 0.00</span></span>
+<span class="line"><span>Post Crop Vignette Amount       : 0</span></span>
+<span class="line"><span>Process Version                 : 11.0</span></span>
+<span class="line"><span>Raw File Name                   : 5L0A2971.dng</span></span>
+<span class="line"><span>Red Hue                         : 0</span></span>
+<span class="line"><span>Red Saturation                  : 0</span></span>
+<span class="line"><span>Saturation                      : 0</span></span>
+<span class="line"><span>Saturation Adjustment Aqua      : 0</span></span>
+<span class="line"><span>Saturation Adjustment Blue      : 0</span></span>
+<span class="line"><span>Saturation Adjustment Green     : 0</span></span>
+<span class="line"><span>Saturation Adjustment Magenta   : 0</span></span>
+<span class="line"><span>Saturation Adjustment Orange    : 0</span></span>
+<span class="line"><span>Saturation Adjustment Purple    : 0</span></span>
+<span class="line"><span>Saturation Adjustment Red       : 0</span></span>
+<span class="line"><span>Saturation Adjustment Yellow    : 0</span></span>
+<span class="line"><span>Shadow Tint                     : 0</span></span>
+<span class="line"><span>Shadows 2012                    : 0</span></span>
+<span class="line"><span>Sharpen Detail                  : 25</span></span>
+<span class="line"><span>Sharpen Edge Masking            : 60</span></span>
+<span class="line"><span>Sharpen Radius                  : +1.0</span></span>
+<span class="line"><span>Sharpness                       : 45</span></span>
+<span class="line"><span>Split Toning Balance            : 0</span></span>
+<span class="line"><span>Split Toning Highlight Hue      : 0</span></span>
+<span class="line"><span>Split Toning Highlight Saturation: 0</span></span>
+<span class="line"><span>Split Toning Shadow Hue         : 0</span></span>
+<span class="line"><span>Split Toning Shadow Saturation  : 0</span></span>
+<span class="line"><span>Color Temperature               : 6650</span></span>
+<span class="line"><span>Texture                         : 0</span></span>
+<span class="line"><span>Tint                            : -7</span></span>
+<span class="line"><span>Tone Curve Name 2012            : Linear</span></span>
+<span class="line"><span>Tone Curve PV2012               : 0, 0, 255, 255</span></span>
+<span class="line"><span>Tone Curve PV2012 Blue          : 0, 0, 255, 255</span></span>
+<span class="line"><span>Tone Curve PV2012 Green         : 0, 0, 255, 255</span></span>
+<span class="line"><span>Tone Curve PV2012 Red           : 0, 0, 255, 255</span></span>
+<span class="line"><span>Version                         : 14.0.1</span></span>
+<span class="line"><span>Vibrance                        : 0</span></span>
+<span class="line"><span>Vignette Amount                 : 0</span></span>
+<span class="line"><span>Whites 2012                     : 0</span></span>
+<span class="line"><span>Format                          : image/jpeg</span></span>
+<span class="line"><span>Document Ancestors              : xmp.did:2ec1b1a6-ffae-0a44-90f9-3b6998456cdf, xmp.did:780a63d9-6024-e942-baf4-cae80b62a8c5</span></span>
+<span class="line"><span>Derived From Document ID        : xmp.did:c3f1ef49-6aa6-4441-8800-6afa19131d22</span></span>
+<span class="line"><span>Derived From Instance ID        : xmp.iid:fd37b6b6-4a37-d44a-89e0-3710c289a8db</span></span>
+<span class="line"><span>Derived From Original Document ID: D3825C53382EED70DB7435B0CCF756F5</span></span>
+<span class="line"><span>History Action                  : derived, saved, saved, saved, derived, saved, converted, saved, saved, converted, derived, saved, saved</span></span>
+<span class="line"><span>History Parameters              : converted from image/x-canon-cr3 to image/dng, saved to new location, converted from image/dng to image/vnd.adobe.photoshop, saved to new location, from image/vnd.adobe.photoshop to application/vnd.adobe.photoshop, from application/vnd.adobe.photoshop to image/jpeg, converted from application/vnd.adobe.photoshop to image/jpeg</span></span>
+<span class="line"><span>History Changed                 : /, /metadata, /metadata, /, /, /, /, /</span></span>
+<span class="line"><span>History Instance ID             : xmp.iid:68afaab8-00f8-4a17-880d-04362acf7f59, xmp.iid:a415f140-19e3-dd4f-a523-2a91fd837241, xmp.iid:a732c1b4-c918-d649-91df-a08fd30a3b28, xmp.iid:c3f1ef49-6aa6-4441-8800-6afa19131d22, xmp.iid:e03136da-36b8-4a4f-a00f-4e953a46cb21, xmp.iid:fd37b6b6-4a37-d44a-89e0-3710c289a8db, xmp.iid:b0dfac61-4499-6b47-b061-c79f9c8868d9, xmp.iid:defc8f04-ab7b-4648-b9d4-1da9f1aa9bf9</span></span>
+<span class="line"><span>History Software Agent          : Adobe Photoshop Lightroom Classic 10.2 (Macintosh), Adobe Photoshop Camera Raw 14.0, Adobe Photoshop Camera Raw 14.0.1 (Windows), Adobe Photoshop Camera Raw 14.0.1 (Windows), Adobe Photoshop 22.4 (Windows), Adobe Photoshop 22.4 (Windows), Adobe Photoshop 22.4 (Windows), Gimp 2.10 (Linux)</span></span>
+<span class="line"><span>History When                    : 2021:11:15 15:50:41+03:00, 2021:12:01 11:25:22+01:00, 2021:12:01 12:34:12+01:00, 2021:12:02 10:19:47+01:00, 2021:12:02 12:53:12+01:00, 2021:12:02 13:32:48+01:00, 2021:12:02 13:32:48+01:00, 2022:02:15 17:23:47+02:00</span></span>
+<span class="line"><span>Look Amount                     : 1</span></span>
+<span class="line"><span>Look Copyright                  : © 2018 Adobe Systems, Inc.</span></span>
+<span class="line"><span>Look Group                      : lang="x-default" Profiles</span></span>
+<span class="line"><span>Look Name                       : Adobe Color</span></span>
+<span class="line"><span>Look Supports Amount            : false</span></span>
+<span class="line"><span>Look Supports Monochrome        : false</span></span>
+<span class="line"><span>Look Supports Output Referred   : false</span></span>
+<span class="line"><span>Look Uuid                       : B952C231111CD8E0ECCF14B86BAA7077</span></span>
+<span class="line"><span>Look Parameters Camera Profile  : Adobe Standard</span></span>
+<span class="line"><span>Look Parameters Convert To Grayscale: False</span></span>
+<span class="line"><span>Look Parameters Look Table      : E1095149FDB39D7A057BAB208837E2E1</span></span>
+<span class="line"><span>Look Parameters Process Version : 11.0</span></span>
+<span class="line"><span>Look Parameters Tone Curve PV2012: 0, 0, 22, 16, 40, 35, 127, 127, 224, 230, 240, 246, 255, 255</span></span>
+<span class="line"><span>Look Parameters Tone Curve PV2012 Blue: 0, 0, 255, 255</span></span>
+<span class="line"><span>Look Parameters Tone Curve PV2012 Green: 0, 0, 255, 255</span></span>
+<span class="line"><span>Look Parameters Tone Curve PV2012 Red: 0, 0, 255, 255</span></span>
+<span class="line"><span>Look Parameters Version         : 14.0.1</span></span>
+<span class="line"><span>Profile CMM Type                : Unknown (lcms)</span></span>
+<span class="line"><span>Profile Version                 : 4.3.0</span></span>
+<span class="line"><span>Profile Class                   : Display Device Profile</span></span>
+<span class="line"><span>Color Space Data                : RGB</span></span>
+<span class="line"><span>Profile Connection Space        : XYZ</span></span>
+<span class="line"><span>Profile Date Time               : 2022:02:15 14:53:19</span></span>
+<span class="line"><span>Profile File Signature          : acsp</span></span>
+<span class="line"><span>Primary Platform                : Apple Computer Inc.</span></span>
+<span class="line"><span>CMM Flags                       : Not Embedded, Independent</span></span>
+<span class="line"><span>Device Manufacturer             : </span></span>
+<span class="line"><span>Device Model                    : </span></span>
+<span class="line"><span>Device Attributes               : Reflective, Glossy, Positive, Color</span></span>
+<span class="line"><span>Rendering Intent                : Perceptual</span></span>
+<span class="line"><span>Connection Space Illuminant     : 0.9642 1 0.82491</span></span>
+<span class="line"><span>Profile Creator                 : Unknown (lcms)</span></span>
+<span class="line"><span>Profile ID                      : 0</span></span>
+<span class="line"><span>Profile Description             : GIMP built-in sRGB</span></span>
+<span class="line"><span>Profile Copyright               : Public Domain</span></span>
+<span class="line"><span>Media White Point               : 0.9642 1 0.82491</span></span>
+<span class="line"><span>Chromatic Adaptation            : 1.04788 0.02292 -0.05022 0.02959 0.99048 -0.01707 -0.00925 0.01508 0.75168</span></span>
+<span class="line"><span>Red Matrix Column               : 0.43604 0.22249 0.01392</span></span>
+<span class="line"><span>Blue Matrix Column              : 0.14305 0.06061 0.71393</span></span>
+<span class="line"><span>Green Matrix Column             : 0.38512 0.7169 0.09706</span></span>
+<span class="line"><span>Red Tone Reproduction Curve     : (Binary data 32 bytes, use -b option to extract)</span></span>
+<span class="line"><span>Green Tone Reproduction Curve   : (Binary data 32 bytes, use -b option to extract)</span></span>
+<span class="line"><span>Blue Tone Reproduction Curve    : (Binary data 32 bytes, use -b option to extract)</span></span>
+<span class="line"><span>Chromaticity Channels           : 3</span></span>
+<span class="line"><span>Chromaticity Colorant           : Unknown (0)</span></span>
+<span class="line"><span>Chromaticity Channel 1          : 0.64 0.33002</span></span>
+<span class="line"><span>Chromaticity Channel 2          : 0.3 0.60001</span></span>
+<span class="line"><span>Chromaticity Channel 3          : 0.15001 0.06</span></span>
+<span class="line"><span>Device Mfg Desc                 : GIMP</span></span>
+<span class="line"><span>Device Model Desc               : sRGB</span></span>
+<span class="line"><span>Current IPTC Digest             : b417d6571f8aba97a1e64afbdedafbdb</span></span>
+<span class="line"><span>Coded Character Set             : UTF8</span></span>
+<span class="line"><span>Envelope Record Version         : 4</span></span>
+<span class="line"><span>Date Created                    : 2022:02:15</span></span>
+<span class="line"><span>Digital Creation Date           : 2021:11:05</span></span>
+<span class="line"><span>Digital Creation Time           : 14:06:13+03:00</span></span>
+<span class="line"><span>Application Record Version      : 4</span></span>
+<span class="line"><span>Time Created                    : 17:23:40-17:23</span></span>
+<span class="line"><span>Image Width                     : 1200</span></span>
+<span class="line"><span>Image Height                    : 800</span></span>
+<span class="line"><span>Encoding Process                : Progressive DCT, Huffman coding</span></span>
+<span class="line"><span>Bits Per Sample                 : 8</span></span>
+<span class="line"><span>Color Components                : 3</span></span>
+<span class="line"><span>Y Cb Cr Sub Sampling            : YCbCr4:4:4 (1 1)</span></span>
+<span class="line"><span>Aperture                        : 2.8</span></span>
+<span class="line"><span>Date/Time Created               : 2022:02:15 17:23:40-17:23</span></span>
+<span class="line"><span>Digital Creation Date/Time      : 2021:11:05 14:06:13+03:00</span></span>
+<span class="line"><span>GPS Latitude                    : 51 deg 30' 51.90" N</span></span>
+<span class="line"><span>GPS Longitude                   : 0 deg 5' 38.73" W</span></span>
+<span class="line"><span>GPS Position                    : 51 deg 30' 51.90" N, 0 deg 5' 38.73" W</span></span>
+<span class="line"><span>Image Size                      : 1200x800</span></span>
+<span class="line"><span>Megapixels                      : 0.960</span></span>
+<span class="line"><span>Scale Factor To 35 mm Equivalent: 0.7</span></span>
+<span class="line"><span>Shutter Speed                   : 1/200</span></span>
+<span class="line"><span>Create Date                     : 2022:02:25 13:37:33.42+03:00</span></span>
+<span class="line"><span>Date/Time Original              : 2022:02:25 13:37:33.42+03:00</span></span>
+<span class="line"><span>Modify Date                     : 2022:02:15 17:23:40+01:00</span></span>
+<span class="line"><span>Thumbnail Image                 : (Binary data 4941 bytes, use -b option to extract)</span></span>
+<span class="line"><span>Circle Of Confusion             : 0.043 mm</span></span>
+<span class="line"><span>Field Of View                   : 54.9 deg</span></span>
+<span class="line"><span>Focal Length                    : 50.0 mm (35 mm equivalent: 34.6 mm)</span></span>
+<span class="line"><span>Hyperfocal Distance             : 20.58 m</span></span>
+<span class="line"><span>Lens ID                         : Canon EF 50mm f/1.8 STM</span></span>
+<span class="line"><span>Light Value                     : 7.9</span></span></code></pre>
+</div></div><aside class="toc" data-toc hidden aria-label="目录" data-astro-cid-sgg5joot><p class="toc-label" data-astro-cid-sgg5joot>目录</p><nav class="toc-nav" data-toc-nav data-astro-cid-sgg5joot></nav></aside></div></article></main><footer data-astro-cid-jo6i4kqk><div class="inner" data-astro-cid-jo6i4kqk><p class="line" data-astro-cid-jo6i4kqk>© 2026 Zumpyx</p><p class="note" data-astro-cid-jo6i4kqk>notes · exploit · write · repeat</p></div></footer><script type="module">function e(e){return e.trim().toLowerCase().replace(/\s+/g,`-`).replace(/[^\w\u4e00-\u9fff-]+/g,``).replace(/-+/g,`-`).replace(/^-|-$/g,``)||`section`}var t=null;function n(){let n=document.querySelector(`[data-article-content]`),r=document.querySelector(`[data-toc]`),i=document.querySelector(`[data-toc-nav]`);if(!n||!r||!i)return;t?.disconnect(),t=null,i.replaceChildren();let a=Array.from(n.querySelectorAll(`h2, h3`)).filter(e=>(e.textContent??``).trim().length>0);if(a.length===0){r.hidden=!0;return}r.hidden=!1;let o=new Set,s=[];for(let t of a){let n=t.id;if(!n){let r=e(t.textContent??``);n=r;let i=2;for(;o.has(n)||document.getElementById(n);)n=`${r}-${i}`,i+=1;t.id=n}o.add(n);let r=document.createElement(`a`);r.href=`#${n}`,r.textContent=(t.textContent??``).trim(),r.className=t.tagName===`H3`?`toc-h3`:`toc-h2`,r.dataset.target=n,i.appendChild(r),s.push(r)}let c=e=>{for(let t of s)t.classList.toggle(`active`,t.dataset.target===e)};t=new IntersectionObserver(e=>{let t=e.filter(e=>e.isIntersecting).sort((e,t)=>e.target.offsetTop-t.target.offsetTop);t[0]&&c(t[0].target.id)},{rootMargin:`-15% 0px -70% 0px`,threshold:[0,1]});for(let e of a)t.observe(e);location.hash?c(decodeURIComponent(location.hash.slice(1))):a[0]&&c(a[0].id)}n(),document.addEventListener(`article-content-unlocked`,()=>{n()});</script></body></html>

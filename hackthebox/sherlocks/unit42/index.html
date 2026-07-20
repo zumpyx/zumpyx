@@ -1,0 +1,166 @@
+<!DOCTYPE html><html lang="zh-CN" data-astro-cid-sgg5joot><head><!-- Global Metadata --><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="icon" type="image/png" href="/favicon.png"><link rel="icon" href="/favicon.ico" sizes="any"><link rel="apple-touch-icon" href="/apple-touch-icon.png"><link rel="sitemap" href="/sitemap-index.xml"><link rel="alternate" type="application/rss+xml" title="Zumpyx's Blog" href="https://blog.zumpyx.com/rss.xml"><meta name="generator" content="Astro v7.1.0"><meta name="color-scheme" content="light dark"><meta name="theme-color" content="#0b0d11" media="(prefers-color-scheme: dark)"><meta name="theme-color" content="#f4f5f7" media="(prefers-color-scheme: light)"><script>
+	(() => {
+		try {
+			const t = localStorage.getItem('theme');
+			if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t);
+			else document.documentElement.removeAttribute('data-theme');
+		} catch {}
+	})();
+</script><style>@font-face{font-family:Atkinson-c7f4c4e8b285552f;src:url("/_astro/fonts/89758defcfa85239.woff") format("woff");font-display:swap;font-weight:400;font-style:normal;}@font-face{font-family:Atkinson-c7f4c4e8b285552f;src:url("/_astro/fonts/14aa8dd5744dd4bc.woff") format("woff");font-display:swap;font-weight:700;font-style:normal;}@font-face{font-family:"Atkinson-c7f4c4e8b285552f fallback: Arial";src:local("Arial");font-display:swap;font-weight:400;font-style:normal;size-adjust:99.3717%;ascent-override:80.1033%;descent-override:25.2587%;line-gap-override:0%;}@font-face{font-family:"Atkinson-c7f4c4e8b285552f fallback: Arial Bold";src:local("Arial Bold");font-display:swap;font-weight:700;font-style:normal;size-adjust:92.2954%;ascent-override:86.2448%;descent-override:27.1953%;line-gap-override:0%;}:root{--font-atkinson:Atkinson-c7f4c4e8b285552f,"Atkinson-c7f4c4e8b285552f fallback: Arial","Atkinson-c7f4c4e8b285552f fallback: Arial Bold",sans-serif;}</style><link rel="preload" href="/_astro/fonts/89758defcfa85239.woff" as="font" type="font/woff" crossorigin><link rel="preload" href="/_astro/fonts/14aa8dd5744dd4bc.woff" as="font" type="font/woff" crossorigin><!-- Canonical URL --><link rel="canonical" href="https://blog.zumpyx.com/hackthebox/sherlocks/unit42/"><!-- Primary Meta Tags --><title>Unit42 · Zumpyx&#39;s Blog</title><meta name="description" content="在这个Sherlock中，您将熟悉Sysmon日志和各种有用的EventID，用于识别和分析Windows系统上的恶意活动。Palo Alto的第四十二单元最近对UltraVNC活动进行了研究，攻击者利用UltraVNC的后门版本来维持对系统的访问。该实验室受到该活动的启发，并指导参与者完成活动的初始访问阶段。"><!-- Open Graph / Facebook --><meta property="og:type" content="website"><meta property="og:url" content="https://blog.zumpyx.com/hackthebox/sherlocks/unit42/"><meta property="og:title" content="Unit42 · Zumpyx's Blog"><meta property="og:description" content="在这个Sherlock中，您将熟悉Sysmon日志和各种有用的EventID，用于识别和分析Windows系统上的恶意活动。Palo Alto的第四十二单元最近对UltraVNC活动进行了研究，攻击者利用UltraVNC的后门版本来维持对系统的访问。该实验室受到该活动的启发，并指导参与者完成活动的初始访问阶段。"><meta property="og:image" content="https://blog.zumpyx.com/_astro/head.CE6FOIKY.png"><!-- Twitter --><meta name="twitter:card" content="summary_large_image"><meta name="twitter:url" content="https://blog.zumpyx.com/hackthebox/sherlocks/unit42/"><meta name="twitter:title" content="Unit42 · Zumpyx's Blog"><meta name="twitter:description" content="在这个Sherlock中，您将熟悉Sysmon日志和各种有用的EventID，用于识别和分析Windows系统上的恶意活动。Palo Alto的第四十二单元最近对UltraVNC活动进行了研究，攻击者利用UltraVNC的后门版本来维持对系统的访问。该实验室受到该活动的启发，并指导参与者完成活动的初始访问阶段。"><meta name="twitter:image" content="https://blog.zumpyx.com/_astro/head.CE6FOIKY.png"><link rel="stylesheet" href="/_astro/Header.CMmW25g2.css"><style>.machine-list[data-astro-cid-twh6cqtg]{border:1px solid var(--border);border-radius:var(--radius);background:var(--bg-elevated);box-shadow:var(--shadow);margin-bottom:2rem;padding:1rem 1.15rem}.machine-list[data-astro-cid-twh6cqtg] h2[data-astro-cid-twh6cqtg]{font-size:1.1rem;font-family:var(--font-mono);color:var(--accent);margin:0 0 .65rem}.machine-list[data-astro-cid-twh6cqtg] ul[data-astro-cid-twh6cqtg]{margin:0;padding-left:1.2rem}.machine-list[data-astro-cid-twh6cqtg] li[data-astro-cid-twh6cqtg]{margin:.35rem 0}.machine-ref[data-astro-cid-twh6cqtg]{color:var(--text-bright);align-items:center;gap:.5rem;text-decoration:none;display:inline-flex}.machine-ref[data-astro-cid-twh6cqtg]:hover{color:var(--accent)}.machine-ref[data-astro-cid-twh6cqtg] img[data-astro-cid-twh6cqtg]{object-fit:cover;border:1px solid var(--border);border-radius:6px}.missing[data-astro-cid-twh6cqtg]{color:var(--text-muted);font-family:var(--font-mono);font-size:.9em}.diff[data-astro-cid-twh6cqtg]{color:var(--text-muted);font-size:.9em}.diff[data-astro-cid-twh6cqtg].very-easy{color:var(--very-easy)}.diff[data-astro-cid-twh6cqtg].easy{color:var(--easy)}.diff[data-astro-cid-twh6cqtg].medium{color:var(--medium)}.diff[data-astro-cid-twh6cqtg].hard{color:var(--hard)}.diff[data-astro-cid-twh6cqtg].insane{color:var(--insane)}.meta .badge.locked{color:var(--medium,#fc0);background:#ffcc001a;border-color:#ffcc0059}
+</style><link rel="stylesheet" href="/_astro/ArticleLayout.DA3idRZl.css"><style>.nav-link[data-astro-cid-evkijfd6]{color:var(--text-muted);font-family:var(--font-mono);letter-spacing:.04em;text-transform:uppercase;white-space:nowrap;border:1px solid #0000;border-radius:999px;justify-content:center;align-items:center;padding:.5em .95em;font-size:.78rem;font-weight:500;text-decoration:none;transition:color .18s,background .18s,border-color .18s,box-shadow .18s;display:inline-flex}.nav-link[data-astro-cid-evkijfd6]:hover{color:var(--text-bright);background:var(--surface-hover);text-decoration:none}.nav-link[data-astro-cid-evkijfd6].active{color:var(--on-accent);background:linear-gradient(135deg, var(--accent-hover), var(--accent));box-shadow:0 0 0 1px var(--border-strong), 0 6px 16px var(--accent-glow-strong);text-shadow:none;border-color:#0000;font-weight:700;text-decoration:none}
+</style><script type="module" src="/_astro/page.CTxKKjGj.js"></script></head><body data-astro-cid-sgg5joot><div class="scanline" aria-hidden="true" data-astro-cid-sgg5joot></div><header data-astro-cid-nen7h5rs><div class="bar" data-astro-cid-nen7h5rs><a class="brand" href="/" data-astro-cid-nen7h5rs><span class="logo" aria-hidden="true" data-astro-cid-nen7h5rs><img src="/_astro/head.CE6FOIKY_1SW1hc.webp" srcset="/_astro/head.CE6FOIKY_1SW1hc.webp 1x, /_astro/head.CE6FOIKY_scYzG.webp 2x" alt data-astro-cid-nen7h5rs="true" loading="lazy" decoding="async" width="64" height="64" class="logo-img"></span><span class="brand-text" data-astro-cid-nen7h5rs><span class="brand-name" data-astro-cid-nen7h5rs>Zumpyx&#39;s Blog</span></span></a><nav class="nav-pill" aria-label="Primary" data-astro-cid-nen7h5rs><div class="nav-track" data-astro-cid-nen7h5rs><a href="/" class="nav-link" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>Home</a><a href="/blog" class="nav-link" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>Blog</a><a href="/hackthebox" class="nav-link active" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>HackTheBox</a><a href="/projects" class="nav-link" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>Projects</a><a href="/about" class="nav-link" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>About</a></div></nav><div class="actions" data-astro-cid-nen7h5rs><button type="button" class="icon-btn search-trigger" data-search-open aria-label="搜索" title="搜索 (Ctrl/⌘+K)" data-astro-cid-7yy3665x><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true" data-astro-cid-7yy3665x><circle cx="11" cy="11" r="6.5" data-astro-cid-7yy3665x></circle><path d="M16.5 16.5 21 21" stroke-linecap="round" data-astro-cid-7yy3665x></path></svg></button><div class="search-root" data-search-root hidden data-astro-cid-7yy3665x><div class="search-backdrop" data-search-close data-astro-cid-7yy3665x></div><div class="search-panel" role="dialog" aria-modal="true" aria-label="全站搜索" data-astro-cid-7yy3665x><div class="search-bar" data-astro-cid-7yy3665x><svg class="search-ico" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true" data-astro-cid-7yy3665x><circle cx="11" cy="11" r="6.5" data-astro-cid-7yy3665x></circle><path d="M16.5 16.5 21 21" stroke-linecap="round" data-astro-cid-7yy3665x></path></svg><input type="search" class="search-input" data-search-input placeholder="全文搜索：标题 / 正文 / 标签…" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="search" data-astro-cid-7yy3665x><kbd class="search-kbd" data-search-close-hint data-astro-cid-7yy3665x>Esc</kbd></div><div class="search-meta" data-search-meta data-astro-cid-7yy3665x>输入关键词开始搜索</div><ul class="search-results" data-search-results role="listbox" aria-label="搜索结果" data-astro-cid-7yy3665x></ul></div></div><script type="module" src="/_astro/SiteSearch.astro_astro_type_script_index_0_lang.CiT4pk6n.js"></script><button type="button" class="icon-btn theme-toggle" data-theme-toggle aria-label="主题：跟随系统" title="主题：跟随系统（点击切换）" data-astro-cid-l6lhmie6><span class="icon icon-system" aria-hidden="true" data-astro-cid-l6lhmie6><!-- auto / system --><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" data-astro-cid-l6lhmie6><rect x="3" y="4" width="18" height="12" rx="2" data-astro-cid-l6lhmie6></rect><path d="M8 20h8M12 16v4" data-astro-cid-l6lhmie6></path></svg></span><span class="icon icon-light" aria-hidden="true" hidden data-astro-cid-l6lhmie6><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" data-astro-cid-l6lhmie6><circle cx="12" cy="12" r="4" data-astro-cid-l6lhmie6></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" data-astro-cid-l6lhmie6></path></svg></span><span class="icon icon-dark" aria-hidden="true" hidden data-astro-cid-l6lhmie6><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" data-astro-cid-l6lhmie6><path d="M21 14.5A8.5 8.5 0 1 1 9.5 3a7 7 0 0 0 11.5 11.5z" stroke-linejoin="round" data-astro-cid-l6lhmie6></path></svg></span></button><script>
+	(() => {
+		const KEY = 'theme';
+		const ORDER = ['system', 'light', 'dark'];
+		const LABELS = {
+			system: '主题：跟随系统',
+			light: '主题：亮色',
+			dark: '主题：暗色',
+		};
+
+		const getStored = () => {
+			try {
+				const v = localStorage.getItem(KEY);
+				if (v === 'light' || v === 'dark' || v === 'system') return v;
+			} catch {}
+			return 'system';
+		};
+
+		const apply = (mode) => {
+			const root = document.documentElement;
+			if (mode === 'light' || mode === 'dark') root.setAttribute('data-theme', mode);
+			else root.removeAttribute('data-theme');
+			try {
+				if (mode === 'system') localStorage.removeItem(KEY);
+				else localStorage.setItem(KEY, mode);
+			} catch {}
+		};
+
+		const syncButton = (mode) => {
+			document.querySelectorAll('[data-theme-toggle]').forEach((btn) => {
+				btn.setAttribute('data-mode', mode);
+				btn.setAttribute('aria-label', LABELS[mode]);
+				btn.setAttribute('title', `${LABELS[mode]}（点击切换）`);
+				btn.querySelectorAll('.icon').forEach((el) => {
+					el.hidden = true;
+				});
+				const icon = btn.querySelector(`.icon-${mode}`);
+				if (icon) icon.hidden = false;
+			});
+		};
+
+		const mode = getStored();
+		apply(mode);
+		syncButton(mode);
+
+		document.querySelectorAll('[data-theme-toggle]').forEach((btn) => {
+			btn.addEventListener('click', () => {
+				const cur = getStored();
+				const next = ORDER[(ORDER.indexOf(cur) + 1) % ORDER.length];
+				apply(next);
+				syncButton(next);
+			});
+		});
+
+		// If following system, react to OS changes
+		try {
+			const mq = window.matchMedia('(prefers-color-scheme: dark)');
+			mq.addEventListener?.('change', () => {
+				if (getStored() === 'system') apply('system');
+			});
+		} catch {}
+	})();
+</script><a class="icon-btn" href="/rss.xml" target="_blank" rel="noopener noreferrer" title="RSS" aria-label="RSS 订阅" data-astro-cid-nen7h5rs><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true" data-astro-cid-nen7h5rs><path d="M5 19a1.5 1.5 0 1 0 0.01 0" fill="currentColor" stroke="none" data-astro-cid-nen7h5rs></path><path d="M4 11a9 9 0 0 1 9 9" stroke-linecap="round" data-astro-cid-nen7h5rs></path><path d="M4 5a15 15 0 0 1 15 15" stroke-linecap="round" data-astro-cid-nen7h5rs></path></svg></a></div></div></header><main data-astro-cid-sgg5joot><article data-astro-cid-sgg5joot><div class="article-shell" data-astro-cid-sgg5joot><div class="prose" data-article-body data-astro-cid-sgg5joot><div class="title" data-astro-cid-sgg5joot><div class="date" data-astro-cid-sgg5joot><time datetime="2024-06-18T00:00:00.000Z">2024-06-18</time></div><div class="title-row" data-astro-cid-sgg5joot><h1 data-astro-cid-sgg5joot>Unit42</h1></div><div class="meta" data-astro-cid-sgg5joot><span class="badge" data-astro-cid-twh6cqtg>Sherlocks</span><span class="badge difficulty-very-easy" data-astro-cid-twh6cqtg>Very Easy</span><span class="badge" data-astro-cid-twh6cqtg>dfir</span><span class="badge" data-astro-cid-twh6cqtg>sysmon</span></div><div class="links" data-astro-cid-sgg5joot><a href="/hackthebox/sherlocks/" data-astro-cid-twh6cqtg>← Sherlocks</a></div><hr data-astro-cid-sgg5joot></div><div class="content" data-article-content data-astro-cid-sgg5joot><h1 id="unit42">Unit42</h1>
+<p><img alt="Pasted-image-20240618091616.png" loading="lazy" decoding="async" width="800" height="800" src="/_astro/Pasted-image-20240618091616.B5daqkSn_Z24NYIB.webp" srcset=""></p>
+<blockquote>
+<p>In this Sherlock, you will familiarize yourself with Sysmon logs and various useful EventIDs for identifying and analyzing malicious activities on a Windows system. Palo Alto’s Unit42 recently conducted research on an UltraVNC campaign, wherein attackers utilized a backdoored version of UltraVNC to maintain access to systems. This lab is inspired by that campaign and guides participants through the initial access stage of the campaign.</p>
+</blockquote>
+<p>在这个Sherlock中，您将熟悉Sysmon日志和各种有用的EventID，用于识别和分析Windows系统上的恶意活动。Palo Alto的第四十二单元最近对UltraVNC活动进行了研究，攻击者利用UltraVNC的后门版本来维持对系统的访问。该实验室受到该活动的启发，并指导参与者完成活动的初始访问阶段。</p>
+<h2 id="任务列表">任务列表</h2>
+<h3 id="1有多少个事件id为11的事件日志">1、有多少个事件ID为11的事件日志？</h3>
+<blockquote>
+<p>How many Event logs are there with Event ID 11?</p>
+</blockquote>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>56</span></span></code></pre>
+<h3 id="2-每当在内存中创建进程时都会记录事件id为1的事件其中包含命令行哈希进程路径父进程路径等详细信息这些信息对分析师非常有用因为它可以让我们看到系统上执行的所有程序这意味着我们可以发现任何正在执行的恶意进程感染受害者系统的恶意程序是什么">2 、每当在内存中创建进程时，都会记录事件ID为1的事件，其中包含命令行、哈希、进程路径、父进程路径等详细信息。这些信息对分析师非常有用，因为它可以让我们看到系统上执行的所有程序，这意味着我们可以发现任何正在执行的恶意进程。感染受害者系统的恶意程序是什么？</h3>
+<blockquote>
+<p>Whenever a process is created in memory, an event with Event ID 1 is recorded with details such as command line, hashes, process path, parent process path, etc. This information is very useful for an analyst because it allows us to see all programs executed on a system, which means we can spot any malicious processes being executed. What is the malicious process that infected the victim’s system?</p>
+</blockquote>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>C:\Users\CyberJunkie\Downloads\Preventivo24.02.14.exe.exe</span></span></code></pre>
+<h3 id="3哪个云驱动器被用来分发恶意软件">3、哪个云驱动器被用来分发恶意软件？</h3>
+<blockquote>
+<p>Which Cloud drive was used to distribute the malware?</p>
+</blockquote>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>dropbox</span></span></code></pre>
+<h3 id="4最初的恶意文件带有时间戳一种防御规避技术更改文件创建日期以使其看起来旧它在磁盘上创建了许多文件pdf文件的时间戳更改为什么">4、最初的恶意文件带有时间戳（一种防御规避技术，更改文件创建日期以使其看起来旧），它在磁盘上创建了许多文件。PDF文件的时间戳更改为什么？</h3>
+<blockquote>
+<p>The initial malicious file time-stamped (a defense evasion technique, where the file creation date is changed to make it appear old) many files it created on disk. What was the timestamp changed to for a PDF file?</p>
+</blockquote>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>2024-01-14 08:10:06</span></span></code></pre>
+<h3 id="5恶意文件在磁盘上丢弃了一些文件磁盘上的oncecmd是在哪里创建的请提供完整的路径和文件名">5、恶意文件在磁盘上丢弃了一些文件。磁盘上的“once.cmd”是在哪里创建的？请提供完整的路径和文件名。</h3>
+<blockquote>
+<p>The malicious file dropped a few files on disk. Where was “once.cmd” created on disk? Please answer with the full path along with the filename.</p>
+</blockquote>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>C:\Users\CyberJunkie\AppData\Roaming\Photo and Fax Vn\Photo and vn 1.1.2\install\F97891C\WindowsVolume\Games\once.cmd</span></span></code></pre>
+<h3 id="6恶意文件试图访问虚拟域很可能是为了检查internet连接状态它试图连接到哪个域名">6、恶意文件试图访问虚拟域，很可能是为了检查internet连接状态。它试图连接到哪个域名？</h3>
+<blockquote>
+<p>The malicious file attempted to reach a dummy domain, most likely to check the internet connection status. What domain name did it try to connect to?</p>
+</blockquote>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>www.example.com</span></span></code></pre>
+<h3 id="7恶意进程试图访问哪个ip地址">7、恶意进程试图访问哪个IP地址？</h3>
+<blockquote>
+<p>Which IP address did the malicious process try to reach out to?</p>
+</blockquote>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>93.184.216.34</span></span></code></pre>
+<h3 id="8恶意进程在用ultravnc的后门变体感染电脑后自行终止这个过程是什么时候结束的">8、恶意进程在用UltraVNC的后门变体感染电脑后自行终止。这个过程是什么时候结束的？</h3>
+<blockquote>
+<p>The malicious process terminated itself after infecting the PC with a backdoored variant of UltraVNC. When did the process terminate itself?</p>
+</blockquote>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>2024-02-14 03:41:58</span></span></code></pre>
+<h2 id="分析">分析</h2>
+<pre class="astro-code astro-code-themes github-light houston" style="--shiki-light:#24292e;--shiki-dark:#eef0f9;--shiki-light-bg:#fff;--shiki-dark-bg:#17191e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>.</span></span>
+<span class="line"><span>├── unit42.zip</span></span>
+<span class="line"><span>└── Microsoft-Windows-Sysmon-Operational.evtx</span></span></code></pre>
+<p>时间 ID 为 11 的日志表示驱动内部错误，可以通过 Windows 事件查看器进行过滤</p>
+<p><img alt="Pasted-image-20240618094622.png" loading="lazy" decoding="async" width="1215" height="856" src="/_astro/Pasted-image-20240618094622.DHuRJeh9_Z1xFBjf.webp" srcset=""></p>
+<p>事件 ID：11，事件数：<code>56</code></p>
+<p>过滤事件 ID：1，查看内存中创建的进程</p>
+<p><img alt="Pasted-image-20240618095354.png" loading="lazy" decoding="async" width="1788" height="1386" src="/_astro/Pasted-image-20240618095354.Cq3Ddsz9_ZG6RGQ.webp" srcset=""></p>
+<p>通常情况下 pingsender.exe 是火狐浏览器的用于遥测的程序，参数对应的域名是 mozilla.org 初步判断无恶意</p>
+<p><img alt="Pasted-image-20240618095746.png" loading="lazy" decoding="async" width="1735" height="1068" src="/_astro/Pasted-image-20240618095746.BgZpZnSp_Z2kql6U.webp" srcset=""></p>
+<p>再搜索一下文件 Hash</p>
+<p><img alt="Pasted-image-20240618095806.png" loading="lazy" decoding="async" width="2262" height="663" src="/_astro/Pasted-image-20240618095806.B_YrB5Yg_u8uQz.webp" srcset=""></p>
+<p>安全！</p>
+<p><img alt="Pasted-image-20240618095837.png" loading="lazy" decoding="async" width="1780" height="1387" src="/_astro/Pasted-image-20240618095837.Bmx8BYkh_2qwQMB.webp" srcset=""></p>
+<p>第二个进程使用同样的手法，基本信息可以看到文件路径在下载目录，并且文件名结尾是两个 <code>.exe</code> 不像是正常公司开发的软件，那么有很大的可能是下载的恶意程序</p>
+<p><img alt="Pasted-image-20240618095942.png" loading="lazy" decoding="async" width="1726" height="1069" src="/_astro/Pasted-image-20240618095942.D3SN3NrB_1GwtVh.webp" srcset=""></p>
+<p>搜索文件 Hash</p>
+<p><img alt="Pasted-image-20240618095959.png" loading="lazy" decoding="async" width="2280" height="685" src="/_astro/Pasted-image-20240618095959.DmJ8AIMe_Z1Enqq2.webp" srcset=""></p>
+<p>发现恶意程序，因此答案为：<code>C:\Users\CyberJunkie\Downloads\Preventivo24.02.14.exe.exe</code></p>
+<p>对于分发恶意软件的云驱动器应该是指云存储</p>
+<p><img alt="Pasted-image-20240618114204.png" loading="lazy" decoding="async" width="1738" height="1080" src="/_astro/Pasted-image-20240618114204.Cxwl4CrL_ZHFVgc.webp" srcset=""></p>
+<p>事件 ID 22 表示 DNS 解析</p>
+<p><img alt="Pasted-image-20240618114615.png" loading="lazy" decoding="async" width="1734" height="1065" src="/_astro/Pasted-image-20240618114615.DiV8OidO_Z1v0olB.webp" srcset=""></p>
+<p>事件 ID：15 表示文件流创建日志，可以确定云存储使用的 <code>dropbox</code> 了</p>
+<p><img alt="Pasted-image-20240618145215.png" loading="lazy" decoding="async" width="1767" height="1069" src="/_astro/Pasted-image-20240618145215.BWT8FTae_1Vf74N.webp" srcset=""></p>
+<p>事件 ID：2 表示文件时间已修改，找到 pdf 文件，修改时间为 <code>2024-01-14 08:10:06</code></p>
+<p><img alt="Pasted-image-20240618152204.png" loading="lazy" decoding="async" width="1768" height="1375" src="/_astro/Pasted-image-20240618152204.DHyICZWY_26XyP7.webp" srcset=""></p>
+<p>事件 ID：11 表示文件创建，找到 once.cmd 路径：<code>C:\Users\CyberJunkie\AppData\Roaming\Photo and Fax Vn\Photo and vn 1.1.2\install\F97891C\WindowsVolume\Games\once.cmd</code></p>
+<p><img alt="Pasted-image-20240618152316.png" loading="lazy" decoding="async" width="1767" height="1059" src="/_astro/Pasted-image-20240618152316.Ch9MxrYC_ZwO0zS.webp" srcset=""></p>
+<p>事件 ID：22 表示域名解析，找到正在尝试访问 <code>www.example.com</code></p>
+<p><img alt="Pasted-image-20240618152505.png" loading="lazy" decoding="async" width="1749" height="1062" src="/_astro/Pasted-image-20240618152505.BcOMUuJ0_Z1tVzWF.webp" srcset=""></p>
+<p>事件 ID：3 表示进程网络连接信息，找到试图访问的 IP 为：<code>93.184.216.34</code></p>
+<p><img alt="Pasted-image-20240618152743.png" loading="lazy" decoding="async" width="1762" height="1063" src="/_astro/Pasted-image-20240618152743.CwYCFauX_1aSG8N.webp" srcset=""></p>
+<p>事件 ID：5 表示进程退出，找到进程退出时间为： <code>2024-02-14 03:41:58</code></p>
+<h2 id="hints">Hints</h2>
+<ol>
+<li>Go to “Filter Current Log” and in the Event ID field type 11. Then click “Apply.”</li>
+<li>Filter events for Event ID 1. Look for any suspicious file names executing from odd directories.</li>
+<li>Event ID 22 can be used to look for any DNS Queries made by the system. Do not filter for any specific event ID; start analyzing the events from the oldest available event. If you see events related to the malicious file being created, look for an Event ID 22 event surrounding that event.</li>
+<li>Filter for Event ID 2. This event ID records any file creation time changes on any files on the system.</li>
+<li>Filter for Event ID 11 and note the files created where the Image name is the name of the malicious file.</li>
+<li>Filter for Event ID 22 and look for the image field. The process name should be the malicious file making the connection.</li>
+<li>Look for Event ID 3. It records the IP address, port, and the process trying to make the connection.</li>
+<li>Filter for Event ID 5 and look for the Image name, which should be the malicious process.</li>
+</ol>
+</div></div><aside class="toc" data-toc hidden aria-label="目录" data-astro-cid-sgg5joot><p class="toc-label" data-astro-cid-sgg5joot>目录</p><nav class="toc-nav" data-toc-nav data-astro-cid-sgg5joot></nav></aside></div></article></main><footer data-astro-cid-jo6i4kqk><div class="inner" data-astro-cid-jo6i4kqk><p class="line" data-astro-cid-jo6i4kqk>© 2026 Zumpyx</p><p class="note" data-astro-cid-jo6i4kqk>notes · exploit · write · repeat</p></div></footer><script type="module">function e(e){return e.trim().toLowerCase().replace(/\s+/g,`-`).replace(/[^\w\u4e00-\u9fff-]+/g,``).replace(/-+/g,`-`).replace(/^-|-$/g,``)||`section`}var t=null;function n(){let n=document.querySelector(`[data-article-content]`),r=document.querySelector(`[data-toc]`),i=document.querySelector(`[data-toc-nav]`);if(!n||!r||!i)return;t?.disconnect(),t=null,i.replaceChildren();let a=Array.from(n.querySelectorAll(`h2, h3`)).filter(e=>(e.textContent??``).trim().length>0);if(a.length===0){r.hidden=!0;return}r.hidden=!1;let o=new Set,s=[];for(let t of a){let n=t.id;if(!n){let r=e(t.textContent??``);n=r;let i=2;for(;o.has(n)||document.getElementById(n);)n=`${r}-${i}`,i+=1;t.id=n}o.add(n);let r=document.createElement(`a`);r.href=`#${n}`,r.textContent=(t.textContent??``).trim(),r.className=t.tagName===`H3`?`toc-h3`:`toc-h2`,r.dataset.target=n,i.appendChild(r),s.push(r)}let c=e=>{for(let t of s)t.classList.toggle(`active`,t.dataset.target===e)};t=new IntersectionObserver(e=>{let t=e.filter(e=>e.isIntersecting).sort((e,t)=>e.target.offsetTop-t.target.offsetTop);t[0]&&c(t[0].target.id)},{rootMargin:`-15% 0px -70% 0px`,threshold:[0,1]});for(let e of a)t.observe(e);location.hash?c(decodeURIComponent(location.hash.slice(1))):a[0]&&c(a[0].id)}n(),document.addEventListener(`article-content-unlocked`,()=>{n()});</script></body></html>
